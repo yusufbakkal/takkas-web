@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Eşleşmeler - TAKKAS</title>
+    <meta name="description" content="TAKKAS - Araç eşleştirme platformu">
+    <meta name="keywords" content="araç takası, araba değişimi, araç eşleştirme">
+    <meta property="og:title" content="TAKKAS - Eşleşmeler">
+    <meta property="og:description" content="Araç eşleştirme platformu">
+    <meta property="og:image" content="assets/images/og-image.jpg">
+    
+    <!-- CSS Bağlantıları -->
+    <link rel="stylesheet" href="assets/css/base.css">
+    <link rel="stylesheet" href="assets/css/navbar.css">
+    <link rel="stylesheet" href="assets/css/matches.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <!-- Sadece Navbar bileşeni -->
+    <div id="navbar-component"></div>
+
+    <main>
+        <div class="matches-container">
+            <!-- Swipe container'ı sola al -->
+            <div class="swipe-container">
+                <div class="card-stack">
+                    <div class="card">
+                        <div class="card-image">
+                            <!-- Görseller için slider -->
+                            <div class="image-slider">
+                                <div class="slider-images">
+                                    <img src="https://images.unsplash.com/photo-1617814076367-b759c7d7e738" alt="Araç 1">
+                                    <img src="https://images.unsplash.com/photo-1580273916550-e323be2ae537" alt="Araç 2">
+                                    <img src="https://images.unsplash.com/photo-1614162692292-7ac56d7f7f1e" alt="Araç 3">
+                                </div>
+                                <div class="slider-indicators">
+                                    <div class="indicator active"></div>
+                                    <div class="indicator"></div>
+                                    <div class="indicator"></div>
+                                </div>
+                                <!-- Slider Butonları -->
+                                <button class="slider-nav prev">
+                                    <i class="fas fa-chevron-left"></i>
+                                </button>
+                                <button class="slider-nav next">
+                                    <i class="fas fa-chevron-right"></i>
+                                </button>
+                            </div>
+                            <div class="card-gradient"></div>
+                        </div>
+                        <div class="card-content">
+                            <div class="card-info">
+                                <h2>BMW M4 Competition</h2>
+                                <p class="car-type">Spor Araç</p>
+                                <div class="car-specs">
+                                    <span><i class="fas fa-calendar"></i> 2023</span>
+                                    <span><i class="fas fa-road"></i> 15,000 km</span>
+                                    <span><i class="fas fa-gas-pump"></i> Benzin</span>
+                                </div>
+                                <div class="car-price">₺2,450,000</div>
+                            </div>
+                        </div>
+                        <!-- Butonlar kartın içinde -->
+                        <div class="action-buttons">
+                            <button class="action-button reject">
+                                <i class="fas fa-times"></i>
+                            </button>
+                            <button class="action-button like">
+                                <i class="fas fa-heart"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Matches Listesi sağa alındı -->
+            <div class="matches-sidebar">
+                <div class="matches-header">
+                    <h2>Eşleşmeler</h2>
+                </div>
+                <div class="matches-list">
+                    <!-- Eşleşme Kartları - badge kaldırıldı -->
+                    <div class="match-card">
+                        <div class="match-image">
+                            <img src="https://images.unsplash.com/photo-1618851142562-03c06812d9a4" alt="Araç">
+                        </div>
+                        <div class="match-info">
+                            <h3>BMW 520i</h3>
+                            <p>İstanbul</p>
+                        </div>
+                    </div>
+
+                    <div class="match-card">
+                        <div class="match-image">
+                            <img src="https://images.unsplash.com/photo-1617814076367-b759c7d7e738" alt="Araç">
+                        </div>
+                        <div class="match-info">
+                            <h3>Mercedes C200</h3>
+                            <p>Ankara</p>
+                        </div>
+                    </div>
+
+                    <!-- Diğer eşleşmeler buraya eklenebilir -->
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // Sadece navbar'ı yükle
+        fetch('components/navbar.html')
+            .then(response => response.text())
+            .then(data => {
+                document.getElementById('navbar-component').innerHTML = data;
+            });
+    </script>
+    <script src="assets/js/matches.js"></script>
+</body>
+</html> 

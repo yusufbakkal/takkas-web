@@ -1,0 +1,142 @@
+<nav class="sidebar">
+    <div class="sidebar-content">
+        <div class="brand">
+            <a href="index.html" class="logo">
+                <img src="assets/images/logo.png" alt="TAKKAS" class="logo-icon" width="32" height="32" loading="lazy">
+                <span class="logo-text">TAKKAS</span>
+            </a>
+        </div>
+
+        <div class="nav-links">
+            <a href="index.html" class="nav-link">
+                <i class="fas fa-th-large"></i>
+                <span>Ana Sayfa</span>
+            </a>
+            <a href="matches.html" class="nav-link">
+                <i class="fas fa-handshake"></i>
+                <span>Eşleşmeler</span>
+            </a>
+            <a href="cars.html" class="nav-link">
+                <i class="fas fa-car"></i>
+                <span>Araba</span>
+            </a>
+            <a href="properties.html" class="nav-link">
+                <i class="fas fa-building"></i>
+                <span>Emlak</span>
+            </a>
+            <a href="create-listing.html" class="nav-link">
+                <i class="fas fa-plus-circle"></i>
+                <span>İlan Ver</span>
+            </a>
+            <a href="messages.html" class="nav-link">
+                <i class="fas fa-comment"></i>
+                <span>Mesajlar</span>
+            </a>
+        </div>
+
+        <div class="nav-footer">
+            <a href="settings.html" class="nav-link">
+                <i class="fas fa-cog"></i>
+                <span>Ayarlar</span>
+            </a>
+            <a href="#" class="nav-link" id="logoutLink" onclick="handleLogout(); return false;">
+                <i class="fas fa-sign-out-alt"></i>
+                <span>Çıkış Yap</span>
+            </a>
+        </div>
+    </div>
+</nav>
+
+<style>
+.nav-link {
+    cursor: pointer; /* Change cursor to pointer on hover */
+}
+</style>
+
+<script>
+    // Çıkış işlemini gerçekleştiren fonksiyon - global kapsamda tanımlandı
+    function handleLogout() {
+        // LocalStorage'dan kullanıcı verilerini temizle
+        localStorage.removeItem('authToken');
+        localStorage.removeItem('userData');
+        
+        // Kullanıcıyı giriş sayfasına yönlendir
+        alert('Çıkış yapıldı!');
+        
+        // Yönlendirme yolunu düzelt
+        const currentPath = window.location.pathname;
+        
+        // Eğer zaten ana sayfadaysak
+        if (currentPath.endsWith('/index.html') || currentPath.endsWith('/')) {
+            window.location.href = 'pages/signin.html';
+        } else {
+            // Alt sayfadaysak
+            window.location.href = '../pages/signin.html';
+        }
+    }
+
+    // Ana sayfada main.js zaten yüklü, burada sadece çıkış butonunu dinleyelim
+    document.addEventListener('DOMContentLoaded', function() {
+        // Dropdown menüdeki çıkış butonu
+        const logoutBtn = document.getElementById('logoutBtn');
+        if (logoutBtn) {
+            logoutBtn.addEventListener('click', handleLogout);
+        }
+        
+        // Sidebar'daki çıkış linki
+        const logoutLink = document.getElementById('logoutLink');
+        if (logoutLink) {
+            logoutLink.addEventListener('click', handleLogout);
+        }
+        
+        // Kullanıcı oturum durumunu kontrol et ve UI'ı güncelle
+        const authToken = localStorage.getItem('authToken');
+        const userDataString = localStorage.getItem('userData');
+        
+        if (authToken && userDataString) {
+            try {
+                // Kullanıcı verilerini parse et
+                const userData = JSON.parse(userDataString);
+                
+                // Kullanıcı adını göster
+                const userNameElements = document.querySelectorAll('.user-name');
+                userNameElements.forEach(element => {
+                    element.textContent = userData.name || 'Kullanıcı';
+                });
+                
+                // Kullanıcı e-postasını göster
+                const userEmailElements = document.querySelectorAll('.user-email');
+                userEmailElements.forEach(element => {
+                    element.textContent = userData.email || '';
+                });
+                
+                // Giriş yapmış kullanıcı içeriğini göster
+                const authContent = document.querySelectorAll('.auth-content');
+                authContent.forEach(element => {
+                    element.style.display = 'block';
+                });
+                
+                // Giriş yapmamış kullanıcı içeriğini gizle
+                const unauthContent = document.querySelectorAll('.unauth-content');
+                unauthContent.forEach(element => {
+                    element.style.display = 'none';
+                });
+                
+            } catch (e) {
+                console.error('Kullanıcı verileri ayrıştırılamadı:', e);
+            }
+        } else {
+            // Giriş yapmış kullanıcı içeriğini gizle
+            const authContent = document.querySelectorAll('.auth-content');
+            authContent.forEach(element => {
+                element.style.display = 'none';
+            });
+            
+            // Giriş yapmamış kullanıcı içeriğini göster
+            const unauthContent = document.querySelectorAll('.unauth-content');
+            unauthContent.forEach(element => {
+                element.style.display = 'block';
+            });
+        }
+    });
+</script> 

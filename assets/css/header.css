@@ -1,0 +1,211 @@
+/* Header Stili */
+.header {
+    background: #fff;
+    padding: 20px 30px;
+    position: fixed;
+    width: calc(100% - 280px);
+    top: 0;
+    right: 0;
+    z-index: 1000;
+    box-shadow: 0 1px 10px rgba(0, 0, 0, 0.05);
+}
+
+.header-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+/* Arama Çubuğu Stili */
+.search-bar {
+    position: relative;
+    width: 358px;
+}
+
+.search-icon {
+    position: absolute;
+    left: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #7C7C8D;
+}
+
+.search-bar input {
+    width: 100%;
+    padding: 12px 14px 12px 44px;
+    background: #F5F4F6;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    color: #7C7C8D;
+}
+
+.header-actions {
+    display: flex;
+    align-items: center;
+    gap: 39px;
+}
+
+.notification-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #7C7C8D;
+    font-size: 20px;
+}
+
+/* Profil linki için stil */
+.header-actions a {
+    text-decoration: none;
+    display: flex;  /* Resmin etrafındaki fazla boşluğu kaldırmak için */
+}
+
+/* Mevcut profil resmi stilleri korunuyor */
+.profile-img {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    cursor: pointer;
+}
+
+/* Notification Styles */
+.notification-wrapper {
+    position: relative;
+}
+
+.notification-badge {
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    background: #FF4B4B;
+    color: white;
+    font-size: 12px;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.notification-dropdown {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    width: 320px;
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    margin-top: 10px;
+    display: none;
+    z-index: 1000;
+}
+
+.notification-dropdown.active {
+    display: block;
+}
+
+.notification-header {
+    padding: 16px;
+    border-bottom: 1px solid #E6E8EC;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.notification-header h3 {
+    font-size: 16px;
+    font-weight: 600;
+    color: #242731;
+    margin: 0;
+}
+
+.mark-all-read {
+    background: none;
+    border: none;
+    color: #A162F7;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+.notification-list {
+    max-height: 360px;
+    overflow-y: auto;
+}
+
+.notification-item {
+    padding: 16px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    border-bottom: 1px solid #E6E8EC;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.notification-item:hover {
+    background: #F8F9FA;
+}
+
+.notification-item.unread {
+    background: #F5F6FA;
+}
+
+.notification-icon {
+    width: 40px;
+    height: 40px;
+    background: #F3F5F8;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #A162F7;
+}
+
+.notification-content {
+    flex: 1;
+}
+
+.notification-text {
+    margin: 0;
+    color: #242731;
+    font-size: 14px;
+    margin-bottom: 4px;
+}
+
+.notification-time {
+    color: #7C7C8D;
+    font-size: 12px;
+}
+
+.notification-footer {
+    padding: 12px;
+    text-align: center;
+    border-top: 1px solid #E6E8EC;
+}
+
+.view-all {
+    color: #A162F7;
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+/* Responsive düzenlemeler */
+@media (max-width: 768px) {
+    .header {
+        width: 100%;
+        padding: 16px;
+    }
+
+    .search-bar {
+        width: 100%;
+        max-width: 300px;
+    }
+
+    .header-actions {
+        gap: 20px;
+    }
+} 

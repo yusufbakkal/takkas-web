@@ -1,0 +1,303 @@
+/* Ayarlar Container */
+.settings-container {
+    max-width: 1000px;
+    margin: 40px auto;
+    padding: 40px;
+    background: white;
+    border-radius: 20px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+}
+
+.settings-container h1 {
+    font-size: 24px;
+    color: #242731;
+    margin-bottom: 30px;
+}
+
+/* Tabs */
+.settings-tabs {
+    display: flex;
+    gap: 20px;
+    border-bottom: 1px solid #E6E8EC;
+    margin-bottom: 30px;
+}
+
+.tab-btn {
+    padding: 10px 0;
+    background: none;
+    border: none;
+    color: #72767C;
+    font-size: 14px;
+    cursor: pointer;
+    position: relative;
+}
+
+.tab-btn.active {
+    color: #FF6370;
+}
+
+.tab-btn.active::after {
+    content: '';
+    position: absolute;
+    bottom: -1px;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background: #FF6370;
+}
+
+/* Tab İçerikleri */
+.tab-content {
+    display: none;
+}
+
+.tab-content.active {
+    display: block;
+}
+
+/* Form Styles */
+.settings-form {
+    display: flex;
+    flex-direction: column;
+    gap: 40px;
+}
+
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 40px;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.form-group.full-width {
+    grid-column: 1 / -1;
+}
+
+.form-group label {
+    font-size: 14px;
+    color: #242731;
+}
+
+.input-icon {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.input-icon i:first-child {
+    position: absolute;
+    left: 12px;
+    color: #72767C;
+}
+
+.input-icon input {
+    width: 100%;
+    padding: 12px 40px; /* Sağ ve sol tarafta ikonlar için boşluk */
+    border: 1px solid #E6E8EC;
+    border-radius: 8px;
+    font-size: 14px;
+}
+
+.toggle-password {
+    position: absolute;
+    right: 12px;
+    color: #72767C;
+    cursor: pointer;
+    background: none;
+    border: none;
+    padding: 0;
+}
+
+/* Kilit ikonunu içeri kaydır */
+.input-icon .fa-lock {
+    left: 12px;
+}
+
+/* Placeholder text'i input focus olduğunda kaybolsun */
+.input-icon input:focus::placeholder {
+    color: transparent;
+}
+
+/* Input'un value değeri varken placeholder'ı gizle */
+.input-icon input:not(:placeholder-shown) {
+    color: #242731;
+}
+
+/* Input focus olduğunda stil */
+.input-icon input:focus {
+    outline: none;
+    border-color: #FF6370;
+    background: white;
+}
+
+/* Photo Section */
+.photo-section {
+    padding: 24px;
+    background: #F9F9F9;
+    border-radius: 10px;
+}
+
+.photo-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 20px;
+}
+
+.photo-header h3 {
+    font-size: 16px;
+    color: #242731;
+    margin-bottom: 4px;
+}
+
+.photo-header p {
+    font-size: 14px;
+    color: #72767C;
+}
+
+.photo-actions {
+    display: flex;
+    gap: 12px;
+}
+
+.btn-delete,
+.btn-update {
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+.btn-delete {
+    background: white;
+    border: 1px solid #E6E8EC;
+    color: #72767C;
+}
+
+.btn-update {
+    background: #FF6370;
+    border: none;
+    color: white;
+}
+
+.photo-preview img {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+/* Social Section */
+.social-section {
+    margin-top: 40px;
+}
+
+.social-section h3 {
+    font-size: 16px;
+    color: #242731;
+    margin-bottom: 16px;
+}
+
+/* Textarea Stili */
+textarea {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #E6E8EC;
+    border-radius: 10px;
+    font-size: 14px;
+    color: #242731;
+    background: #F5F5F5;
+    resize: vertical;
+}
+
+/* Checkbox Stili */
+.checkbox-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+}
+
+.checkbox-description {
+    font-size: 12px;
+    color: #72767C;
+    margin-top: 4px;
+    margin-left: 24px;
+}
+
+input[type="checkbox"] {
+    width: 16px;
+    height: 16px;
+    accent-color: #FF6370;
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+    .settings-container {
+        margin: 20px;
+        padding: 30px;
+    }
+
+    .form-row {
+        grid-template-columns: 1fr;
+    }
+
+    .settings-tabs {
+        overflow-x: auto;
+        padding-bottom: 10px;
+    }
+
+    .photo-header {
+        flex-direction: column;
+        gap: 16px;
+    }
+
+    .photo-actions {
+        width: 100%;
+    }
+
+    .btn-delete,
+    .btn-update {
+        flex: 1;
+        text-align: center;
+    }
+}
+
+/* Section başlıkları arası boşluk */
+.settings-content h2 {
+    margin-bottom: 16px;
+}
+
+.settings-description {
+    margin-bottom: 40px;
+}
+
+.social-section .form-group {
+    margin-bottom: 24px;
+}
+
+/* Hover durumları */
+.btn-update:hover {
+    background: #ff4957; /* Biraz daha koyu tonu */
+}
+
+/* Şifre gücü göstergesi renkleri */
+.strength-bar.weak::before {
+    width: 33%;
+    background: #ff4444;
+}
+
+.strength-bar.medium::before {
+    width: 66%;
+    background: #ffb74b;
+}
+
+.strength-bar.strong::before {
+    width: 100%;
+    background: #4CAF50;
+} 

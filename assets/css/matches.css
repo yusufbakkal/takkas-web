@@ -1,0 +1,523 @@
+.matches-container {
+    display: flex;
+    height: 100vh;
+    margin-left: 280px;
+    margin-top: -50px; /* Yukarı kaydırmak için negatif margin ekledik */
+    background: #f5f7fa;
+    justify-content: center;
+    align-items: center;
+    padding: 0 40px;
+    gap: 40px;
+}
+
+/* Matches Sidebar - Sağda */
+.matches-sidebar {
+    width: 450px;
+    background: white;
+    border-radius: 20px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+    display: flex;
+    flex-direction: column;
+    height: 700px; /* Kart yüksekliğiyle aynı */
+    margin-left: 40px;
+}
+
+.matches-header {
+    padding: 24px;
+    border-bottom: 1px solid #f0f2f5;
+}
+
+.matches-header h2 {
+    font-size: 22px;
+    color: #242731;
+    margin: 0;
+    font-weight: 600;
+}
+
+.matches-list {
+    flex: 1;
+    overflow-y: auto;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+/* Eşleşme Kartları */
+.match-card {
+    display: flex;
+    gap: 16px;
+    padding: 16px;
+    background: #f8f9fa;
+    border-radius: 16px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.match-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    background: white;
+}
+
+.match-image {
+    width: 90px;
+    height: 90px;
+    border-radius: 12px;
+    overflow: hidden;
+    background: #eef0f2;
+}
+
+.match-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+}
+
+.match-info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.match-info h3 {
+    font-size: 18px;
+    color: #242731;
+    margin: 0 0 4px 0;
+    font-weight: 600;
+}
+
+.match-info p {
+    margin: 0;
+    font-size: 14px;
+    color: #72767C;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.match-info p i {
+    font-size: 14px;
+    color: #A162F7;
+}
+
+/* Scrollbar stilleri */
+.matches-list::-webkit-scrollbar {
+    width: 6px;
+}
+
+.matches-list::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 3px;
+}
+
+.matches-list::-webkit-scrollbar-thumb {
+    background: #c5c7cd;
+    border-radius: 3px;
+}
+
+.matches-list::-webkit-scrollbar-thumb:hover {
+    background: #a1a3a9;
+}
+
+/* Ana Swipe Alanı */
+.swipe-container {
+    width: 500px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    height: 85vh; /* Yüksekliği biraz azalttık */
+}
+
+.card-stack {
+    width: 100%;
+    height: 100%;
+    position: relative;
+}
+
+.card-container {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    will-change: transform;
+    transform: translateZ(0);
+}
+
+.card {
+    position: relative;
+    transition: transform 0.3s ease, opacity 0.3s ease;
+    cursor: grab;
+    user-select: none;
+    transform-origin: bottom;
+    width: 100%;
+    height: 100%;
+    background: white;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+}
+
+.card-image {
+    width: 100%;
+    height: 100%;
+    position: relative;
+    background: #f5f5f5; /* Görsel yüklenene kadar arka plan */
+}
+
+.card-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+    will-change: transform;
+    transform: translateZ(0);
+    backface-visibility: hidden;
+}
+
+.card-gradient {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 50%;
+    background: linear-gradient(to top, rgba(0,0,0,0.8), transparent);
+}
+
+.card-content {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 20px;
+    color: white;
+    padding-bottom: 120px; /* Action butonları için daha fazla alan bırak */
+}
+
+.card-info h2 {
+    font-size: 28px;
+    margin: 0 0 8px 0;
+}
+
+.car-type {
+    font-size: 18px;
+    opacity: 0.9;
+    margin-bottom: 12px;
+}
+
+.car-specs {
+    display: flex;
+    gap: 16px;
+    margin-bottom: 12px;
+    font-size: 16px;
+}
+
+.car-specs span {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.car-price {
+    font-size: 24px;
+    font-weight: 600;
+}
+
+/* Action butonları kartın içinde */
+.action-buttons {
+    position: absolute;
+    bottom: 40px;
+    left: 0;
+    right: 0;
+    display: flex;
+    justify-content: center;
+    gap: 24px;
+    z-index: 3;
+}
+
+.action-button {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    background: rgba(255, 255, 255, 0.3);
+    backdrop-filter: blur(8px);
+    transition: all 0.2s ease;
+}
+
+/* Butonların hover efektleri */
+.action-button:hover {
+    transform: scale(1.1);
+    background: rgba(255, 255, 255, 0.4);
+}
+
+.action-button.reject {
+    color: #FF4B4B;
+}
+
+.action-button.like {
+    color: #FF6370;
+}
+
+/* Kart animasyonları */
+.card-container.removed {
+    display: none;
+}
+
+.card-container.swipe-left {
+    transform: translateX(-120%) rotate(-20deg);
+    opacity: 0;
+}
+
+.card-container.swipe-right {
+    transform: translateX(120%) rotate(20deg);
+    opacity: 0;
+}
+
+/* Responsive düzenlemeler */
+@media (max-width: 1400px) {
+    .matches-container {
+        gap: 16px;
+    }
+    .matches-sidebar {
+        width: 400px;
+    }
+    .swipe-container {
+        width: 450px;
+    }
+}
+
+@media (max-width: 1200px) {
+    .matches-container {
+        padding: 0 20px;
+    }
+    .matches-sidebar {
+        width: 350px;
+    }
+    .swipe-container {
+        width: 400px;
+    }
+}
+
+@media (max-width: 992px) {
+    .matches-container {
+        margin-left: 0;
+        padding: 0 15px;
+        flex-direction: column; /* Mobilde alt alta göster */
+    }
+    
+    .swipe-container {
+        width: 100%;
+        max-width: 400px;
+        height: 500px;
+    }
+    
+    .matches-sidebar {
+        width: 100%;
+        max-width: 400px;
+        height: auto;
+        margin: 20px 0;
+    }
+
+    .matches-list {
+        max-height: 300px;
+    }
+}
+
+@media (max-width: 576px) {
+    .matches-container {
+        padding: 0 10px;
+    }
+    
+    .swipe-container {
+        height: 450px;
+    }
+    
+    .matches-sidebar {
+        max-width: 100%;
+    }
+    
+    .match-card {
+        padding: 12px;
+    }
+    
+    .match-image {
+        width: 70px;
+        height: 70px;
+    }
+    
+    .action-button {
+        width: 48px;
+        height: 48px;
+        font-size: 20px;
+    }
+}
+
+/* Slider stilleri */
+.image-slider {
+    width: 100%;
+    height: 100%;
+    position: relative;
+    overflow: hidden;
+}
+
+.slider-images {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    transition: transform 0.3s ease;
+}
+
+.slider-images img {
+    width: 100%;
+    height: 100%;
+    flex-shrink: 0;
+    object-fit: cover;
+    object-position: center;
+}
+
+/* Slider Göstergeleri */
+.slider-indicators {
+    position: absolute;
+    top: 16px;
+    left: 16px;
+    right: 16px;
+    display: flex;
+    gap: 4px;
+    z-index: 2;
+}
+
+.indicator {
+    flex: 1;
+    height: 3px;
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 2px;
+    transition: all 0.3s ease;
+}
+
+.indicator.active {
+    background: white;
+}
+
+/* Eski dot stillerini kaldır */
+.slider-dots {
+    display: none;
+}
+
+/* Slider Navigasyon Butonları */
+.slider-nav {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.8);
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #333;
+    z-index: 2;
+    transition: all 0.3s ease;
+}
+
+.slider-nav:hover {
+    background: white;
+}
+
+.slider-nav.prev {
+    left: 10px;
+}
+
+.slider-nav.next {
+    right: 10px;
+}
+
+/* Görsel hata durumu için yedek stil */
+.image-error {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #f8f8f8;
+    color: #999;
+    font-size: 24px;
+}
+
+/* Lazy loading için blur efekti */
+.lazy-image {
+    filter: blur(10px);
+    transition: filter 0.3s ease;
+}
+
+.lazy-image.loaded {
+    filter: blur(0);
+}
+
+/* Touch cihazlar için iyileştirmeler */
+@media (hover: none) {
+    .action-button:hover {
+        transform: none;
+    }
+    
+    .match-card:hover {
+        transform: none;
+    }
+}
+
+/* Sürükleme animasyonları */
+.card.dragging {
+    cursor: grabbing;
+    transition: none;
+}
+
+.card.swiping {
+    transition: transform 0.5s ease;
+}
+
+.card.swipe-left {
+    transform: translate(-150%, 0) rotate(-30deg);
+    opacity: 0;
+}
+
+.card.swipe-right {
+    transform: translate(150%, 0) rotate(30deg);
+    opacity: 0;
+}
+
+/* Swipe yönü göstergesi */
+.swipe-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 32px;
+    font-weight: bold;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+    z-index: 10;
+    pointer-events: none;
+}
+
+.swipe-overlay.like {
+    background: rgba(0, 255, 0, 0.2);
+    color: #00ff00;
+}
+
+.swipe-overlay.nope {
+    background: rgba(255, 0, 0, 0.2);
+    color: #ff0000;
+} 

@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Emlak - TAKKAS</title>
+    
+    <!-- CSS Bağlantıları -->
+    <link rel="stylesheet" href="assets/css/base.css">
+    <link rel="stylesheet" href="assets/css/header.css">
+    <link rel="stylesheet" href="assets/css/navbar.css">
+    <link rel="stylesheet" href="assets/css/properties.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <!-- Header Bileşeni -->
+    <div id="header-component"></div>
+
+    <!-- Navbar Bileşeni -->
+    <div id="navbar-component"></div>
+
+    <!-- Ana İçerik -->
+    <main>
+        <div class="property-grid" id="propertyGrid">
+            <!-- Emlak kartları dinamik olarak buraya eklenecek -->
+        </div>
+        <div class="loading-spinner" id="loadingSpinner">
+            <div class="spinner"></div>
+        </div>
+    </main>
+
+    <!-- JavaScript -->
+    <script>
+        // Bileşenleri yükle
+        fetch('components/header.html')
+            .then(response => response.text())
+            .then(data => {
+                document.getElementById('header-component').innerHTML = data;
+            });
+
+        fetch('components/navbar.html')
+            .then(response => response.text())
+            .then(data => {
+                document.getElementById('navbar-component').innerHTML = data;
+            });
+
+        // Değişkenler
+        let page = 1;
+        const itemsPerPage = 8;
+        let loading = false;
+
+        // Simüle edilmiş API çağrısı
+        async function fetchProperties(pageNumber) {
+            return new Promise((resolve) => {
+                setTimeout(() => {
+                    const properties = Array(8).fill().map((_, index) => ({
+                        id: (pageNumber - 1) * 8 + index + 1,
+                        title: ['Lüks Villa', 'Modern Daire', 'Deniz Manzaralı', 'Bahçeli Ev'][index % 4],
+                        type: ['Villa', 'Daire', 'Rezidans', 'Müstakil'][index % 4],
+                        image: `https://picsum.photos/seed/${(pageNumber - 1) * 8 + index}/400/250`,
+                        rooms: `${2 + (index % 4)} + 1`,
+                        size: `${100 + (index * 25)}m²`,
+                        price: 1000000 + ((pageNumber - 1) * 8 + index) * 500000
+                    }));
+                    resolve(properties);
+                }, 500);
+            });
+        }
+
+        // Emlak kartı HTML'i oluştur
+        function createPropertyCard(property) {
+            return `
+                <article class="property-card">
+                    <div class="property-content">
+                        <header class="property-header">
+                            <div class="property-title-row">
+                                <h2 class="property-name">${property.title}</h2>
+                                <button class="property-favorite" aria-label="Favorilere ekle">
+                                    <i class="far fa-heart"></i>
+                                </button>
+                            </div>
+                            <p class="property-type">${property.type}</p>
+                        </header>
+                        <img src="${property.image}" alt="${property.title}" class="property-image">
+                        <footer class="property-details">
+                            <div class="property-specs">
+                                <div class="spec-item">
+                                    <i class="fas fa-bed spec-icon"></i>
+                                    <span>${property.rooms}</span>
+                                </div>
+                            </div>
+                            <p class="property-price">
+                                <span class="price-amount">${property.price.toLocaleString()} TL</span>
+                            </p>
+                        </footer>
+                    </div>
+                </article>
+            `;
+        }
+
+        // Emlakları yükle
+        async function loadProperties() {
+            if (loading) return;
+            loading = true;
+
+            const spinner = document.getElementById('loadingSpinner');
+            spinner.classList.add('active');
+
+            try {
+                const newProperties = await fetchProperties(page);
+                const propertyGrid = document.getElementById('propertyGrid');
+                
+                for (let i = 0; i < newProperties.length; i += 4) {
+                    const rowProperties = newProperties.slice(i, i + 4);
+                    const propertyRow = document.createElement('div');
+                    propertyRow.className = 'property-row';
+                    
+                    rowProperties.forEach(property => {
+                        propertyRow.innerHTML += createPropertyCard(property);
+                    });
+
+                    propertyGrid.appendChild(propertyRow);
+                }
+
+                page++;
+            } catch (error) {
+                console.error('Emlaklar yüklenirken hata oluştu:', error);
+            } finally {
+                loading = false;
+                spinner.classList.remove('active');
+            }
+        }
+
+        // Scroll olayını dinle
+        function handleScroll() {
+            const { scrollTop, scrollHeight, clientHeight } = document.documentElement;
+            if (!loading && (scrollHeight - scrollTop - clientHeight) < 300) {
+                loadProperties();
+            }
+        }
+
+        // Sayfa yüklendiğinde ilk emlakları yükle
+        document.addEventListener('DOMContentLoaded', loadProperties);
+        
+        // Scroll event listener
+        let ticking = false;
+        window.addEventListener('scroll', function() {
+            if (!ticking) {
+                window.requestAnimationFrame(function() {
+                    handleScroll();
+                    ticking = false;
+                });
+                ticking = true;
+            }
+        });
+
+        // Favoriye ekleme fonksiyonu
+        document.addEventListener('click', function(e) {
+            if (e.target.closest('.property-favorite')) {
+                const button = e.target.closest('.property-favorite');
+                button.classList.toggle('active');
+                const icon = button.querySelector('i');
+                icon.classList.toggle('far');
+                icon.classList.toggle('fas');
+            }
+        });
+    </script>
+</body>
+</html> 

@@ -1,0 +1,125 @@
+/* Dikey Navbar Stili */
+.sidebar {
+    background: #fff;
+    width: 280px;
+    height: 100vh;
+    position: fixed;
+    left: 0;
+    top: 0;
+    padding: 24px;
+    box-shadow: 1px 0 10px rgba(0, 0, 0, 0.05);
+    display: flex;
+    flex-direction: column;
+}
+
+.sidebar-content {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.brand {
+    margin-bottom: 40px;
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    text-decoration: none;
+}
+
+.logo-icon {
+    width: 32px;
+    height: 32px;
+    background: #A162F7;
+    padding: 6px;
+    border-radius: 8px;
+}
+
+.logo-text {
+    font-size: 24px;
+    font-weight: 700;
+    color: #1F2128;
+}
+
+.nav-links {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: auto;
+}
+
+.nav-link {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px;
+    color: #5F6165;
+    text-decoration: none;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+}
+
+.nav-link i {
+    font-size: 20px;
+    width: 24px;
+    text-align: center;
+}
+
+.nav-link span {
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.nav-link:hover,
+.nav-link.active {
+    background: #F3F5F8;
+    color: #1F2128;
+}
+
+.nav-footer {
+    margin-top: auto;
+    padding-top: 24px;
+    border-top: 1px solid #F3F5F8;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.nav-footer .nav-link {
+    color: #5F6165;
+}
+
+.nav-footer .nav-link:last-child {
+    color: #FF6B6B;
+}
+
+.nav-footer .nav-link:last-child:hover {
+    background: rgba(255, 107, 107, 0.1);
+    color: #FF6B6B;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .sidebar {
+        height: auto;
+    }
+
+    .nav-links {
+        flex-direction: row;
+        overflow-x: auto;
+        padding-bottom: 8px;
+        margin-bottom: 24px;
+    }
+
+    .nav-link span {
+        display: none;
+    }
+
+    .nav-footer {
+        flex-direction: row;
+        justify-content: center;
+        padding-top: 16px;
+    }
+} 

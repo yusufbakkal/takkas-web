@@ -1,0 +1,30 @@
+/* Kayıt ol butonu */
+.register-btn {
+    width: 100%;
+    padding: 12px;
+    background-color: #FF6370 !important;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.3s ease;
+}
+
+/* Google ile kayıt ol butonu */
+.google-register-btn {
+    width: 100%;
+    padding: 12px;
+    background: white;
+    color: #333;
+    border: 1px solid #E6E8EC;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 500;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+} 
