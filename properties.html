@@ -121,12 +121,12 @@
             const price = property.price || 0;
             
             return `
-                <article class="property-card">
+                <article class="property-card" onclick="window.location.href='property-detail.html?id=${property.id}'">
                     <div class="property-content">
                         <header class="property-header">
                             <div class="property-title-row">
                                 <h2 class="property-name">${title}</h2>
-                                <button class="property-favorite" aria-label="Favorilere ekle">
+                                <button class="property-favorite" aria-label="Favorilere ekle" onclick="event.stopPropagation()">
                                     <i class="far fa-heart"></i>
                                 </button>
                             </div>
