@@ -80,12 +80,14 @@
     border-radius: 8px;
     overflow: hidden;
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    height: 400px; /* Sabit yükseklik */
 }
 
 .property-main-image img {
     width: 100%;
-    height: auto;
+    height: 100%;
     display: block;
+    object-fit: cover; /* Görsel oranını koruyarak kaplar */
 }
 
 .image-counter {
@@ -114,6 +116,7 @@
     cursor: pointer;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
     transition: background-color 0.2s;
+    z-index: 10; /* Butonların üstte kalmasını sağlar */
 }
 
 .image-nav:hover {
@@ -133,6 +136,21 @@
     gap: 10px;
     overflow-x: auto;
     padding-bottom: 10px;
+    scrollbar-width: thin;
+    scrollbar-color: #ccc transparent;
+}
+
+.property-thumbnails::-webkit-scrollbar {
+    height: 6px;
+}
+
+.property-thumbnails::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.property-thumbnails::-webkit-scrollbar-thumb {
+    background-color: #ccc;
+    border-radius: 6px;
 }
 
 .property-thumbnail {
@@ -142,13 +160,20 @@
     overflow: hidden;
     cursor: pointer;
     opacity: 0.7;
-    transition: opacity 0.2s;
+    transition: opacity 0.2s, transform 0.2s;
     border: 2px solid transparent;
+    flex-shrink: 0; /* Küçük resimlerin sıkışmasını önler */
+}
+
+.property-thumbnail:hover {
+    opacity: 0.9;
+    transform: translateY(-2px);
 }
 
 .property-thumbnail.active {
     opacity: 1;
     border-color: #007bff;
+    transform: translateY(-2px);
 }
 
 .property-thumbnail img {
@@ -184,9 +209,15 @@
     cursor: pointer;
     font-size: 20px;
     color: #ccc;
+    transition: transform 0.2s;
 }
 
-.favorite-button i.favorited {
+.favorite-button:hover {
+    transform: scale(1.1);
+}
+
+.favorite-button i.favorited,
+.favorite-button i.fas {
     color: #ff4d4d;
 }
 
@@ -248,7 +279,7 @@
     font-weight: 500;
     cursor: pointer;
     margin-bottom: 10px;
-    transition: background-color 0.2s;
+    transition: all 0.2s;
 }
 
 .contact-button i {
@@ -262,6 +293,8 @@
 
 .phone-button:hover {
     background-color: #0069d9;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
 .message-button {
@@ -272,6 +305,8 @@
 
 .message-button:hover {
     background-color: #e9ecef;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
 }
 
 /* Uyarı Kutusu */
@@ -289,6 +324,7 @@
 .warning-box i {
     font-size: 20px;
     margin-bottom: 10px;
+    color: #ffc107;
 }
 
 .warning-box p {
@@ -300,12 +336,19 @@
     text-decoration: none;
     display: flex;
     align-items: center;
+    transition: color 0.2s;
+}
+
+.details-link:hover {
+    color: #0056b3;
+    text-decoration: underline;
 }
 
 .details-link i {
     font-size: 12px;
     margin-left: 5px;
     margin-bottom: 0;
+    color: #007bff;
 }
 
 /* İlan Detayları Bölümü */
@@ -335,6 +378,13 @@
 .detail-item {
     display: flex;
     flex-direction: column;
+    padding: 10px;
+    border-radius: 4px;
+    transition: background-color 0.2s;
+}
+
+.detail-item:hover {
+    background-color: #f8f9fa;
 }
 
 .detail-label {
@@ -365,17 +415,29 @@
 }
 
 /* Responsive Tasarım */
-@media (max-width: 768px) {
+@media (max-width: 992px) {
     .property-main-content {
         flex-direction: column;
     }
 
     .property-sidebar {
         width: 100%;
+        order: -1; /* Mobil görünümde sidebar'ı üste taşır */
+        margin-bottom: 20px;
     }
+    
+    .property-main-image {
+        height: 350px;
+    }
+}
 
+@media (max-width: 768px) {
     .property-details-grid {
         grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    }
+    
+    .property-main-image {
+        height: 300px;
     }
 }
 
@@ -391,5 +453,13 @@
     .image-nav {
         width: 30px;
         height: 30px;
+    }
+    
+    .property-main-image {
+        height: 250px;
+    }
+    
+    .price-amount {
+        font-size: 20px;
     }
 } 

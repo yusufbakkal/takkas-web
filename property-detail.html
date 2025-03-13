@@ -305,16 +305,30 @@
             const thumbnailsContainer = document.getElementById('propertyThumbnails');
             thumbnailsContainer.innerHTML = '';
 
-            // 5 adet placeholder görsel oluştur
-            for (let i = 1; i <= 5; i++) {
+            // Gerçek ev görselleri
+            const houseImages = [
+                'https://images.unsplash.com/photo-1580587771525-78b9dba3b914?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
+                'https://images.unsplash.com/photo-1583608205776-bfd35f0d9f83?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
+                'https://images.unsplash.com/photo-1568605114967-8130f3a36994?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
+                'https://images.unsplash.com/photo-1576941089067-2de3c901e126?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
+                'https://images.unsplash.com/photo-1512917774080-9991f1c4c750?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80'
+            ];
+
+            // Ana görseli ayarla
+            document.getElementById('mainPropertyImage').src = houseImages[0];
+            document.getElementById('mainPropertyImage').alt = 'Emlak Görseli 1';
+
+            // 5 adet gerçek görsel oluştur
+            for (let i = 0; i < houseImages.length; i++) {
                 const thumbnail = document.createElement('div');
                 thumbnail.className = 'property-thumbnail';
-                if (i === 1) thumbnail.classList.add('active');
+                if (i === 0) thumbnail.classList.add('active');
 
                 const img = document.createElement('img');
-                img.src = `https://via.placeholder.com/150x100/e0e0e0/333333?text=Görsel+${i}`;
-                img.alt = `Emlak Görseli ${i}`;
-                img.dataset.index = i;
+                img.src = houseImages[i];
+                img.alt = `Emlak Görseli ${i + 1}`;
+                img.dataset.index = i + 1;
+                img.dataset.fullImage = houseImages[i];
 
                 thumbnail.appendChild(img);
                 thumbnailsContainer.appendChild(thumbnail);
@@ -325,13 +339,13 @@
                     this.classList.add('active');
                     
                     const index = img.dataset.index;
-                    document.getElementById('mainPropertyImage').src = `https://via.placeholder.com/800x600/e0e0e0/333333?text=Emlak+G%C3%B6rseli+${index}`;
+                    document.getElementById('mainPropertyImage').src = img.dataset.fullImage;
                     document.getElementById('currentImageIndex').textContent = index;
                 });
             }
 
             // Toplam görsel sayısını güncelle
-            document.getElementById('totalImages').textContent = '5';
+            document.getElementById('totalImages').textContent = houseImages.length.toString();
 
             // Önceki ve sonraki görsel butonları
             document.getElementById('prevImage').addEventListener('click', function() {
@@ -356,11 +370,17 @@
             }
             
             document.getElementById('currentImageIndex').textContent = newIndex;
-            document.getElementById('mainPropertyImage').src = `https://via.placeholder.com/800x600/e0e0e0/333333?text=Emlak+G%C3%B6rseli+${newIndex}`;
             
             // Küçük resimlerdeki aktif sınıfını güncelle
-            document.querySelectorAll('.property-thumbnail').forEach(thumb => thumb.classList.remove('active'));
-            document.querySelectorAll('.property-thumbnail img')[newIndex - 1].parentElement.classList.add('active');
+            const thumbnails = document.querySelectorAll('.property-thumbnail');
+            thumbnails.forEach(thumb => thumb.classList.remove('active'));
+            
+            const activeThumb = thumbnails[newIndex - 1];
+            activeThumb.classList.add('active');
+            
+            // Ana görseli güncelle
+            const activeImg = activeThumb.querySelector('img');
+            document.getElementById('mainPropertyImage').src = activeImg.dataset.fullImage;
         }
 
         // Favoriye ekleme/çıkarma
