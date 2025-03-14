@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>İlan Detayı - TAKKAS</title>
+    
+    <!-- CSS Bağlantıları -->
+    <link rel="stylesheet" href="assets/css/base.css">
+    <link rel="stylesheet" href="assets/css/property-detail-header.css">
+    <link rel="stylesheet" href="assets/css/footer.css">
+    <link rel="stylesheet" href="assets/css/property-detail.css">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <!-- Özel Header Bileşeni -->
+    <div id="header-component"></div>
+
+    <!-- Ana İçerik -->
+    <main class="property-detail-container">
+        <div class="loading-spinner" id="loadingSpinner">
+            <div class="spinner"></div>
+        </div>
+
+        <div class="property-detail" id="propertyDetail">
+            <!-- İlan detayları dinamik olarak buraya eklenecek -->
+        </div>
+
+        <div class="similar-properties">
+            <h2>Benzer İlanlar</h2>
+            <div class="property-grid" id="similarPropertiesGrid">
+                <!-- Benzer emlak kartları dinamik olarak buraya eklenecek -->
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer Bileşeni -->
+    <div id="footer-component"></div>
+
+    <!-- JavaScript -->
+    <script>
+        // Bileşenleri yükle
+        Promise.all([
+            fetch('components/property-detail-header.html').then(response => response.text()),
+            fetch('components/footer.html').then(response => response.text())
+        ]).then(([header, footer]) => {
+            document.getElementById('header-component').innerHTML = header;
+            document.getElementById('footer-component').innerHTML = footer;
+            
+            // Sayfa yüklendikten sonra ilan detaylarını getir
+            loadPropertyDetails();
+        });
+
+        // URL'den ilan ID'sini al
+        function getPropertyIdFromUrl() {
+            const urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get('id') || 3; // Varsayılan olarak 3 numaralı ilanı göster
+        }
+
+        // İlan detaylarını yükle
+        async function loadPropertyDetails() {
+            const propertyId = getPropertyIdFromUrl();
+            const spinner = document.getElementById('loadingSpinner');
+            spinner.classList.add('active');
+
+            try {
+                // API'den ilan detaylarını çek
+                const propertyDetails = await fetchPropertyDetails(propertyId);
+                
+                // İlan detaylarını sayfaya ekle
+                renderPropertyDetails(propertyDetails);
+                
+                // Benzer ilanları yükle
+                loadSimilarProperties(propertyDetails.estate_type);
+            } catch (error) {
+                console.error('İlan detayları yüklenirken hata oluştu:', error);
+                document.getElementById('propertyDetail').innerHTML = `
+                    <div class="error-message">
+                        <h2>Üzgünüz, ilan detayları yüklenemedi.</h2>
+                        <p>Lütfen daha sonra tekrar deneyin.</p>
+                    </div>
+                `;
+            } finally {
+                spinner.classList.remove('active');
+            }
+        }
+
+        // API'den ilan detaylarını çek
+        async function fetchPropertyDetails(propertyId) {
+            try {
+                const apiUrl = `https://takkas-api.onrender.com/api/estates/${propertyId}`;
+                console.log('API isteği gönderiliyor:', apiUrl);
+                
+                const response = await fetch(apiUrl);
+                console.log('API yanıt durumu:', response.status, response.statusText);
+                
+                if (!response.ok) {
+                    throw new Error(`API isteği başarısız oldu: ${response.status} ${response.statusText}`);
+                }
+                
+                const data = await response.json();
+                console.log('API yanıtı:', data);
+                
+                return data;
+            } catch (error) {
+                console.error('İlan detayları çekilirken hata oluştu:', error);
+                
+                // Hata durumunda örnek veri döndür
+                return {
+                    id: 3,
+                    estate_type: "villa",
+                    title: "Baraka",
+                    description: "Muhteşem deniz manzaralı, yeni yapılmış lüks daire. Fiyat güncellendi.",
+                    price: "153700.00",
+                    created_at: "2025-03-06T15:48:34.514Z",
+                    square_meters_gross: "150.00",
+                    square_meters_net: "135.00",
+                    room_number: "8+1",
+                    building_age: 0,
+                    located_floor: 5,
+                    total_floor: 12,
+                    heating: "Doğalgaz",
+                    bath_number: 2,
+                    balcony: true,
+                    lift: true,
+                    parking: true,
+                    furnished: false,
+                    using_status: "Boş",
+                    on_site: true,
+                    site_name: "Deniz Panorama Evleri",
+                    dues: "500.00",
+                    deed_status: "Kat Mülkiyetli",
+                    zoning_status: "Konut",
+                    square_meters_price: "5000.00",
+                    ada_no: null,
+                    parsel_no: null,
+                    pafta_no: null,
+                    kaks: null,
+                    gabari: null,
+                    credit_status: true,
+                    from_where: "Emlakçı",
+                    user_id: 5,
+                    address_id: 1,
+                    category_id: 20
+                };
+            }
+        }
+
+        // İlan detaylarını sayfaya ekle
+        function renderPropertyDetails(property) {
+            // Varsayılan görseller
+            const defaultImages = [
+                'https://images.unsplash.com/photo-1580587771525-78b9dba3b914?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1074&q=80',
+                'https://images.unsplash.com/photo-1512917774080-9991f1c4c750?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1170&q=80',
+                'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1170&q=80',
+                'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1175&q=80',
+                'https://images.unsplash.com/photo-1600585154526-990dced4db3d?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=687&q=80'
+            ];
+
+            // Tarih formatını düzenle
+            const createdDate = new Date(property.created_at);
+            const formattedDate = createdDate.toLocaleDateString('tr-TR', {
+                day: 'numeric',
+                month: 'long',
+                year: 'numeric'
+            });
+
+            // Fiyatı formatla
+            const formattedPrice = parseFloat(property.price).toLocaleString('tr-TR');
+            
+            // İlan sahibi bilgisini al
+            const fromWhere = property.from_where || 'Belirtilmemiş';
+
+            // İlan detay HTML'ini oluştur
+            const propertyDetailHtml = `
+                <div class="property-header">
+                    <h1 class="property-title">${property.title}</h1>
+                    <div class="property-meta">
+                        <span class="property-type">${property.estate_type.toUpperCase()}</span>
+                        <span class="property-date">İlan Tarihi: ${formattedDate}</span>
+                    </div>
+                </div>
+
+                <div class="property-main-content">
+                    <div class="property-gallery">
+                        <div class="main-image">
+                            <img src="${defaultImages[0]}" alt="${property.title}" id="mainImage">
+                        </div>
+                        <div class="thumbnail-container">
+                            ${defaultImages.map((img, index) => `
+                                <div class="thumbnail ${index === 0 ? 'active' : ''}" onclick="changeMainImage('${img}', this)">
+                                    <img src="${img}" alt="Görsel ${index + 1}">
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+
+                    <div class="property-info-sidebar">
+                        <div class="property-price-section">
+                            <div class="property-price">${formattedPrice} TL</div>
+                            <button class="favorite-button">
+                                <i class="far fa-heart"></i>
+                                <span>Favorilere Ekle</span>
+                            </button>
+                        </div>
+
+                        <div class="property-key-details">
+                            <div class="key-detail-item">
+                                <div class="key-detail-label">İlan Tipi</div>
+                                <div class="key-detail-value">${property.estate_type}</div>
+                            </div>
+                            <div class="key-detail-item">
+                                <div class="key-detail-label">Oda Sayısı</div>
+                                <div class="key-detail-value">${property.room_number}</div>
+                            </div>
+                            <div class="key-detail-item">
+                                <div class="key-detail-label">Brüt m²</div>
+                                <div class="key-detail-value">${property.square_meters_gross} m²</div>
+                            </div>
+                            <div class="key-detail-item">
+                                <div class="key-detail-label">Net m²</div>
+                                <div class="key-detail-value">${property.square_meters_net} m²</div>
+                            </div>
+                            <div class="key-detail-item">
+                                <div class="key-detail-label">Bina Yaşı</div>
+                                <div class="key-detail-value">${property.building_age} Yıl</div>
+                            </div>
+                            <div class="key-detail-item">
+                                <div class="key-detail-label">Banyo Sayısı</div>
+                                <div class="key-detail-value">${property.bath_number}</div>
+                            </div>
+                        </div>
+
+                        <div class="property-contact">
+                            <h3>İletişim Bilgileri</h3>
+                            <div class="contact-info">
+                                <div class="contact-item">
+                                    <i class="fas fa-user"></i>
+                                    <span>${fromWhere}</span>
+                                </div>
+                                <div class="contact-item">
+                                    <i class="fas fa-phone"></i>
+                                    <span>+90 (555) 123 45 67</span>
+                                </div>
+                            </div>
+                            <button class="contact-button">İlan Sahibini Ara</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="property-description">
+                    <h3>İlan Açıklaması</h3>
+                    <p>${property.description}</p>
+                </div>
+
+                <div class="property-details-grid">
+                    <h3>Tüm Özellikler</h3>
+                    <div class="details-grid">
+                        <div class="detail-item">
+                            <div class="detail-label">İlan Tipi</div>
+                            <div class="detail-value">${property.estate_type}</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">Oda Sayısı</div>
+                            <div class="detail-value">${property.room_number}</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">Brüt m²</div>
+                            <div class="detail-value">${property.square_meters_gross} m²</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">Net m²</div>
+                            <div class="detail-value">${property.square_meters_net} m²</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">Bina Yaşı</div>
+                            <div class="detail-value">${property.building_age} Yıl</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">Bulunduğu Kat</div>
+                            <div class="detail-value">${property.located_floor}. Kat</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">Kat Sayısı</div>
+                            <div class="detail-value">${property.total_floor}</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">Isıtma</div>
+                            <div class="detail-value">${property.heating}</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">Banyo Sayısı</div>
+                            <div class="detail-value">${property.bath_number}</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">Balkon</div>
+                            <div class="detail-value">${property.balcony ? 'Var' : 'Yok'}</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">Asansör</div>
+                            <div class="detail-value">${property.lift ? 'Var' : 'Yok'}</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">Otopark</div>
+                            <div class="detail-value">${property.parking ? 'Var' : 'Yok'}</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">Eşyalı</div>
+                            <div class="detail-value">${property.furnished ? 'Evet' : 'Hayır'}</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">Kullanım Durumu</div>
+                            <div class="detail-value">${property.using_status}</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">Site İçerisinde</div>
+                            <div class="detail-value">${property.on_site ? 'Evet' : 'Hayır'}</div>
+                        </div>
+                        ${property.on_site ? `
+                        <div class="detail-item">
+                            <div class="detail-label">Site Adı</div>
+                            <div class="detail-value">${property.site_name}</div>
+                        </div>
+                        ` : ''}
+                        <div class="detail-item">
+                            <div class="detail-label">Aidat</div>
+                            <div class="detail-value">${property.dues} TL</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">Tapu Durumu</div>
+                            <div class="detail-value">${property.deed_status}</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">İmar Durumu</div>
+                            <div class="detail-value">${property.zoning_status}</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">m² Birim Fiyatı</div>
+                            <div class="detail-value">${property.square_meters_price} TL</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">Krediye Uygunluk</div>
+                            <div class="detail-value">${property.credit_status ? 'Uygun' : 'Uygun Değil'}</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">Kimden</div>
+                            <div class="detail-value">${fromWhere}</div>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            document.getElementById('propertyDetail').innerHTML = propertyDetailHtml;
+
+            // Ana görsel değiştirme fonksiyonunu global scope'a ekle
+            window.changeMainImage = function(imgSrc, thumbElement) {
+                document.getElementById('mainImage').src = imgSrc;
+                
+                // Aktif thumbnail'i güncelle
+                document.querySelectorAll('.thumbnail').forEach(thumb => {
+                    thumb.classList.remove('active');
+                });
+                thumbElement.classList.add('active');
+            };
+
+            // Favoriye ekleme fonksiyonu
+            document.querySelector('.favorite-button').addEventListener('click', function() {
+                const icon = this.querySelector('i');
+                icon.classList.toggle('far');
+                icon.classList.toggle('fas');
+                
+                if (icon.classList.contains('fas')) {
+                    this.querySelector('span').textContent = 'Favorilerden Çıkar';
+                } else {
+                    this.querySelector('span').textContent = 'Favorilere Ekle';
+                }
+            });
+        }
+
+        // Benzer ilanları yükle
+        async function loadSimilarProperties(propertyType) {
+            try {
+                // API'den benzer ilanları çek
+                const apiUrl = `https://takkas-api.onrender.com/api/estates?estate_type=${propertyType}`;
+                console.log('Benzer ilanlar için API isteği gönderiliyor:', apiUrl);
+                
+                const response = await fetch(apiUrl);
+                
+                if (!response.ok) {
+                    throw new Error(`API isteği başarısız oldu: ${response.status} ${response.statusText}`);
+                }
+                
+                const data = await response.json();
+                console.log('Benzer ilanlar API yanıtı:', data);
+                
+                // Benzer ilanları işle
+                const estateData = Array.isArray(data) ? data : (data.results || data.data || []);
+                
+                // En fazla 4 benzer ilan göster
+                const similarProperties = estateData.slice(0, 4);
+                
+                // Benzer ilanları sayfaya ekle
+                renderSimilarProperties(similarProperties);
+            } catch (error) {
+                console.error('Benzer ilanlar yüklenirken hata oluştu:', error);
+                
+                // Hata durumunda örnek veriler göster
+                const dummyProperties = Array(4).fill().map((_, index) => ({
+                    id: index + 10,
+                    title: ['Lüks Villa', 'Modern Daire', 'Deniz Manzaralı', 'Bahçeli Ev'][index],
+                    estate_type: 'villa',
+                    price: 1000000 + (index * 500000),
+                    room_number: `${2 + (index % 3)} + 1`,
+                    square_meters_gross: 150 + (index * 25)
+                }));
+                
+                renderSimilarProperties(dummyProperties);
+            }
+        }
+
+        // Benzer ilanları sayfaya ekle
+        function renderSimilarProperties(properties) {
+            const similarPropertiesGrid = document.getElementById('similarPropertiesGrid');
+            
+            // Varsayılan görseller
+            const defaultImages = [
+                'https://images.unsplash.com/photo-1580587771525-78b9dba3b914?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1074&q=80',
+                'https://images.unsplash.com/photo-1512917774080-9991f1c4c750?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1170&q=80',
+                'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1170&q=80',
+                'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1175&q=80'
+            ];
+            
+            // Benzer ilanlar HTML'ini oluştur
+            const similarPropertiesHtml = properties.map((property, index) => {
+                const image = property.image_url || property.image || defaultImages[index % defaultImages.length];
+                const price = typeof property.price === 'number' ? property.price.toLocaleString() : property.price;
+                
+                return `
+                    <article class="property-card">
+                        <a href="property-detail.html?id=${property.id}" class="property-link">
+                            <div class="property-content">
+                                <header class="property-header">
+                                    <div class="property-title-row">
+                                        <h2 class="property-name">${property.title}</h2>
+                                        <button class="property-favorite" aria-label="Favorilere ekle">
+                                            <i class="far fa-heart"></i>
+                                        </button>
+                                    </div>
+                                    <p class="property-type">${property.estate_type}</p>
+                                </header>
+                                <img src="${image}" alt="${property.title}" class="property-image">
+                                <footer class="property-details">
+                                    <div class="property-specs">
+                                        <div class="spec-item">
+                                            <i class="fas fa-bed spec-icon"></i>
+                                            <span>${property.room_number}</span>
+                                        </div>
+                                    </div>
+                                    <p class="property-price">
+                                        <span class="price-amount">${price} TL</span>
+                                    </p>
+                                </footer>
+                            </div>
+                        </a>
+                    </article>
+                `;
+            }).join('');
+            
+            similarPropertiesGrid.innerHTML = similarPropertiesHtml;
+            
+            // Favoriye ekleme fonksiyonu
+            document.querySelectorAll('.property-favorite').forEach(button => {
+                button.addEventListener('click', function(e) {
+                    e.preventDefault(); // Link tıklamasını engelle
+                    
+                    this.classList.toggle('active');
+                    const icon = this.querySelector('i');
+                    icon.classList.toggle('far');
+                    icon.classList.toggle('fas');
+                });
+            });
+        }
+    </script>
+</body>
+</html> 

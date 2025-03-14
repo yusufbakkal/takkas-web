@@ -137,29 +137,31 @@
             
             return `
                 <article class="property-card">
-                    <div class="property-content">
-                        <header class="property-header">
-                            <div class="property-title-row">
-                                <h2 class="property-name">${title}</h2>
-                                <button class="property-favorite" aria-label="Favorilere ekle">
-                                    <i class="far fa-heart"></i>
-                                </button>
-                            </div>
-                            <p class="property-type">${type}</p>
-                        </header>
-                        <img src="${image}" alt="${title}" class="property-image" onerror="this.onerror=null; this.src='${defaultImage}';">
-                        <footer class="property-details">
-                            <div class="property-specs">
-                                <div class="spec-item">
-                                    <i class="fas fa-bed spec-icon"></i>
-                                    <span>${rooms}</span>
+                    <a href="property-detail.html?id=${property.id}" class="property-link">
+                        <div class="property-content">
+                            <header class="property-header">
+                                <div class="property-title-row">
+                                    <h2 class="property-name">${title}</h2>
+                                    <button class="property-favorite" aria-label="Favorilere ekle">
+                                        <i class="far fa-heart"></i>
+                                    </button>
                                 </div>
-                            </div>
-                            <p class="property-price">
-                                <span class="price-amount">${typeof price === 'number' ? price.toLocaleString() : price} TL</span>
-                            </p>
-                        </footer>
-                    </div>
+                                <p class="property-type">${type}</p>
+                            </header>
+                            <img src="${image}" alt="${title}" class="property-image" onerror="this.onerror=null; this.src='${defaultImage}';">
+                            <footer class="property-details">
+                                <div class="property-specs">
+                                    <div class="spec-item">
+                                        <i class="fas fa-bed spec-icon"></i>
+                                        <span>${rooms}</span>
+                                    </div>
+                                </div>
+                                <p class="property-price">
+                                    <span class="price-amount">${typeof price === 'number' ? price.toLocaleString() : price} TL</span>
+                                </p>
+                            </footer>
+                        </div>
+                    </a>
                 </article>
             `;
         }

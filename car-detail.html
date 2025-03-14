@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Araç İlan Detayı - TAKKAS</title>
+    
+    <!-- CSS Bağlantıları -->
+    <link rel="stylesheet" href="assets/css/base.css">
+    <link rel="stylesheet" href="assets/css/property-detail-header.css">
+    <link rel="stylesheet" href="assets/css/footer.css">
+    <link rel="stylesheet" href="assets/css/car-detail.css">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <!-- Özel Header Bileşeni -->
+    <div id="header-component"></div>
+
+    <!-- Ana İçerik -->
+    <main class="property-detail-container">
+        <div class="loading-spinner" id="loadingSpinner">
+            <div class="spinner"></div>
+        </div>
+
+        <div class="property-detail" id="carDetail">
+            <!-- İlan detayları dinamik olarak buraya eklenecek -->
+        </div>
+
+        <div class="similar-properties">
+            <h2>Benzer Araçlar</h2>
+            <div class="property-grid" id="similarCarsGrid">
+                <!-- Benzer araç kartları dinamik olarak buraya eklenecek -->
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer Bileşeni -->
+    <div class="full-width-footer-wrapper">
+        <div id="footer-component"></div>
+    </div>
+
+    <!-- JavaScript -->
+    <script>
+        // Bileşenleri yükle
+        Promise.all([
+            fetch('components/property-detail-header.html').then(response => response.text()),
+            fetch('components/footer.html').then(response => response.text())
+        ]).then(([header, footer]) => {
+            document.getElementById('header-component').innerHTML = header;
+            document.getElementById('footer-component').innerHTML = footer;
+            
+            // Sayfa yüklendikten sonra ilan detaylarını getir
+            loadCarDetails();
+        });
+
+        // URL'den ilan ID'sini al
+        function getCarIdFromUrl() {
+            const urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get('id') || 45; // Varsayılan olarak 45 numaralı ilanı göster
+        }
+
+        // İlan detaylarını yükle
+        async function loadCarDetails() {
+            const carId = getCarIdFromUrl();
+            const spinner = document.getElementById('loadingSpinner');
+            spinner.classList.add('active');
+
+            try {
+                // API'den ilan detaylarını çek
+                const carDetails = await fetchCarDetails(carId);
+                
+                // İlan detaylarını sayfaya ekle
+                renderCarDetails(carDetails);
+                
+                // Benzer ilanları yükle
+                loadSimilarCars(carDetails.category_id);
+            } catch (error) {
+                console.error('İlan detayları yüklenirken hata oluştu:', error);
+                document.getElementById('carDetail').innerHTML = `
+                    <div class="error-message">
+                        <h2>Üzgünüz, ilan detayları yüklenemedi.</h2>
+                        <p>Lütfen daha sonra tekrar deneyin.</p>
+                    </div>
+                `;
+            } finally {
+                spinner.classList.remove('active');
+            }
+        }
+
+        // API'den ilan detaylarını çek
+        async function fetchCarDetails(carId) {
+            try {
+                const apiUrl = `https://takkas-api.onrender.com/api/vehicles/${carId}`;
+                console.log('API isteği gönderiliyor:', apiUrl);
+                
+                const response = await fetch(apiUrl);
+                console.log('API yanıt durumu:', response.status, response.statusText);
+                
+                if (!response.ok) {
+                    throw new Error(`API isteği başarısız oldu: ${response.status} ${response.statusText}`);
+                }
+                
+                const data = await response.json();
+                console.log('API yanıtı:', data);
+                
+                return data;
+            } catch (error) {
+                console.error('İlan detayları çekilirken hata oluştu:', error);
+                
+                // Hata durumunda örnek veri döndür
+                return {
+                    "id": 45,
+                    "user_id": 5,
+                    "listing_type": "Kiralık",
+                    "title": "semihten ucuz Araba",
+                    "description": "tyt acted 9 bin yaptım bende doktor sayılırım doktordan temiz araba",
+                    "price": "1500000",
+                    "currency": "TRY",
+                    "advert_status": true,
+                    "address_id": null,
+                    "model_id": 4,
+                    "desired_model_ids": [],
+                    "category_id": 16,
+                    "fuel_type": "Dizel",
+                    "gear_type": "Otomatik",
+                    "color": "Gri",
+                    "motor_power": "170",
+                    "motor_volume": "1.4 TFSI",
+                    "paint_change": true,
+                    "from_where": "sahibinden",
+                    "kilometer": 50000,
+                    "drive_type": "Önden Çekiş",
+                    "fuel_consumption": "5.00",
+                    "fuel_tank_capacity": "55.00",
+                    "created_at": "2025-03-13T12:49:24.612Z",
+                    "updated_at": "2025-03-13T12:49:24.612Z",
+                    "common_properties": {},
+                    "specific_properties": {},
+                    "case_type": "Sedan",
+                    "user_name": "Admin User",
+                    "user_email": "admin@example.com",
+                    "user_phone": "5551234567",
+                    "brand": "Audi",
+                    "model": "A3",
+                    "series": "A3 Cabrio",
+                    "series_package": "Sports Line",
+                    "production_year": 2017,
+                    "city": null,
+                    "district": null,
+                    "neighborhood": null,
+                    "category_name": "Elektrikli Otomobil",
+                    "desired_vehicles": []
+                };
+            }
+        }
+
+        // İlan detaylarını sayfaya ekle
+        function renderCarDetails(car) {
+            // Varsayılan görseller
+            const defaultImages = [
+                'https://images.unsplash.com/photo-1494976388531-d1058494cdd8?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1170&q=80',
+                'https://images.unsplash.com/photo-1583121274602-3e2820c69888?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1170&q=80',
+                'https://images.unsplash.com/photo-1605559424843-9e4c228bf1c2?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1164&q=80',
+                'https://images.unsplash.com/photo-1552519507-da3b142c6e3d?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1170&q=80',
+                'https://images.unsplash.com/photo-1542362567-b07e54358753?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1170&q=80'
+            ];
+
+            // Tarih formatını düzenle
+            const createdDate = new Date(car.created_at);
+            const formattedDate = createdDate.toLocaleDateString('tr-TR', {
+                day: 'numeric',
+                month: 'long',
+                year: 'numeric'
+            });
+
+            // Fiyatı formatla
+            const formattedPrice = parseFloat(car.price).toLocaleString('tr-TR');
+            
+            // İlan sahibi bilgisini al
+            const fromWhere = car.from_where || 'Belirtilmemiş';
+
+            // İlan detay HTML'ini oluştur
+            const carDetailHtml = `
+                <div class="property-header">
+                    <h1 class="property-title">${car.title}</h1>
+                    <div class="property-meta">
+                        <span class="property-type">${car.brand} ${car.model}</span>
+                        <span class="property-date">İlan Tarihi: ${formattedDate}</span>
+                    </div>
+                </div>
+
+                <div class="property-main-content">
+                    <div class="property-gallery">
+                        <div class="main-image">
+                            <img src="${defaultImages[0]}" alt="${car.title}" id="mainImage">
+                        </div>
+                        <div class="thumbnail-container">
+                            ${defaultImages.map((img, index) => `
+                                <div class="thumbnail ${index === 0 ? 'active' : ''}" onclick="changeMainImage('${img}', this)">
+                                    <img src="${img}" alt="Görsel ${index + 1}">
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+
+                    <div class="property-info-sidebar">
+                        <div class="property-price-section">
+                            <div class="property-price">${formattedPrice} TL</div>
+                            <button class="favorite-button">
+                                <i class="far fa-heart"></i>
+                                <span>Favorilere Ekle</span>
+                            </button>
+                        </div>
+
+                        <div class="property-key-details">
+                            <div class="key-detail-item">
+                                <div class="key-detail-label">Marka</div>
+                                <div class="key-detail-value">${car.brand}</div>
+                            </div>
+                            <div class="key-detail-item">
+                                <div class="key-detail-label">Model</div>
+                                <div class="key-detail-value">${car.model}</div>
+                            </div>
+                            <div class="key-detail-item">
+                                <div class="key-detail-label">Seri</div>
+                                <div class="key-detail-value">${car.series || 'Belirtilmemiş'}</div>
+                            </div>
+                            <div class="key-detail-item">
+                                <div class="key-detail-label">Yıl</div>
+                                <div class="key-detail-value">${car.production_year}</div>
+                            </div>
+                            <div class="key-detail-item">
+                                <div class="key-detail-label">Kilometre</div>
+                                <div class="key-detail-value">${car.kilometer.toLocaleString()} km</div>
+                            </div>
+                            <div class="key-detail-item">
+                                <div class="key-detail-label">Yakıt Tipi</div>
+                                <div class="key-detail-value">${car.fuel_type}</div>
+                            </div>
+                        </div>
+
+                        <div class="property-contact">
+                            <h3>İletişim Bilgileri</h3>
+                            <div class="contact-info">
+                                <div class="contact-item">
+                                    <i class="fas fa-user"></i>
+                                    <span>${fromWhere}</span>
+                                </div>
+                                <div class="contact-item">
+                                    <i class="fas fa-phone"></i>
+                                    <span>+90 ${car.user_phone || '(555) 123 45 67'}</span>
+                                </div>
+                            </div>
+                            <button class="contact-button">İlan Sahibini Ara</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="property-description">
+                    <h3>İlan Açıklaması</h3>
+                    <p>${car.description}</p>
+                </div>
+
+                <div class="property-details-grid">
+                    <h3>Tüm Özellikler</h3>
+                    <div class="details-grid">
+                        <div class="detail-item">
+                            <div class="detail-label">İlan Tipi</div>
+                            <div class="detail-value">${car.listing_type}</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">Marka</div>
+                            <div class="detail-value">${car.brand}</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">Model</div>
+                            <div class="detail-value">${car.model}</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">Seri</div>
+                            <div class="detail-value">${car.series || 'Belirtilmemiş'}</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">Paket</div>
+                            <div class="detail-value">${car.series_package || 'Belirtilmemiş'}</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">Yıl</div>
+                            <div class="detail-value">${car.production_year}</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">Kilometre</div>
+                            <div class="detail-value">${car.kilometer.toLocaleString()} km</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">Yakıt Tipi</div>
+                            <div class="detail-value">${car.fuel_type}</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">Vites</div>
+                            <div class="detail-value">${car.gear_type}</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">Kasa Tipi</div>
+                            <div class="detail-value">${car.case_type}</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">Renk</div>
+                            <div class="detail-value">${car.color}</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">Motor Gücü</div>
+                            <div class="detail-value">${car.motor_power} HP</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">Motor Hacmi</div>
+                            <div class="detail-value">${car.motor_volume}</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">Çekiş</div>
+                            <div class="detail-value">${car.drive_type}</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">Yakıt Tüketimi</div>
+                            <div class="detail-value">${car.fuel_consumption} lt/100km</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">Yakıt Deposu</div>
+                            <div class="detail-value">${car.fuel_tank_capacity} lt</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">Boya Değişimi</div>
+                            <div class="detail-value">${car.paint_change ? 'Var' : 'Yok'}</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">Kategori</div>
+                            <div class="detail-value">${car.category_name}</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">Kimden</div>
+                            <div class="detail-value">${fromWhere}</div>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            document.getElementById('carDetail').innerHTML = carDetailHtml;
+
+            // Ana görsel değiştirme fonksiyonunu global scope'a ekle
+            window.changeMainImage = function(imgSrc, thumbElement) {
+                document.getElementById('mainImage').src = imgSrc;
+                
+                // Aktif thumbnail'i güncelle
+                document.querySelectorAll('.thumbnail').forEach(thumb => {
+                    thumb.classList.remove('active');
+                });
+                thumbElement.classList.add('active');
+            };
+
+            // Favoriye ekleme fonksiyonu
+            document.querySelector('.favorite-button').addEventListener('click', function() {
+                const icon = this.querySelector('i');
+                icon.classList.toggle('far');
+                icon.classList.toggle('fas');
+                
+                if (icon.classList.contains('fas')) {
+                    this.querySelector('span').textContent = 'Favorilerden Çıkar';
+                } else {
+                    this.querySelector('span').textContent = 'Favorilere Ekle';
+                }
+            });
+        }
+
+        // Benzer ilanları yükle
+        async function loadSimilarCars(categoryId) {
+            try {
+                // API'den benzer ilanları çek
+                const apiUrl = `https://takkas-api.onrender.com/api/vehicles?category_id=${categoryId}`;
+                console.log('Benzer ilanlar için API isteği gönderiliyor:', apiUrl);
+                
+                const response = await fetch(apiUrl);
+                
+                if (!response.ok) {
+                    throw new Error(`API isteği başarısız oldu: ${response.status} ${response.statusText}`);
+                }
+                
+                const data = await response.json();
+                console.log('Benzer ilanlar API yanıtı:', data);
+                
+                // Benzer ilanları işle
+                const carData = Array.isArray(data) ? data : (data.results || data.data || []);
+                
+                // En fazla 4 benzer ilan göster
+                const similarCars = carData.slice(0, 4);
+                
+                // Benzer ilanları sayfaya ekle
+                renderSimilarCars(similarCars);
+            } catch (error) {
+                console.error('Benzer ilanlar yüklenirken hata oluştu:', error);
+                
+                // Hata durumunda örnek veriler göster
+                const dummyCars = [
+                    {
+                        id: 10,
+                        title: "Temiz Aile Arabası",
+                        brand: "Toyota",
+                        model: "Corolla",
+                        price: "500.000",
+                        kilometer: 50000,
+                        production_year: 2018,
+                        fuel_type: "Benzin"
+                    },
+                    {
+                        id: 11,
+                        title: "Az Kullanılmış Otomobil",
+                        brand: "Honda",
+                        model: "Civic",
+                        price: "700.000",
+                        kilometer: 60000,
+                        production_year: 2019,
+                        fuel_type: "Dizel"
+                    },
+                    {
+                        id: 12,
+                        title: "Bakımlı Araç",
+                        brand: "BMW",
+                        model: "3 Serisi",
+                        price: "900.000",
+                        kilometer: 70000,
+                        production_year: 2020,
+                        fuel_type: "Hibrit"
+                    },
+                    {
+                        id: 13,
+                        title: "Sıfır Ayarında",
+                        brand: "Mercedes",
+                        model: "C-Class",
+                        price: "1.100.000",
+                        kilometer: 80000,
+                        production_year: 2021,
+                        fuel_type: "Elektrik"
+                    }
+                ];
+                
+                renderSimilarCars(dummyCars);
+            }
+        }
+
+        // Benzer ilanları sayfaya ekle
+        function renderSimilarCars(cars) {
+            const similarCarsGrid = document.getElementById('similarCarsGrid');
+            
+            // Varsayılan görseller
+            const defaultImages = [
+                'https://images.unsplash.com/photo-1494976388531-d1058494cdd8?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1170&q=80',
+                'https://images.unsplash.com/photo-1583121274602-3e2820c69888?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1170&q=80',
+                'https://images.unsplash.com/photo-1605559424843-9e4c228bf1c2?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1164&q=80',
+                'https://images.unsplash.com/photo-1552519507-da3b142c6e3d?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1170&q=80'
+            ];
+            
+            // Benzer ilanlar HTML'ini oluştur
+            const similarCarsHtml = cars.map((car, index) => {
+                const image = car.image_url || car.image || defaultImages[index % defaultImages.length];
+                const price = typeof car.price === 'string' ? car.price : car.price?.toLocaleString('tr-TR');
+                
+                return `
+                    <article class="property-card">
+                        <a href="car-detail.html?id=${car.id}" class="property-link">
+                            <div class="property-content">
+                                <header class="property-header">
+                                    <div class="property-title-row">
+                                        <h2 class="property-name">${car.title}</h2>
+                                        <button class="property-favorite" aria-label="Favorilere ekle">
+                                            <i class="far fa-heart"></i>
+                                        </button>
+                                    </div>
+                                    <p class="property-type">${car.brand} ${car.model}</p>
+                                </header>
+                                <img src="${image}" alt="${car.title}" class="property-image">
+                                <footer class="property-details">
+                                    <div class="property-specs">
+                                        <div class="spec-item">
+                                            <i class="fas fa-calendar-alt spec-icon"></i>
+                                            <span>${car.production_year}</span>
+                                        </div>
+                                        <div class="spec-item">
+                                            <i class="fas fa-tachometer-alt spec-icon"></i>
+                                            <span>${car.kilometer ? car.kilometer.toLocaleString() + ' km' : 'Belirtilmemiş'}</span>
+                                        </div>
+                                    </div>
+                                    <p class="property-price">
+                                        <span class="price-amount">${price} TL</span>
+                                    </p>
+                                </footer>
+                            </div>
+                        </a>
+                    </article>
+                `;
+            }).join('');
+            
+            similarCarsGrid.innerHTML = similarCarsHtml;
+            
+            // Favoriye ekleme fonksiyonu
+            document.querySelectorAll('.property-favorite').forEach(button => {
+                button.addEventListener('click', function(e) {
+                    e.preventDefault(); // Link tıklamasını engelle
+                    e.stopPropagation(); // Üst elemanlara tıklama olayının yayılmasını engelle
+                    
+                    this.classList.toggle('active');
+                    const icon = this.querySelector('i');
+                    icon.classList.toggle('far');
+                    icon.classList.toggle('fas');
+                });
+            });
+        }
+    </script>
+</body>
+</html> 

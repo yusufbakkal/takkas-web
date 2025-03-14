@@ -1,0 +1,599 @@
+/* Araba İlan Detay Sayfası Stilleri */
+
+.property-detail-container {
+    max-width: 1200px;
+    margin: 100px auto 40px;
+    padding: 0 20px;
+    font-family: DM Sans, sans-serif;
+}
+
+.property-detail {
+    margin-bottom: 60px;
+}
+
+/* Başlık Bölümü */
+.property-header {
+    margin-bottom: 24px;
+}
+
+.property-title {
+    font-size: 28px;
+    font-weight: 700;
+    color: #242731;
+    margin: 0 0 8px;
+    line-height: 1.3;
+}
+
+.property-meta {
+    display: flex;
+    gap: 16px;
+    color: #5f6165;
+    font-size: 14px;
+}
+
+.property-type {
+    font-weight: 600;
+    color: #FF6370;
+}
+
+/* Ana İçerik Düzeni */
+.property-main-content {
+    display: flex;
+    gap: 30px;
+    margin-bottom: 30px;
+}
+
+/* Galeri Bölümü */
+.property-gallery {
+    flex: 1;
+    max-width: 60%;
+}
+
+.main-image {
+    width: 100%;
+    height: 400px;
+    margin-bottom: 16px;
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.main-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.thumbnail-container {
+    display: flex;
+    gap: 12px;
+    overflow-x: auto;
+    padding-bottom: 8px;
+    scrollbar-width: thin;
+}
+
+.thumbnail {
+    width: 80px;
+    height: 60px;
+    border-radius: 8px;
+    overflow: hidden;
+    cursor: pointer;
+    flex-shrink: 0;
+    border: 2px solid transparent;
+    transition: border-color 0.2s;
+}
+
+.thumbnail.active {
+    border-color: #FF6370;
+}
+
+.thumbnail img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+/* Yan Bilgi Bölümü */
+.property-info-sidebar {
+    flex: 1;
+    max-width: 40%;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+.property-price-section {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    padding: 20px;
+    background-color: #f8f9fa;
+    border-radius: 12px;
+}
+
+.property-price {
+    font-size: 28px;
+    font-weight: 700;
+    color: #242731;
+}
+
+.favorite-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 12px;
+    background-color: white;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.2s;
+}
+
+.favorite-button:hover {
+    background-color: #f0f0f0;
+}
+
+.favorite-button i {
+    color: #FF6370;
+    font-size: 18px;
+}
+
+/* Anahtar Özellikler */
+.property-key-details {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+    padding: 20px;
+    background-color: #f8f9fa;
+    border-radius: 12px;
+}
+
+.key-detail-item {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.key-detail-label {
+    font-size: 13px;
+    color: #5f6165;
+}
+
+.key-detail-value {
+    font-size: 15px;
+    font-weight: 600;
+    color: #242731;
+}
+
+/* İletişim Bölümü */
+.property-contact {
+    padding: 20px;
+    background-color: #f8f9fa;
+    border-radius: 12px;
+}
+
+.property-contact h3 {
+    font-size: 18px;
+    margin: 0 0 16px;
+    color: #242731;
+    border-bottom: 1px solid #e0e0e0;
+    padding-bottom: 10px;
+}
+
+.contact-info {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 16px;
+}
+
+.contact-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.contact-item i {
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #FF6370;
+    color: white;
+    border-radius: 50%;
+    font-size: 12px;
+}
+
+.contact-item span {
+    font-size: 15px;
+    color: #242731;
+    font-weight: 500;
+}
+
+.contact-item:first-child span {
+    font-weight: 600;
+    color: #FF6370;
+    text-transform: capitalize;
+}
+
+.contact-button {
+    width: 100%;
+    padding: 12px;
+    background-color: #FF6370;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.contact-button:hover {
+    background-color: #ff4957;
+}
+
+/* Açıklama Bölümü */
+.property-description {
+    padding: 20px;
+    background-color: #f8f9fa;
+    border-radius: 12px;
+    margin-bottom: 24px;
+}
+
+.property-description h3 {
+    font-size: 18px;
+    margin: 0 0 16px;
+    color: #242731;
+}
+
+.property-description p {
+    line-height: 1.6;
+    color: #5f6165;
+    margin: 0;
+}
+
+/* Özellikler Tablosu */
+.property-details-grid {
+    padding: 20px;
+    background-color: #f8f9fa;
+    border-radius: 12px;
+    margin-bottom: 30px;
+}
+
+.property-details-grid h3 {
+    font-size: 18px;
+    margin: 0 0 20px;
+    color: #242731;
+}
+
+.details-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+    row-gap: 16px;
+}
+
+.detail-item {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.detail-label {
+    font-size: 13px;
+    color: #5f6165;
+}
+
+.detail-value {
+    font-size: 15px;
+    font-weight: 600;
+    color: #242731;
+}
+
+/* Benzer İlanlar Bölümü */
+.similar-properties {
+    margin-bottom: 40px;
+}
+
+.similar-properties h2 {
+    font-size: 24px;
+    font-weight: 700;
+    margin: 0 0 24px;
+    color: #242731;
+}
+
+.property-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 24px;
+}
+
+/* Araba Kartları */
+.property-card {
+    border-radius: 12px;
+    overflow: hidden;
+    background-color: white;
+    border: 1px solid #e0e0e0;
+    transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.property-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+.property-link {
+    text-decoration: none;
+    color: inherit;
+    display: block;
+}
+
+.property-content {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+.property-card .property-header {
+    padding: 16px 16px 12px;
+}
+
+.property-title-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 8px;
+}
+
+.property-name {
+    font-size: 16px;
+    font-weight: 600;
+    color: #242731;
+    margin: 0;
+    line-height: 1.3;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+}
+
+.property-favorite {
+    background: none;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    color: #5f6165;
+    margin-left: 8px;
+    flex-shrink: 0;
+}
+
+.property-favorite i {
+    font-size: 18px;
+    transition: color 0.2s, transform 0.2s;
+}
+
+.property-favorite:hover i,
+.property-favorite.active i {
+    color: #FF6370;
+    transform: scale(1.1);
+}
+
+.property-card .property-type {
+    font-size: 14px;
+    color: #5f6165;
+}
+
+.property-image {
+    width: 100%;
+    height: 160px;
+    object-fit: cover;
+    display: block;
+}
+
+.property-details {
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-top: auto;
+}
+
+.property-specs {
+    display: flex;
+    gap: 16px;
+}
+
+.spec-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 14px;
+    color: #5f6165;
+}
+
+.spec-icon {
+    color: #FF6370;
+}
+
+.property-price {
+    font-weight: 700;
+    font-size: 18px;
+    color: #FF6370;
+    margin: 0;
+}
+
+/* Yükleme Animasyonu */
+.loading-spinner {
+    text-align: center;
+    padding: 2rem;
+    display: none;
+}
+
+.loading-spinner.active {
+    display: block;
+}
+
+.spinner {
+    width: 50px;
+    height: 50px;
+    border: 5px solid #f3f3f3;
+    border-top: 5px solid #FF6370;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin: 0 auto;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Hata Mesajı */
+.error-message {
+    text-align: center;
+    padding: 40px;
+    background-color: #f8f9fa;
+    border-radius: 12px;
+}
+
+.error-message h2 {
+    color: #FF6370;
+    margin-bottom: 12px;
+}
+
+.error-message p {
+    color: #5f6165;
+}
+
+/* Responsive Tasarım */
+@media (max-width: 1024px) {
+    .property-main-content {
+        flex-direction: column;
+    }
+    
+    .property-gallery,
+    .property-info-sidebar {
+        max-width: 100%;
+    }
+    
+    .details-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .property-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 768px) {
+    .property-detail-container {
+        margin-top: 80px;
+        padding: 0 16px;
+    }
+    
+    .property-title {
+        font-size: 24px;
+    }
+    
+    .main-image {
+        height: 300px;
+    }
+    
+    .property-key-details {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 576px) {
+    .property-detail-container {
+        margin-top: 70px;
+    }
+    
+    .details-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .property-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .main-image {
+        height: 250px;
+    }
+    
+    .thumbnail {
+        width: 70px;
+        height: 50px;
+    }
+}
+
+@media (min-width: 1025px) and (max-width: 1200px) {
+    .property-main-content {
+        gap: 20px;
+    }
+    
+    .property-gallery {
+        max-width: 55%;
+    }
+    
+    .property-info-sidebar {
+        max-width: 45%;
+    }
+}
+
+@media (min-width: 1201px) {
+    .property-gallery {
+        max-width: 65%;
+    }
+    
+    .property-info-sidebar {
+        max-width: 35%;
+    }
+}
+
+/* Footer Genişliği */
+.full-width-footer-wrapper {
+    width: 100vw;
+    position: relative;
+    left: 50%;
+    right: 50%;
+    margin-left: -50vw;
+    margin-right: -50vw;
+    background-color: #fff;
+    overflow: hidden;
+}
+
+#footer-component {
+    width: 100%;
+}
+
+#footer-component .footer {
+    width: 100%;
+    margin-left: 0;
+    padding-left: 0;
+    padding-right: 0;
+}
+
+#footer-component .footer-container {
+    width: 100%;
+    max-width: 100%;
+    padding-left: 30px;
+    padding-right: 30px;
+    box-sizing: border-box;
+}
+
+@media (max-width: 768px) {
+    #footer-component .footer-container {
+        padding-left: 20px;
+        padding-right: 20px;
+    }
+}
+
+body {
+    overflow-x: hidden;
+} 
