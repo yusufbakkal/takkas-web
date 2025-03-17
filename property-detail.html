@@ -366,6 +366,74 @@
             const thumbnails = document.querySelectorAll('.thumbnail');
             const prevBtn = document.getElementById('prevImage');
             const nextBtn = document.getElementById('nextImage');
+            
+            // Ana görsel container'ı
+            const mainImageContainer = document.querySelector('.main-image');
+            
+            // Dokunmatik kaydırma için değişkenler
+            let touchStartX = 0;
+            let touchEndX = 0;
+            
+            // Dokunmatik kaydırma olayları
+            mainImageContainer.addEventListener('touchstart', function(e) {
+                touchStartX = e.changedTouches[0].screenX;
+            }, false);
+            
+            mainImageContainer.addEventListener('touchend', function(e) {
+                touchEndX = e.changedTouches[0].screenX;
+                handleSwipe();
+            }, false);
+            
+            // Fare ile kaydırma olayları
+            let isDragging = false;
+            let startX = 0;
+            
+            mainImageContainer.addEventListener('mousedown', function(e) {
+                isDragging = true;
+                startX = e.clientX;
+                e.preventDefault(); // Görsel sürüklemesini engelle
+            });
+            
+            mainImageContainer.addEventListener('mousemove', function(e) {
+                if (!isDragging) return;
+                e.preventDefault(); // Görsel sürüklemesini engelle
+            });
+            
+            mainImageContainer.addEventListener('mouseup', function(e) {
+                if (!isDragging) return;
+                
+                const endX = e.clientX;
+                const diffX = endX - startX;
+                
+                if (Math.abs(diffX) > 50) { // En az 50px kaydırma gerekli
+                    if (diffX > 0) {
+                        changeImage(currentImageIndex - 1); // Sağa kaydırma
+                    } else {
+                        changeImage(currentImageIndex + 1); // Sola kaydırma
+                    }
+                }
+                
+                isDragging = false;
+            });
+            
+            mainImageContainer.addEventListener('mouseleave', function() {
+                isDragging = false;
+            });
+            
+            // Kaydırma işlemini yönet
+            function handleSwipe() {
+                const swipeThreshold = 50; // En az 50px kaydırma gerekli
+                
+                if (touchEndX < touchStartX - swipeThreshold) {
+                    // Sola kaydırma
+                    changeImage(currentImageIndex + 1);
+                }
+                
+                if (touchEndX > touchStartX + swipeThreshold) {
+                    // Sağa kaydırma
+                    changeImage(currentImageIndex - 1);
+                }
+            }
 
             // Görsel değiştirme fonksiyonu
             function changeImage(index) {

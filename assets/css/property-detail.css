@@ -78,6 +78,15 @@
     border-radius: 12px;
     overflow: hidden;
     position: relative;
+    cursor: grab;
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+}
+
+.main-image:active {
+    cursor: grabbing;
 }
 
 .main-image img {
@@ -85,6 +94,7 @@
     height: 100%;
     object-fit: cover;
     display: block;
+    pointer-events: none;
 }
 
 /* Galeri Navigasyon Butonları */
