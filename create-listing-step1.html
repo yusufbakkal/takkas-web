@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>İlan Ver - Kategori Seçimi - TAKKAS</title>
+    
+    <!-- CSS Bağlantıları -->
+    <link rel="stylesheet" href="assets/css/base.css">
+    <link rel="stylesheet" href="assets/css/property-detail-header.css">
+    <link rel="stylesheet" href="assets/css/footer.css">
+    <link rel="stylesheet" href="assets/css/create-listing.css">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <!-- Özel Header Bileşeni -->
+    <div id="header-component"></div>
+
+    <!-- Ana İçerik -->
+    <main class="create-listing-container">
+        <div class="create-listing-header">
+            <h1>İlan Ver</h1>
+            <div class="steps-container">
+                <div class="step active">
+                    <div class="step-number">1</div>
+                    <div class="step-text">Kategori Seç</div>
+                </div>
+                <div class="step-line"></div>
+                <div class="step">
+                    <div class="step-number">2</div>
+                    <div class="step-text">İlan Detayları</div>
+                </div>
+                <div class="step-line"></div>
+                <div class="step">
+                    <div class="step-number">3</div>
+                    <div class="step-text">Fotoğraf Ekle</div>
+                </div>
+                <div class="step-line"></div>
+                <div class="step">
+                    <div class="step-number">4</div>
+                    <div class="step-text">Önizleme</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="create-listing-content">
+            <h2 class="section-title">Adım Adım Kategori Seç</h2>
+            
+            <div class="category-grid">
+                <!-- Emlak Kategorisi -->
+                <div class="category-card">
+                    <a href="create-listing-step2.html?category=emlak" class="category-link">
+                        <div class="category-icon" style="background-color: #FFA500;">
+                            <i class="fas fa-home"></i>
+                        </div>
+                        <div class="category-name">Emlak</div>
+                    </a>
+                </div>
+                
+                <!-- Vasıta Kategorisi -->
+                <div class="category-card">
+                    <a href="create-listing-step2.html?category=vasita" class="category-link">
+                        <div class="category-icon" style="background-color: #FF6370;">
+                            <i class="fas fa-car"></i>
+                        </div>
+                        <div class="category-name">Vasıta</div>
+                    </a>
+                </div>
+                
+                <!-- Yedek Parça Kategorisi -->
+                <div class="category-card">
+                    <a href="create-listing-step2.html?category=yedek-parca" class="category-link">
+                        <div class="category-icon" style="background-color: #20C997;">
+                            <i class="fas fa-cogs"></i>
+                        </div>
+                        <div class="category-name">Yedek Parça, Aksesuar, Donanım & Tuning</div>
+                    </a>
+                </div>
+                
+                <!-- İkinci El Kategorisi -->
+                <div class="category-card">
+                    <a href="create-listing-step2.html?category=ikinci-el" class="category-link">
+                        <div class="category-icon" style="background-color: #6C5CE7;">
+                            <i class="fas fa-shopping-cart"></i>
+                        </div>
+                        <div class="category-name">İkinci El ve Sıfır Alışveriş</div>
+                    </a>
+                </div>
+                
+                <!-- İş Makineleri Kategorisi -->
+                <div class="category-card">
+                    <a href="create-listing-step2.html?category=is-makineleri" class="category-link">
+                        <div class="category-icon" style="background-color: #9C27B0;">
+                            <i class="fas fa-truck-monster"></i>
+                        </div>
+                        <div class="category-name">İş Makineleri & Sanayi</div>
+                    </a>
+                </div>
+                
+                <!-- Ustalar Kategorisi -->
+                <div class="category-card">
+                    <a href="create-listing-step2.html?category=ustalar" class="category-link">
+                        <div class="category-icon" style="background-color: #3498DB;">
+                            <i class="fas fa-tools"></i>
+                        </div>
+                        <div class="category-name">Ustalar ve Hizmetler</div>
+                    </a>
+                </div>
+                
+                <!-- Özel Ders Kategorisi -->
+                <div class="category-card">
+                    <a href="create-listing-step2.html?category=ozel-ders" class="category-link">
+                        <div class="category-icon" style="background-color: #2ECC71;">
+                            <i class="fas fa-book"></i>
+                        </div>
+                        <div class="category-name">Özel Ders Verenler</div>
+                    </a>
+                </div>
+                
+                <!-- İş İlanları Kategorisi -->
+                <div class="category-card">
+                    <a href="create-listing-step2.html?category=is-ilanlari" class="category-link">
+                        <div class="category-icon" style="background-color: #95A5A6;">
+                            <i class="fas fa-briefcase"></i>
+                        </div>
+                        <div class="category-name">İş İlanları</div>
+                    </a>
+                </div>
+                
+                <!-- Hayvanlar Kategorisi -->
+                <div class="category-card">
+                    <a href="create-listing-step2.html?category=hayvanlar" class="category-link">
+                        <div class="category-icon" style="background-color: #00BCD4;">
+                            <i class="fas fa-paw"></i>
+                        </div>
+                        <div class="category-name">Hayvanlar Alemi</div>
+                    </a>
+                </div>
+                
+                <!-- Yardımcı Arayanlar Kategorisi -->
+                <div class="category-card">
+                    <a href="create-listing-step2.html?category=yardimci-arayanlar" class="category-link">
+                        <div class="category-icon" style="background-color: #FF5722;">
+                            <i class="fas fa-hands-helping"></i>
+                        </div>
+                        <div class="category-name">Yardımcı Arayanlar</div>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer Bileşeni -->
+    <div class="full-width-footer-wrapper">
+        <div id="footer-component"></div>
+    </div>
+
+    <!-- JavaScript -->
+    <script>
+        // Bileşenleri yükle
+        Promise.all([
+            fetch('components/property-detail-header.html').then(response => response.text()),
+            fetch('components/footer.html').then(response => response.text())
+        ]).then(([header, footer]) => {
+            document.getElementById('header-component').innerHTML = header;
+            document.getElementById('footer-component').innerHTML = footer;
+        });
+    </script>
+</body>
+</html> 
