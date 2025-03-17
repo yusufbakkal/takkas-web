@@ -47,6 +47,7 @@
 .property-gallery {
     flex: 1;
     max-width: 60%;
+    position: relative;
 }
 
 .main-image {
@@ -55,6 +56,7 @@
     margin-bottom: 16px;
     border-radius: 12px;
     overflow: hidden;
+    position: relative;
 }
 
 .main-image img {
@@ -62,6 +64,41 @@
     height: 100%;
     object-fit: cover;
     display: block;
+}
+
+/* Galeri Navigasyon Butonları */
+.gallery-nav {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 40px;
+    height: 40px;
+    background-color: rgba(255, 255, 255, 0.8);
+    border: none;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: #242731;
+    font-size: 16px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    z-index: 2;
+    transition: all 0.2s ease;
+}
+
+.gallery-nav:hover {
+    background-color: #fff;
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.15);
+    color: #FF6370;
+}
+
+.prev-btn {
+    left: 15px;
+}
+
+.next-btn {
+    right: 15px;
 }
 
 .thumbnail-container {
@@ -294,116 +331,118 @@
     color: #242731;
 }
 
-/* Benzer İlanlar Bölümü */
-.similar-properties {
-    margin-bottom: 40px;
+/* Benzer Araçlar Bölümü */
+.similar-cars-section {
+    margin-top: 60px;
+    padding-top: 40px;
+    border-top: 1px solid #e0e0e0;
 }
 
-.similar-properties h2 {
+.similar-cars-title {
     font-size: 24px;
-    font-weight: 700;
-    margin: 0 0 24px;
+    font-weight: 600;
+    margin-bottom: 30px;
     color: #242731;
 }
 
-.property-grid {
+.car-grid {
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 24px;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 30px;
+    margin-bottom: 40px;
 }
 
-/* Araba Kartları */
-.property-card {
+.car-card {
+    background-color: #fff;
     border-radius: 12px;
     overflow: hidden;
-    background-color: white;
-    border: 1px solid #e0e0e0;
-    transition: transform 0.3s, box-shadow 0.3s;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
-.property-card:hover {
+.car-card:hover {
     transform: translateY(-5px);
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.12);
 }
 
-.property-link {
+.car-link {
     text-decoration: none;
     color: inherit;
     display: block;
 }
 
-.property-content {
+.car-content {
     display: flex;
     flex-direction: column;
     height: 100%;
 }
 
-.property-card .property-header {
-    padding: 16px 16px 12px;
+.car-header {
+    padding: 16px 20px 12px;
 }
 
-.property-title-row {
+.car-title-row {
     display: flex;
     justify-content: space-between;
-    align-items: flex-start;
+    align-items: center;
     margin-bottom: 8px;
 }
 
-.property-name {
-    font-size: 16px;
+.car-name {
+    font-size: 18px;
     font-weight: 600;
     color: #242731;
     margin: 0;
-    line-height: 1.3;
+    white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
+    max-width: 80%;
 }
 
-.property-favorite {
+.car-type {
+    font-size: 14px;
+    color: #72767C;
+    margin: 0;
+}
+
+.car-favorite {
     background: none;
     border: none;
-    padding: 0;
+    color: #A5A5A5;
     cursor: pointer;
-    color: #5f6165;
-    margin-left: 8px;
-    flex-shrink: 0;
+    font-size: 20px;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: color 0.2s ease;
 }
 
-.property-favorite i {
-    font-size: 18px;
-    transition: color 0.2s, transform 0.2s;
+.car-favorite:hover, .car-favorite.active {
+    color: #FF4C4C;
 }
 
-.property-favorite:hover i,
-.property-favorite.active i {
-    color: #FF6370;
-    transform: scale(1.1);
+.car-favorite.active i {
+    font-weight: 900;
 }
 
-.property-card .property-type {
-    font-size: 14px;
-    color: #5f6165;
-}
-
-.property-image {
+.car-image {
     width: 100%;
-    height: 160px;
+    height: 180px;
     object-fit: cover;
     display: block;
 }
 
-.property-details {
-    padding: 16px;
+.car-details {
+    padding: 16px 20px;
     display: flex;
-    flex-direction: column;
-    gap: 12px;
+    justify-content: space-between;
+    align-items: center;
+    border-top: 1px solid #f0f0f0;
     margin-top: auto;
 }
 
-.property-specs {
+.car-specs {
     display: flex;
     gap: 16px;
 }
@@ -413,18 +452,38 @@
     align-items: center;
     gap: 6px;
     font-size: 14px;
-    color: #5f6165;
+    color: #72767C;
 }
 
 .spec-icon {
-    color: #FF6370;
+    font-size: 14px;
+    color: #A5A5A5;
 }
 
-.property-price {
-    font-weight: 700;
-    font-size: 18px;
-    color: #FF6370;
+.car-price {
+    font-size: 16px;
+    font-weight: 600;
+    color: #242731;
     margin: 0;
+}
+
+.price-amount {
+    white-space: nowrap;
+}
+
+.no-similar-cars, .error-message {
+    text-align: center;
+    padding: 30px;
+    color: #72767C;
+    font-size: 16px;
+    background-color: #f9f9f9;
+    border-radius: 8px;
+    margin-bottom: 40px;
+}
+
+.error-message {
+    color: #e74c3c;
+    background-color: #fdeaea;
 }
 
 /* Yükleme Animasyonu */
@@ -453,24 +512,40 @@
     100% { transform: rotate(360deg); }
 }
 
-/* Hata Mesajı */
-.error-message {
-    text-align: center;
-    padding: 40px;
-    background-color: #f8f9fa;
-    border-radius: 12px;
-}
-
-.error-message h2 {
-    color: #FF6370;
-    margin-bottom: 12px;
-}
-
-.error-message p {
-    color: #5f6165;
-}
-
 /* Responsive Tasarım */
+@media (max-width: 1200px) {
+    .car-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+@media (max-width: 992px) {
+    .car-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 768px) {
+    .similar-cars-title {
+        font-size: 22px;
+        margin-bottom: 20px;
+    }
+    
+    .car-grid {
+        gap: 20px;
+    }
+}
+
+@media (max-width: 576px) {
+    .car-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .car-image {
+        height: 200px;
+    }
+}
+
 @media (max-width: 1024px) {
     .property-main-content {
         flex-direction: column;

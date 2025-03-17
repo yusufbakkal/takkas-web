@@ -68,6 +68,7 @@
 .property-gallery {
     flex: 1;
     max-width: 60%;
+    position: relative;
 }
 
 .main-image {
@@ -76,6 +77,7 @@
     margin-bottom: 16px;
     border-radius: 12px;
     overflow: hidden;
+    position: relative;
 }
 
 .main-image img {
@@ -83,6 +85,41 @@
     height: 100%;
     object-fit: cover;
     display: block;
+}
+
+/* Galeri Navigasyon Butonları */
+.gallery-nav {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 40px;
+    height: 40px;
+    background-color: rgba(255, 255, 255, 0.8);
+    border: none;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: #242731;
+    font-size: 16px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    z-index: 2;
+    transition: all 0.2s ease;
+}
+
+.gallery-nav:hover {
+    background-color: #fff;
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.15);
+    color: #FF6370;
+}
+
+.prev-btn {
+    left: 15px;
+}
+
+.next-btn {
+    right: 15px;
 }
 
 .thumbnail-container {

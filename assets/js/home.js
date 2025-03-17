@@ -54,7 +54,7 @@ async function fetchCarsAndCreateSlider() {
 // API'den araçları çek
 async function fetchCars() {
     try {
-        const response = await fetch('https://takkas-api.onrender.com/api/vehicle-listings');
+        const response = await fetch('https://takkas-api.onrender.com/api/vehicles');
         
         if (!response.ok) {
             throw new Error(`API isteği başarısız oldu: ${response.status} ${response.statusText}`);
@@ -70,13 +70,30 @@ async function fetchCars() {
             // Araç adını belirle
             const name = car.title || car.name || car.model || 'Bilinmeyen Araç';
             
+            // Varsayılan görseller
+            const defaultImages = [
+                'https://images.unsplash.com/photo-1583121274602-3e2820c69888?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1170&q=80',
+                'https://images.unsplash.com/photo-1605559424843-9e4c228bf1c2?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1164&q=80',
+                'https://images.unsplash.com/photo-1552519507-da3b142c6e3d?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1170&q=80',
+                'https://images.unsplash.com/photo-1542362567-b07e54358753?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1170&q=80',
+                'https://images.unsplash.com/photo-1550355291-bbee04a92027?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1236&q=80',
+                'https://images.unsplash.com/photo-1494976388531-d1058494cdd8?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1170&q=80',
+                'https://images.unsplash.com/photo-1553440569-bcc63803a83d?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1125&q=80',
+                'https://images.unsplash.com/photo-1549317661-bd32c8ce0db2?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1170&q=80'
+            ];
+            
+            // Rastgele bir görsel seç
+            const randomImage = defaultImages[Math.floor(Math.random() * defaultImages.length)];
+            
             return {
-                id: car.id || Math.random().toString(36).substr(2, 9),
+                id: car.id,
                 name: name,
-                type: car.case_type || car.type || car.category || car.vehicleType || 'Bilinmeyen Tip',
-                image: null, // Görsel yok, createCarCard varsayılan görsel kullanacak
+                type: car.case_type || car.type || car.category || car.vehicleType || car.category_name || 'Bilinmeyen Tip',
+                image: car.image_url || car.image || randomImage,
                 transmission: car.gear_type || car.transmission || car.gearbox || 'Otomatik',
-                price: car.price || car.amount || 100000
+                price: car.price || car.amount || 100000,
+                brand: car.brand || '',
+                model: car.model || ''
             };
         });
     } catch (error) {
@@ -92,11 +109,25 @@ function createCarCard(car) {
     const type = car.type || 'Bilinmeyen Tip';
     
     // Görsel için varsayılan bir placeholder kullan, API'den görsel gelmezse
-    const defaultImage = `https://via.placeholder.com/400x250/e0e0e0/333333?text=${encodeURIComponent(name)}`;
-    const image = car.image || defaultImage;
+    const defaultImages = [
+        'https://images.unsplash.com/photo-1583121274602-3e2820c69888?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1170&q=80',
+        'https://images.unsplash.com/photo-1605559424843-9e4c228bf1c2?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1164&q=80',
+        'https://images.unsplash.com/photo-1552519507-da3b142c6e3d?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1170&q=80',
+        'https://images.unsplash.com/photo-1542362567-b07e54358753?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1170&q=80',
+        'https://images.unsplash.com/photo-1550355291-bbee04a92027?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1236&q=80',
+        'https://images.unsplash.com/photo-1494976388531-d1058494cdd8?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1170&q=80',
+        'https://images.unsplash.com/photo-1553440569-bcc63803a83d?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1125&q=80',
+        'https://images.unsplash.com/photo-1549317661-bd32c8ce0db2?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1170&q=80'
+    ];
+    
+    // Rastgele bir görsel seç (eğer car.image yoksa)
+    const randomImage = defaultImages[Math.floor(Math.random() * defaultImages.length)];
+    const image = car.image || randomImage;
     
     const transmission = car.transmission || 'Bilinmeyen';
     const price = car.price || 0;
+    const brand = car.brand || '';
+    const model = car.model || '';
     
     // Yeni kart elementi oluştur
     const cardElement = document.createElement('div');
@@ -111,10 +142,10 @@ function createCarCard(car) {
                         <i class="far fa-heart"></i>
                     </button>
                 </div>
-                <p class="car-type">${type}</p>
+                <p class="car-type">${brand} ${model}</p>
             </header>
-            <a href="cars.html" class="car-link">
-                <img src="${image}" alt="${name}" class="car-image" onerror="this.onerror=null; this.src='${defaultImage}';">
+            <a href="car-detail.html?id=${car.id}" class="car-link">
+                <img src="${image}" alt="${name}" class="car-image" onerror="this.onerror=null; this.src='${randomImage}';">
             </a>
             <footer class="car-details">
                 <div class="car-specs">
@@ -177,68 +208,84 @@ function loadSampleCars() {
     
     const sampleCars = [
         {
-            id: 1,
-            name: 'Porshe 718 Cayman S',
-            type: 'Coupe',
-            image: 'https://images.unsplash.com/photo-1617814076367-b759c7d7e738?auto=format&fit=crop&w=800&h=1000',
-            transmission: 'Manual',
-            price: 400000
-        },
-        {
-            id: 2,
-            name: 'BMW M4 Competition',
+            id: 52,
+            name: '2023 Model Lüks Sedan',
             type: 'Sedan',
-            image: 'https://images.unsplash.com/photo-1580273916550-e323be2ae537?auto=format&fit=crop&w=800&h=1000',
-            transmission: 'Automatic',
-            price: 450000
+            image: 'https://images.unsplash.com/photo-1583121274602-3e2820c69888?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1170&q=80',
+            transmission: 'Otomatik',
+            price: 1850000,
+            brand: 'Toyota',
+            model: 'Corolla'
         },
         {
-            id: 3,
-            name: 'Mercedes-AMG GT',
-            type: 'Sports Car',
-            image: 'https://images.unsplash.com/photo-1614162692292-7ac56d7f7f1e?auto=format&fit=crop&w=800&h=1000',
-            transmission: 'DCT',
-            price: 500000
+            id: 47,
+            name: '2023 Model Lüks Sedan',
+            type: 'Sedan',
+            image: 'https://images.unsplash.com/photo-1605559424843-9e4c228bf1c2?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1164&q=80',
+            transmission: 'Otomatik',
+            price: 1850000,
+            brand: 'Mercedes',
+            model: 'C-Serisi'
         },
         {
-            id: 4,
-            name: 'Audi RS7',
-            type: 'Sportback',
-            image: 'https://images.unsplash.com/photo-1544829099-b9a0c07fad1a?auto=format&fit=crop&w=800&h=1000',
-            transmission: 'Manual',
-            price: 550000
+            id: 45,
+            name: 'semihten ucuz Araba',
+            type: 'Sedan',
+            image: 'https://images.unsplash.com/photo-1552519507-da3b142c6e3d?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1170&q=80',
+            transmission: 'Otomatik',
+            price: 1500000,
+            brand: 'Audi',
+            model: 'A3'
         },
         {
-            id: 5,
+            id: 43,
             name: '2020 Model BMW',
             type: 'Sedan',
-            image: null,
-            transmission: 'Otomatik',
-            price: 600000
-        },
-        {
-            id: 6,
-            name: 'Mercedes C200',
-            type: 'Sedan',
-            image: null,
+            image: 'https://images.unsplash.com/photo-1542362567-b07e54358753?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1170&q=80',
             transmission: 'Manuel',
-            price: 650000
+            price: 500000,
+            brand: 'BMW',
+            model: '5 Serisi'
         },
         {
-            id: 7,
-            name: 'Audi A3',
-            type: 'Hatchback',
-            image: null,
-            transmission: 'Otomatik',
-            price: 700000
-        },
-        {
-            id: 8,
-            name: 'Volkswagen Passat',
+            id: 42,
+            name: 'test data',
             type: 'Sedan',
-            image: null,
+            image: 'https://images.unsplash.com/photo-1550355291-bbee04a92027?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1236&q=80',
             transmission: 'Manuel',
-            price: 750000
+            price: 100000,
+            brand: 'Volkswagen',
+            model: 'Passat'
+        },
+        {
+            id: 41,
+            name: 'data',
+            type: 'Sedan',
+            image: 'https://images.unsplash.com/photo-1494976388531-d1058494cdd8?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1170&q=80',
+            transmission: 'Manuel',
+            price: 1000000,
+            brand: 'Honda',
+            model: 'Civic'
+        },
+        {
+            id: 40,
+            name: 'test',
+            type: 'Sedan',
+            image: 'https://images.unsplash.com/photo-1553440569-bcc63803a83d?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1125&q=80',
+            transmission: 'Manuel',
+            price: 750000,
+            brand: 'Ford',
+            model: 'Focus'
+        },
+        {
+            id: 39,
+            name: 'BMW 320i',
+            type: 'Sedan',
+            image: 'https://images.unsplash.com/photo-1549317661-bd32c8ce0db2?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1170&q=80',
+            transmission: 'Manuel',
+            price: 1000000,
+            brand: 'BMW',
+            model: '320i'
         }
     ];
     

@@ -186,10 +186,16 @@
                     <div class="property-gallery">
                         <div class="main-image">
                             <img src="${defaultImages[0]}" alt="${property.title}" id="mainImage">
+                            <button class="gallery-nav prev-btn" id="prevImage" aria-label="Önceki görsel">
+                                <i class="fas fa-chevron-left"></i>
+                            </button>
+                            <button class="gallery-nav next-btn" id="nextImage" aria-label="Sonraki görsel">
+                                <i class="fas fa-chevron-right"></i>
+                            </button>
                         </div>
                         <div class="thumbnail-container">
                             ${defaultImages.map((img, index) => `
-                                <div class="thumbnail ${index === 0 ? 'active' : ''}" onclick="changeMainImage('${img}', this)">
+                                <div class="thumbnail ${index === 0 ? 'active' : ''}" data-index="${index}">
                                     <img src="${img}" alt="Görsel ${index + 1}">
                                 </div>
                             `).join('')}
@@ -353,16 +359,46 @@
 
             document.getElementById('propertyDetail').innerHTML = propertyDetailHtml;
 
-            // Ana görsel değiştirme fonksiyonunu global scope'a ekle
-            window.changeMainImage = function(imgSrc, thumbElement) {
-                document.getElementById('mainImage').src = imgSrc;
+            // Görsel galerisi için değişkenler
+            let currentImageIndex = 0;
+            const images = defaultImages;
+            const mainImage = document.getElementById('mainImage');
+            const thumbnails = document.querySelectorAll('.thumbnail');
+            const prevBtn = document.getElementById('prevImage');
+            const nextBtn = document.getElementById('nextImage');
+
+            // Görsel değiştirme fonksiyonu
+            function changeImage(index) {
+                if (index < 0) index = images.length - 1;
+                if (index >= images.length) index = 0;
+                
+                currentImageIndex = index;
+                mainImage.src = images[index];
                 
                 // Aktif thumbnail'i güncelle
-                document.querySelectorAll('.thumbnail').forEach(thumb => {
+                thumbnails.forEach(thumb => {
                     thumb.classList.remove('active');
                 });
-                thumbElement.classList.add('active');
-            };
+                thumbnails[index].classList.add('active');
+            }
+
+            // Önceki görsel butonu
+            prevBtn.addEventListener('click', () => {
+                changeImage(currentImageIndex - 1);
+            });
+
+            // Sonraki görsel butonu
+            nextBtn.addEventListener('click', () => {
+                changeImage(currentImageIndex + 1);
+            });
+
+            // Thumbnail tıklama olayları
+            thumbnails.forEach(thumb => {
+                thumb.addEventListener('click', () => {
+                    const index = parseInt(thumb.getAttribute('data-index'));
+                    changeImage(index);
+                });
+            });
 
             // Favoriye ekleme fonksiyonu
             document.querySelector('.favorite-button').addEventListener('click', function() {
