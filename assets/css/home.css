@@ -58,8 +58,13 @@
 
 /* Responsive Ana Sayfa */
 @media (max-width: 768px) {
+    .welcome-section {
+        padding: 2rem 1rem;
+        margin: 0 0.5rem 2rem 0.5rem;
+    }
+    
     .welcome-section h1 {
-        font-size: 2rem;
+        font-size: 1.8rem;
     }
 
     .welcome-section p {
@@ -69,6 +74,11 @@
     .features-section {
         grid-template-columns: 1fr;
         padding: 1rem;
+        gap: 1.5rem;
+    }
+    
+    .feature {
+        padding: 1.5rem;
     }
 }
 
@@ -143,15 +153,26 @@
 /* Responsive */
 @media (max-width: 768px) {
     .hero-slider {
-        height: 400px;
-        margin-top: 2%;
+        height: 350px;
+        margin-top: 80px;
+        padding: 10px;
+    }
+    
+    .slider-dots {
+        bottom: 10px;
+    }
+    
+    .dot {
+        width: 10px;
+        height: 10px;
     }
 }
 
 @media (max-width: 480px) {
     .hero-slider {
-        height: 300px;
-        margin-top: 2%;
+        height: 250px;
+        margin-top: 80px;
+        padding: 10px;
     }
 }
 
@@ -171,6 +192,13 @@
     transition: transform 0.3s ease;
     width: calc(100% - 80px); /* Ok butonları için kenar boşluğu */
     margin: 0 auto;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none; /* Firefox için */
+}
+
+.car-slider-container::-webkit-scrollbar {
+    display: none; /* Chrome, Safari ve Opera için */
 }
 
 .car-slider .car-card {
@@ -358,19 +386,69 @@
 
 /* Responsive */
 @media (max-width: 1200px) {
-    .car-card {
-        flex: 0 0 calc(33.333% - 16px); /* 3 kart */
+    .car-slider .car-card {
+        flex: 0 0 calc(33.333% - 24px); /* 3 kart */
     }
 }
 
 @media (max-width: 992px) {
-    .car-card {
-        flex: 0 0 calc(50% - 12px); /* 2 kart */
+    .car-slider .car-card {
+        flex: 0 0 calc(50% - 24px); /* 2 kart */
+    }
+    
+    .car-slider-container {
+        padding: 0 20px;
+        width: calc(100% - 40px);
+    }
+}
+
+@media (max-width: 768px) {
+    .car-slider {
+        padding: 10px 0;
+        margin: 20px 0;
+    }
+    
+    .car-slider-container {
+        padding: 0 15px;
+        width: calc(100% - 30px);
+        gap: 15px;
+    }
+    
+    .slider-nav {
+        width: 30px;
+        height: 30px;
+    }
+    
+    .car-slider .car-specs {
+        gap: 10px;
+    }
+    
+    .car-slider .spec-item {
+        font-size: 12px;
+    }
+    
+    .car-slider .car-price {
+        font-size: 14px;
     }
 }
 
 @media (max-width: 576px) {
-    .car-card {
-        flex: 0 0 100%; /* 1 kart */
+    .car-slider .car-card {
+        flex: 0 0 calc(100% - 20px); /* 1 kart */
+        height: 320px;
+    }
+    
+    .car-slider-container {
+        padding: 0 10px;
+        width: calc(100% - 20px);
+        gap: 10px;
+    }
+    
+    .car-slider .car-image {
+        height: 160px;
+    }
+    
+    .slider-nav {
+        display: none; /* Mobilde ok butonlarını gizle */
     }
 } 

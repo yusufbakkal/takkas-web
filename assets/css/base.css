@@ -10,6 +10,7 @@ body {
     background: var(--background);
     color: var(--text-primary);
     line-height: 1.5;
+    overflow-x: hidden;
 }
 
 main {
@@ -45,8 +46,15 @@ button, input {
     main {
         margin-left: 0;
         margin-top: 73px;
+        padding: 1rem;
     }
 } 
+
+@media (max-width: 576px) {
+    main {
+        padding: 0.75rem;
+    }
+}
 
 .loading-overlay {
     position: fixed;
@@ -73,6 +81,11 @@ button, input {
     border-radius: 50%;
     animation: spin 1s linear infinite;
 } 
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
 
 .error-toast {
     position: fixed;
