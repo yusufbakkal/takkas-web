@@ -519,7 +519,8 @@
             const lightboxNext = document.querySelector('.lightbox-next');
 
             // Ana görsele tıklandığında lightbox'ı aç
-            mainImage.addEventListener('click', function() {
+            mainImage.addEventListener('click', function(e) {
+                e.stopPropagation(); // Olayın yayılmasını engelle
                 lightboxImage.src = images[currentImageIndex];
                 lightbox.style.display = 'flex';
                 document.body.style.overflow = 'hidden'; // Sayfanın kaydırılmasını engelle
@@ -527,7 +528,8 @@
 
             // Thumbnail'lere tıklandığında da lightbox'ı aç
             thumbnails.forEach(thumb => {
-                thumb.addEventListener('click', function() {
+                thumb.addEventListener('click', function(e) {
+                    e.stopPropagation(); // Olayın yayılmasını engelle
                     const index = parseInt(thumb.getAttribute('data-index'));
                     changeImage(index);
                     lightboxImage.src = images[index];
@@ -584,17 +586,18 @@
 
             lightboxImage.addEventListener('touchstart', function(e) {
                 lightboxTouchStartX = e.changedTouches[0].screenX;
-                e.preventDefault(); // Varsayılan davranışı engelle
-            }, { passive: false });
+            }, false);
 
             lightboxImage.addEventListener('touchend', function(e) {
                 lightboxTouchEndX = e.changedTouches[0].screenX;
                 handleLightboxSwipe();
-                e.preventDefault(); // Varsayılan davranışı engelle
-            }, { passive: false });
+            }, false);
 
             lightboxImage.addEventListener('touchmove', function(e) {
-                e.preventDefault(); // Sayfanın kaydırılmasını engelle
+                // Sadece lightbox içinde kaydırma yaparken sayfanın kaydırılmasını engelle
+                if (lightbox.style.display === 'flex') {
+                    e.preventDefault();
+                }
             }, { passive: false });
 
             function handleLightboxSwipe() {
