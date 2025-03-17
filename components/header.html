@@ -12,9 +12,42 @@
             <button class="notification-btn" aria-label="Bildirimleri göster">
                 <i class="fas fa-bell"></i>
             </button>
-            <a href="settings.html">
-                <img src="assets/images/avatar.png" alt="Profile" class="profile-img">
+            <a href="settings.html" class="profile-link">
+                <div class="avatar-circle" id="userAvatar">
+                    <span class="avatar-initials">YB</span>
+                </div>
             </a>
         </div>
     </div>
-</header> 
+</header>
+
+<script>
+    // Kullanıcı adını al ve baş harfleri göster
+    document.addEventListener('DOMContentLoaded', function() {
+        // Örnek kullanıcı adı (gerçek uygulamada API'den veya localStorage'dan alınabilir)
+        const userName = "Yusuf Bakkal"; // Varsayılan kullanıcı adı
+        
+        // Kullanıcı adının baş harflerini al
+        const initials = userName.split(' ')
+            .map(name => name.charAt(0))
+            .join('')
+            .toUpperCase()
+            .substring(0, 2); // En fazla 2 harf al
+        
+        // Avatar'a baş harfleri yerleştir
+        document.querySelector('.avatar-initials').textContent = initials;
+        
+        // Rastgele bir arka plan rengi oluştur (kullanıcı adına göre sabit bir renk de olabilir)
+        const colors = [
+            '#FF6370', '#4CAF50', '#2196F3', '#9C27B0', '#FF9800', 
+            '#795548', '#607D8B', '#3F51B5', '#009688', '#FFC107'
+        ];
+        
+        // Kullanıcı adına göre sabit bir renk seç (aynı kullanıcı adı hep aynı rengi alır)
+        const colorIndex = userName.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0) % colors.length;
+        const backgroundColor = colors[colorIndex];
+        
+        // Avatar'ın arka plan rengini ayarla
+        document.querySelector('.avatar-circle').style.backgroundColor = backgroundColor;
+    });
+</script> 
