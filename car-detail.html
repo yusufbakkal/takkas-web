@@ -41,6 +41,20 @@
         <div id="footer-component"></div>
     </div>
 
+    <!-- Lightbox -->
+    <div id="imageLightbox" class="lightbox">
+        <div class="lightbox-content">
+            <span class="lightbox-close">&times;</span>
+            <img class="lightbox-image" id="lightboxImage">
+            <button class="lightbox-nav lightbox-prev">
+                <i class="fas fa-chevron-left"></i>
+            </button>
+            <button class="lightbox-nav lightbox-next">
+                <i class="fas fa-chevron-right"></i>
+            </button>
+        </div>
+    </div>
+
     <!-- JavaScript -->
     <script>
         // Bileşenleri yükle
@@ -606,6 +620,13 @@
                     } else {
                         changeImage(currentImageIndex + 1); // Sola kaydırma
                     }
+                } else {
+                    // Kaydırma olmadıysa ve sadece tıklama ise lightbox'ı aç
+                    if (Math.abs(diffX) < 5) {
+                        lightboxImage.src = images[currentImageIndex];
+                        lightbox.style.display = 'flex';
+                        document.body.style.overflow = 'hidden';
+                    }
                 }
                 
                 isDragging = false;
@@ -675,6 +696,102 @@
                     this.querySelector('span').textContent = 'Favorilere Ekle';
                 }
             });
+
+            // Lightbox fonksiyonları
+            const lightbox = document.getElementById('imageLightbox');
+            const lightboxImage = document.getElementById('lightboxImage');
+            const lightboxClose = document.querySelector('.lightbox-close');
+            const lightboxPrev = document.querySelector('.lightbox-prev');
+            const lightboxNext = document.querySelector('.lightbox-next');
+
+            // Ana görsele tıklandığında lightbox'ı aç
+            mainImage.addEventListener('click', function() {
+                lightboxImage.src = images[currentImageIndex];
+                lightbox.style.display = 'flex';
+                document.body.style.overflow = 'hidden'; // Sayfanın kaydırılmasını engelle
+            });
+
+            // Thumbnail'lere tıklandığında da lightbox'ı aç
+            thumbnails.forEach(thumb => {
+                thumb.addEventListener('click', function() {
+                    const index = parseInt(thumb.getAttribute('data-index'));
+                    changeImage(index);
+                    lightboxImage.src = images[index];
+                    lightbox.style.display = 'flex';
+                    document.body.style.overflow = 'hidden';
+                });
+            });
+
+            // Lightbox'ı kapat
+            lightboxClose.addEventListener('click', function() {
+                lightbox.style.display = 'none';
+                document.body.style.overflow = 'auto'; // Sayfanın kaydırılmasını tekrar etkinleştir
+            });
+
+            // Lightbox dışına tıklandığında kapat
+            lightbox.addEventListener('click', function(e) {
+                if (e.target === lightbox) {
+                    lightbox.style.display = 'none';
+                    document.body.style.overflow = 'auto';
+                }
+            });
+
+            // Lightbox içinde önceki görsel
+            lightboxPrev.addEventListener('click', function() {
+                changeImage(currentImageIndex - 1);
+                lightboxImage.src = images[currentImageIndex];
+            });
+
+            // Lightbox içinde sonraki görsel
+            lightboxNext.addEventListener('click', function() {
+                changeImage(currentImageIndex + 1);
+                lightboxImage.src = images[currentImageIndex];
+            });
+
+            // Klavye ile gezinme
+            document.addEventListener('keydown', function(e) {
+                if (lightbox.style.display === 'flex') {
+                    if (e.key === 'ArrowLeft') {
+                        changeImage(currentImageIndex - 1);
+                        lightboxImage.src = images[currentImageIndex];
+                    } else if (e.key === 'ArrowRight') {
+                        changeImage(currentImageIndex + 1);
+                        lightboxImage.src = images[currentImageIndex];
+                    } else if (e.key === 'Escape') {
+                        lightbox.style.display = 'none';
+                        document.body.style.overflow = 'auto';
+                    }
+                }
+            });
+
+            // Lightbox içinde dokunmatik kaydırma
+            let lightboxTouchStartX = 0;
+            let lightboxTouchEndX = 0;
+
+            lightboxImage.addEventListener('touchstart', function(e) {
+                lightboxTouchStartX = e.changedTouches[0].screenX;
+            }, false);
+
+            lightboxImage.addEventListener('touchend', function(e) {
+                lightboxTouchEndX = e.changedTouches[0].screenX;
+                handleLightboxSwipe();
+            }, false);
+
+            function handleLightboxSwipe() {
+                const swipeThreshold = 50;
+                
+                if (lightboxTouchEndX < lightboxTouchStartX - swipeThreshold) {
+                    // Sola kaydırma
+                    changeImage(currentImageIndex + 1);
+                    lightboxImage.src = images[currentImageIndex];
+                }
+                
+                if (lightboxTouchEndX > lightboxTouchStartX + swipeThreshold) {
+                    // Sağa kaydırma
+                    changeImage(currentImageIndex - 1);
+                    lightboxImage.src = images[currentImageIndex];
+                }
+            }
         }
 
         // Benzer araçları yükle
