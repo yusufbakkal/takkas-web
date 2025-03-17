@@ -395,7 +395,16 @@
             
             mainImageContainer.addEventListener('touchend', function(e) {
                 touchEndX = e.changedTouches[0].screenX;
-                handleSwipe();
+                const diffX = touchEndX - touchStartX;
+                
+                // Eğer kaydırma mesafesi küçükse, bu bir dokunma olarak kabul edilir
+                if (Math.abs(diffX) < 10) {
+                    lightboxImage.src = images[currentImageIndex];
+                    lightbox.style.display = 'flex';
+                    document.body.style.overflow = 'hidden';
+                } else {
+                    handleSwipe();
+                }
             }, false);
             
             // Fare ile kaydırma olayları
@@ -575,12 +584,18 @@
 
             lightboxImage.addEventListener('touchstart', function(e) {
                 lightboxTouchStartX = e.changedTouches[0].screenX;
-            }, false);
+                e.preventDefault(); // Varsayılan davranışı engelle
+            }, { passive: false });
 
             lightboxImage.addEventListener('touchend', function(e) {
                 lightboxTouchEndX = e.changedTouches[0].screenX;
                 handleLightboxSwipe();
-            }, false);
+                e.preventDefault(); // Varsayılan davranışı engelle
+            }, { passive: false });
+
+            lightboxImage.addEventListener('touchmove', function(e) {
+                e.preventDefault(); // Sayfanın kaydırılmasını engelle
+            }, { passive: false });
 
             function handleLightboxSwipe() {
                 const swipeThreshold = 50;
