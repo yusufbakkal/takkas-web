@@ -110,10 +110,10 @@
                 const dummyProperties = Array(16).fill().map((_, index) => ({
                     id: index + 1,
                     title: ['Lüks Villa', 'Modern Daire', 'Deniz Manzaralı', 'Bahçeli Ev', 'Şehir Merkezi Daire', 'Müstakil Ev', 'Rezidans', 'Dubleks'][index % 8],
-                    type: ['Villa', 'Daire', 'Rezidans', 'Müstakil'][index % 4],
+                        type: ['Villa', 'Daire', 'Rezidans', 'Müstakil'][index % 4],
                     image: null, // Görsel yok, createPropertyCard varsayılan görsel kullanacak
-                    rooms: `${2 + (index % 4)} + 1`,
-                    size: `${100 + (index * 25)}m²`,
+                        rooms: `${2 + (index % 4)} + 1`,
+                        size: `${100 + (index * 25)}m²`,
                     price: 1000000 + (index * 500000)
                 }));
                 
@@ -138,29 +138,29 @@
             return `
                 <article class="property-card">
                     <a href="property-detail.html?id=${property.id}" class="property-link">
-                        <div class="property-content">
-                            <header class="property-header">
-                                <div class="property-title-row">
+                    <div class="property-content">
+                        <header class="property-header">
+                            <div class="property-title-row">
                                     <h2 class="property-name">${title}</h2>
-                                    <button class="property-favorite" aria-label="Favorilere ekle">
-                                        <i class="far fa-heart"></i>
-                                    </button>
-                                </div>
+                                <button class="property-favorite" aria-label="Favorilere ekle">
+                                    <i class="far fa-heart"></i>
+                                </button>
+                            </div>
                                 <p class="property-type">${type}</p>
-                            </header>
+                        </header>
                             <img src="${image}" alt="${title}" class="property-image" onerror="this.onerror=null; this.src='${defaultImage}';">
-                            <footer class="property-details">
-                                <div class="property-specs">
-                                    <div class="spec-item">
-                                        <i class="fas fa-bed spec-icon"></i>
+                        <footer class="property-details">
+                            <div class="property-specs">
+                                <div class="spec-item">
+                                    <i class="fas fa-bed spec-icon"></i>
                                         <span>${rooms}</span>
                                     </div>
-                                </div>
-                                <p class="property-price">
+                            </div>
+                            <p class="property-price">
                                     <span class="price-amount">${typeof price === 'number' ? price.toLocaleString() : price} TL</span>
-                                </p>
-                            </footer>
-                        </div>
+                            </p>
+                        </footer>
+                    </div>
                     </a>
                 </article>
             `;

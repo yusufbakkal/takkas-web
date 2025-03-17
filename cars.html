@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+AK<!DOCTYPE html>
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
@@ -113,9 +113,9 @@
         // API'den tüm araçları çek
         async function fetchAllCars() {
             try {
-                console.log('API isteği gönderiliyor:', 'https://takkas-api.onrender.com/api/vehicle-listings');
+                console.log('API isteği gönderiliyor:', 'https://takkas-api.onrender.com/api/vehicles');
                 
-                const response = await fetch('https://takkas-api.onrender.com/api/vehicle-listings');
+                const response = await fetch('https://takkas-api.onrender.com/api/vehicles');
                 console.log('API yanıt durumu:', response.status, response.statusText);
                 
                 if (!response.ok) {
@@ -150,13 +150,17 @@
                     const randomImage = defaultImages[Math.floor(Math.random() * defaultImages.length)];
                     
                     return {
-                        id: car.id || Math.random().toString(36).substr(2, 9),
+                        id: car.id,
                         name: name,
-                        type: car.case_type || car.type || car.category || car.vehicleType || 'Bilinmeyen Tip',
+                        type: car.case_type || car.type || car.category || car.vehicleType || car.category_name || 'Bilinmeyen Tip',
                         image: car.image_url || car.image || randomImage,
                         passengers: car.passengers || car.capacity || 4,
                         transmission: car.gear_type || car.transmission || car.gearbox || 'Otomatik',
-                        price: car.price || car.amount || 100000
+                        price: car.price || car.amount || 100000,
+                        brand: car.brand || '',
+                        model: car.model || '',
+                        production_year: car.production_year || '',
+                        kilometer: car.kilometer || 0
                     };
                 });
                 
@@ -166,24 +170,112 @@
                 console.error('Arabalar yüklenirken hata oluştu:', error);
                 
                 // Hata durumunda örnek veriler döndür
-                const dummyCars = Array(16).fill().map((_, index) => ({
-                    id: index + 1,
-                    name: ['2020 Model BMW', 'Mercedes C200', 'Audi A3', 'Volkswagen Passat', 'Toyota Corolla', 'Honda Civic', 'Ford Focus', 'Renault Megane'][index % 8],
-                    type: ['Sedan', 'SUV', 'Hatchback', 'Station Wagon'][index % 4],
-                    image: [
-                        'https://images.unsplash.com/photo-1583121274602-3e2820c69888?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1170&q=80',
-                        'https://images.unsplash.com/photo-1605559424843-9e4c228bf1c2?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1164&q=80',
-                        'https://images.unsplash.com/photo-1552519507-da3b142c6e3d?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1170&q=80',
-                        'https://images.unsplash.com/photo-1542362567-b07e54358753?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1170&q=80',
-                        'https://images.unsplash.com/photo-1550355291-bbee04a92027?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1236&q=80',
-                        'https://images.unsplash.com/photo-1494976388531-d1058494cdd8?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1170&q=80',
-                        'https://images.unsplash.com/photo-1553440569-bcc63803a83d?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1125&q=80',
-                        'https://images.unsplash.com/photo-1549317661-bd32c8ce0db2?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1170&q=80'
-                    ][index % 8],
-                    passengers: 4 + (index % 3),
-                    transmission: ['Otomatik', 'Manuel', 'Yarı Otomatik'][index % 3],
-                    price: 100000 + (index * 50000)
-                }));
+                const dummyCars = [
+                    {
+                        id: 52,
+                        name: "2023 Model Lüks Sedan",
+                        type: "Sedan",
+                        image: 'https://images.unsplash.com/photo-1583121274602-3e2820c69888?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1170&q=80',
+                        passengers: 5,
+                        transmission: "Otomatik",
+                        price: 1850000,
+                        brand: "Toyota",
+                        model: "Corolla",
+                        production_year: 1985,
+                        kilometer: 15000
+                    },
+                    {
+                        id: 47,
+                        name: "2023 Model Lüks Sedan",
+                        type: "Sedan",
+                        image: 'https://images.unsplash.com/photo-1605559424843-9e4c228bf1c2?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1164&q=80',
+                        passengers: 5,
+                        transmission: "Otomatik",
+                        price: 1850000,
+                        brand: "Mercedes",
+                        model: "C-Serisi",
+                        production_year: 2023,
+                        kilometer: 15000
+                    },
+                    {
+                        id: 45,
+                        name: "semihten ucuz Araba",
+                        type: "Sedan",
+                        image: 'https://images.unsplash.com/photo-1552519507-da3b142c6e3d?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1170&q=80',
+                        passengers: 5,
+                        transmission: "Otomatik",
+                        price: 1500000,
+                        brand: "Audi",
+                        model: "A3",
+                        production_year: 2017,
+                        kilometer: 50000
+                    },
+                    {
+                        id: 43,
+                        name: "2020 Model BMW",
+                        type: "Sedan",
+                        image: 'https://images.unsplash.com/photo-1542362567-b07e54358753?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1170&q=80',
+                        passengers: 5,
+                        transmission: "Manuel",
+                        price: 500000,
+                        brand: "BMW",
+                        model: "5 Serisi",
+                        production_year: 2020,
+                        kilometer: 4500
+                    },
+                    {
+                        id: 42,
+                        name: "test data",
+                        type: "Sedan",
+                        image: 'https://images.unsplash.com/photo-1550355291-bbee04a92027?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1236&q=80',
+                        passengers: 5,
+                        transmission: "Manuel",
+                        price: 100000,
+                        brand: "Volkswagen",
+                        model: "Passat",
+                        production_year: 2019,
+                        kilometer: 45000
+                    },
+                    {
+                        id: 41,
+                        name: "data",
+                        type: "Sedan",
+                        image: 'https://images.unsplash.com/photo-1494976388531-d1058494cdd8?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1170&q=80',
+                        passengers: 5,
+                        transmission: "Manuel",
+                        price: 1000000,
+                        brand: "Honda",
+                        model: "Civic",
+                        production_year: 2018,
+                        kilometer: 10000
+                    },
+                    {
+                        id: 40,
+                        name: "test",
+                        type: "Sedan",
+                        image: 'https://images.unsplash.com/photo-1553440569-bcc63803a83d?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1125&q=80',
+                        passengers: 5,
+                        transmission: "Manuel",
+                        price: 750000,
+                        brand: "Ford",
+                        model: "Focus",
+                        production_year: 2017,
+                        kilometer: 45000
+                    },
+                    {
+                        id: 39,
+                        name: "BMW 320i",
+                        type: "Sedan",
+                        image: 'https://images.unsplash.com/photo-1549317661-bd32c8ce0db2?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1170&q=80',
+                        passengers: 5,
+                        transmission: "Manuel",
+                        price: 1000000,
+                        brand: "BMW",
+                        model: "320i",
+                        production_year: 2016,
+                        kilometer: 45000
+                    }
+                ];
                 
                 console.log('Hata durumunda örnek veriler döndürülüyor:', dummyCars);
                 return dummyCars;
@@ -202,33 +294,35 @@
             
             const transmission = car.transmission || 'Bilinmeyen';
             const price = car.price || 0;
+            const brand = car.brand || '';
+            const model = car.model || '';
             
             return `
                 <article class="car-card">
-                    <a href="car-detail.html?id=${car.id}" class="car-link">
-                        <div class="car-content">
-                            <header class="car-header">
-                                <div class="car-title-row">
-                                    <h2 class="car-name">${name}</h2>
+                    <a href="car-detail.html?id=${car.id}" class="car-link" data-car-id="${car.id}">
+                    <div class="car-content">
+                        <header class="car-header">
+                            <div class="car-title-row">
+                                <h2 class="car-name">${name}</h2>
                                     <button class="car-favorite" aria-label="Favorilere ekle" onclick="event.stopPropagation(); event.preventDefault();">
-                                        <i class="far fa-heart"></i>
-                                    </button>
+                                    <i class="far fa-heart"></i>
+                                </button>
+                            </div>
+                                <p class="car-type">${brand} ${model}</p>
+                        </header>
+                        <img src="${image}" alt="${name}" class="car-image" onerror="this.onerror=null; this.src='${defaultImage}';">
+                        <footer class="car-details">
+                            <div class="car-specs">
+                                <div class="spec-item">
+                                    <i class="fas fa-cog spec-icon"></i>
+                                    <span>${transmission}</span>
                                 </div>
-                                <p class="car-type">${type}</p>
-                            </header>
-                            <img src="${image}" alt="${name}" class="car-image" onerror="this.onerror=null; this.src='${defaultImage}';">
-                            <footer class="car-details">
-                                <div class="car-specs">
-                                    <div class="spec-item">
-                                        <i class="fas fa-cog spec-icon"></i>
-                                        <span>${transmission}</span>
-                                    </div>
-                                </div>
-                                <p class="car-price">
-                                    <span class="price-amount">${typeof price === 'number' ? price.toLocaleString() : price} TL</span>
-                                </p>
-                            </footer>
-                        </div>
+                            </div>
+                            <p class="car-price">
+                                <span class="price-amount">${typeof price === 'number' ? price.toLocaleString() : price} TL</span>
+                            </p>
+                        </footer>
+                    </div>
                     </a>
                 </article>
             `;
@@ -321,15 +415,152 @@
             } else {
                 console.log('API testi başarısız! Örnek veriler kullanılacak...');
                 // Örnek verilerle devam et
-                allCars = Array(16).fill().map((_, index) => ({
-                    id: index + 1,
-                    name: ['2020 Model BMW', 'Mercedes C200', 'Audi A3', 'Volkswagen Passat', 'Toyota Corolla', 'Honda Civic', 'Ford Focus', 'Renault Megane'][index % 8],
-                    type: ['Sedan', 'SUV', 'Hatchback', 'Station Wagon'][index % 4],
-                    image: null, // Görsel yok, createCarCard varsayılan görsel kullanacak
-                    passengers: 4 + (index % 3),
-                    transmission: ['Otomatik', 'Manuel', 'Yarı Otomatik'][index % 3],
-                    price: 100000 + (index * 50000)
-                }));
+                allCars = [
+                    {
+                        id: 1,
+                        name: "2020 Model BMW",
+                        type: "Sedan",
+                        image: 'https://images.unsplash.com/photo-1583121274602-3e2820c69888?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1170&q=80',
+                        passengers: 5,
+                        transmission: "Otomatik",
+                        price: 1200000
+                    },
+                    {
+                        id: 2,
+                        name: "Mercedes C200",
+                        type: "Sedan",
+                        image: 'https://images.unsplash.com/photo-1605559424843-9e4c228bf1c2?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1164&q=80',
+                        passengers: 5,
+                        transmission: "Otomatik",
+                        price: 1500000
+                    },
+                    {
+                        id: 3,
+                        name: "Audi A3",
+                        type: "Hatchback",
+                        image: 'https://images.unsplash.com/photo-1552519507-da3b142c6e3d?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1170&q=80',
+                        passengers: 5,
+                        transmission: "Yarı Otomatik",
+                        price: 950000
+                    },
+                    {
+                        id: 4,
+                        name: "Volkswagen Passat",
+                        type: "Sedan",
+                        image: 'https://images.unsplash.com/photo-1542362567-b07e54358753?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1170&q=80',
+                        passengers: 5,
+                        transmission: "Otomatik",
+                        price: 1100000
+                    },
+                    {
+                        id: 5,
+                        name: "Toyota Corolla",
+                        type: "Sedan",
+                        image: 'https://images.unsplash.com/photo-1550355291-bbee04a92027?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1236&q=80',
+                        passengers: 5,
+                        transmission: "Manuel",
+                        price: 850000
+                    },
+                    {
+                        id: 6,
+                        name: "Honda Civic",
+                        type: "Sedan",
+                        image: 'https://images.unsplash.com/photo-1494976388531-d1058494cdd8?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1170&q=80',
+                        passengers: 5,
+                        transmission: "Otomatik",
+                        price: 900000
+                    },
+                    {
+                        id: 7,
+                        name: "Ford Focus",
+                        type: "Hatchback",
+                        image: 'https://images.unsplash.com/photo-1553440569-bcc63803a83d?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1125&q=80',
+                        passengers: 5,
+                        transmission: "Manuel",
+                        price: 750000
+                    },
+                    {
+                        id: 8,
+                        name: "Renault Megane",
+                        type: "Hatchback",
+                        image: 'https://images.unsplash.com/photo-1549317661-bd32c8ce0db2?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1170&q=80',
+                        passengers: 5,
+                        transmission: "Otomatik",
+                        price: 700000
+                    },
+                    {
+                        id: 9,
+                        name: "Hyundai i20",
+                        type: "Hatchback",
+                        image: 'https://images.unsplash.com/photo-1583121274602-3e2820c69888?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1170&q=80',
+                        passengers: 5,
+                        transmission: "Manuel",
+                        price: 600000
+                    },
+                    {
+                        id: 10,
+                        name: "Kia Sportage",
+                        type: "SUV",
+                        image: 'https://images.unsplash.com/photo-1605559424843-9e4c228bf1c2?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1164&q=80',
+                        passengers: 5,
+                        transmission: "Otomatik",
+                        price: 1300000
+                    },
+                    {
+                        id: 11,
+                        name: "Nissan Qashqai",
+                        type: "SUV",
+                        image: 'https://images.unsplash.com/photo-1552519507-da3b142c6e3d?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1170&q=80',
+                        passengers: 5,
+                        transmission: "Otomatik",
+                        price: 1250000
+                    },
+                    {
+                        id: 12,
+                        name: "Peugeot 3008",
+                        type: "SUV",
+                        image: 'https://images.unsplash.com/photo-1542362567-b07e54358753?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1170&q=80',
+                        passengers: 5,
+                        transmission: "Otomatik",
+                        price: 1350000
+                    },
+                    {
+                        id: 13,
+                        name: "Skoda Octavia",
+                        type: "Sedan",
+                        image: 'https://images.unsplash.com/photo-1550355291-bbee04a92027?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1236&q=80',
+                        passengers: 5,
+                        transmission: "Otomatik",
+                        price: 950000
+                    },
+                    {
+                        id: 14,
+                        name: "Fiat Egea",
+                        type: "Sedan",
+                        image: 'https://images.unsplash.com/photo-1494976388531-d1058494cdd8?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1170&q=80',
+                        passengers: 5,
+                        transmission: "Manuel",
+                        price: 650000
+                    },
+                    {
+                        id: 15,
+                        name: "Opel Astra",
+                        type: "Hatchback",
+                        image: 'https://images.unsplash.com/photo-1553440569-bcc63803a83d?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1125&q=80',
+                        passengers: 5,
+                        transmission: "Otomatik",
+                        price: 800000
+                    },
+                    {
+                        id: 45,
+                        name: "Semihten Ucuz Araba",
+                        type: "Sedan",
+                        image: 'https://images.unsplash.com/photo-1549317661-bd32c8ce0db2?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1170&q=80',
+                        passengers: 5,
+                        transmission: "Otomatik",
+                        price: 1500000
+                    }
+                ];
                 
                 loadMoreCars();
             }
