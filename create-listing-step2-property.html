@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>İlan Ver - Emlak Alt Kategorisi Seçimi - TAKKAS</title>
+    
+    <!-- CSS Bağlantıları -->
+    <link rel="stylesheet" href="assets/css/base.css">
+    <link rel="stylesheet" href="assets/css/property-detail-header.css">
+    <link rel="stylesheet" href="assets/css/footer.css">
+    <link rel="stylesheet" href="assets/css/create-listing.css">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <!-- Özel Header Bileşeni -->
+    <div id="header-component"></div>
+
+    <!-- Ana İçerik -->
+    <main class="create-listing-container">
+        <div class="create-listing-header">
+            <h1>İlan Ver</h1>
+            <div class="steps-container">
+                <div class="step completed">
+                    <div class="step-number">1</div>
+                    <div class="step-text">Kategori Seç</div>
+                </div>
+                <div class="step-line completed"></div>
+                <div class="step active">
+                    <div class="step-number">2</div>
+                    <div class="step-text">Alt Kategori Seç</div>
+                </div>
+                <div class="step-line"></div>
+                <div class="step">
+                    <div class="step-number">3</div>
+                    <div class="step-text">İlan Detayları</div>
+                </div>
+                <div class="step-line"></div>
+                <div class="step">
+                    <div class="step-number">4</div>
+                    <div class="step-text">Fotoğraf Ekle</div>
+                </div>
+                <div class="step-line"></div>
+                <div class="step">
+                    <div class="step-number">5</div>
+                    <div class="step-text">Önizleme</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="create-listing-content">
+            <div class="category-path">
+                <a href="create-listing-step1.html">Ana Kategoriler</a> &gt; 
+                <span class="current-category">Emlak</span>
+            </div>
+            
+            <h2 class="section-title">Emlak Tipini Seçin</h2>
+            
+            <div class="subcategory-list">
+                <!-- Konut Kategorisi -->
+                <div class="subcategory-card">
+                    <a href="create-listing-step3.html?category=emlak&subcategory=konut" class="subcategory-link">
+                        <div class="subcategory-icon">
+                            <i class="fas fa-home"></i>
+                        </div>
+                        <div class="subcategory-details">
+                            <div class="subcategory-name">Konut</div>
+                            <div class="subcategory-description">Daire, müstakil ev, villa, yazlık</div>
+                        </div>
+                        <div class="subcategory-arrow">
+                            <i class="fas fa-chevron-right"></i>
+                        </div>
+                    </a>
+                </div>
+                
+                <!-- İş Yeri Kategorisi -->
+                <div class="subcategory-card">
+                    <a href="create-listing-step3.html?category=emlak&subcategory=isyeri" class="subcategory-link">
+                        <div class="subcategory-icon">
+                            <i class="fas fa-building"></i>
+                        </div>
+                        <div class="subcategory-details">
+                            <div class="subcategory-name">İş Yeri</div>
+                            <div class="subcategory-description">Ofis, dükkan, depo, fabrika</div>
+                        </div>
+                        <div class="subcategory-arrow">
+                            <i class="fas fa-chevron-right"></i>
+                        </div>
+                    </a>
+                </div>
+                
+                <!-- Arsa Kategorisi -->
+                <div class="subcategory-card">
+                    <a href="create-listing-step3.html?category=emlak&subcategory=arsa" class="subcategory-link">
+                        <div class="subcategory-icon">
+                            <i class="fas fa-map"></i>
+                        </div>
+                        <div class="subcategory-details">
+                            <div class="subcategory-name">Arsa</div>
+                            <div class="subcategory-description">Konut, ticari, tarla, bağ, bahçe</div>
+                        </div>
+                        <div class="subcategory-arrow">
+                            <i class="fas fa-chevron-right"></i>
+                        </div>
+                    </a>
+                </div>
+                
+                <!-- Bina Kategorisi -->
+                <div class="subcategory-card">
+                    <a href="create-listing-step3.html?category=emlak&subcategory=bina" class="subcategory-link">
+                        <div class="subcategory-icon">
+                            <i class="fas fa-city"></i>
+                        </div>
+                        <div class="subcategory-details">
+                            <div class="subcategory-name">Bina</div>
+                            <div class="subcategory-description">Apartman, rezidans, komple bina</div>
+                        </div>
+                        <div class="subcategory-arrow">
+                            <i class="fas fa-chevron-right"></i>
+                        </div>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer Bileşeni -->
+    <div class="full-width-footer-wrapper">
+        <div id="footer-component"></div>
+    </div>
+
+    <!-- JavaScript -->
+    <script>
+        // Bileşenleri yükle
+        Promise.all([
+            fetch('components/property-detail-header.html').then(response => response.text()),
+            fetch('components/footer.html').then(response => response.text())
+        ]).then(([header, footer]) => {
+            document.getElementById('header-component').innerHTML = header;
+            document.getElementById('footer-component').innerHTML = footer;
+        });
+        
+        // Tamamlanmış adımların stilini ayarla
+        document.addEventListener('DOMContentLoaded', function() {
+            const completedSteps = document.querySelectorAll('.step.completed');
+            completedSteps.forEach(step => {
+                const stepNumber = step.querySelector('.step-number');
+                stepNumber.innerHTML = '<i class="fas fa-check"></i>';
+                stepNumber.style.backgroundColor = '#4CAF50';
+                stepNumber.style.borderColor = '#4CAF50';
+            });
+            
+            const completedLines = document.querySelectorAll('.step-line.completed');
+            completedLines.forEach(line => {
+                line.style.backgroundColor = '#4CAF50';
+            });
+        });
+    </script>
+</body>
+</html> 
