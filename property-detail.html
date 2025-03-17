@@ -407,49 +407,6 @@
                 }
             }, false);
             
-            // Fare ile kaydırma olayları
-            let isDragging = false;
-            let startX = 0;
-            
-            mainImageContainer.addEventListener('mousedown', function(e) {
-                isDragging = true;
-                startX = e.clientX;
-                e.preventDefault(); // Görsel sürüklemesini engelle
-            });
-            
-            mainImageContainer.addEventListener('mousemove', function(e) {
-                if (!isDragging) return;
-                e.preventDefault(); // Görsel sürüklemesini engelle
-            });
-            
-            mainImageContainer.addEventListener('mouseup', function(e) {
-                if (!isDragging) return;
-                
-                const endX = e.clientX;
-                const diffX = endX - startX;
-                
-                if (Math.abs(diffX) > 50) { // En az 50px kaydırma gerekli
-                    if (diffX > 0) {
-                        changeImage(currentImageIndex - 1); // Sağa kaydırma
-                    } else {
-                        changeImage(currentImageIndex + 1); // Sola kaydırma
-                    }
-                } else {
-                    // Kaydırma olmadıysa ve sadece tıklama ise lightbox'ı aç
-                    if (Math.abs(diffX) < 5) {
-                        lightboxImage.src = images[currentImageIndex];
-                        lightbox.style.display = 'flex';
-                        document.body.style.overflow = 'hidden';
-                    }
-                }
-                
-                isDragging = false;
-            });
-            
-            mainImageContainer.addEventListener('mouseleave', function() {
-                isDragging = false;
-            });
-            
             // Kaydırma işlemini yönet
             function handleSwipe() {
                 const swipeThreshold = 50; // En az 50px kaydırma gerekli
@@ -464,7 +421,7 @@
                     changeImage(currentImageIndex - 1);
                 }
             }
-
+            
             // Görsel değiştirme fonksiyonu
             function changeImage(index) {
                 if (index < 0) index = images.length - 1;
@@ -479,17 +436,17 @@
                 });
                 thumbnails[index].classList.add('active');
             }
-
+            
             // Önceki görsel butonu
             prevBtn.addEventListener('click', () => {
                 changeImage(currentImageIndex - 1);
             });
-
+            
             // Sonraki görsel butonu
             nextBtn.addEventListener('click', () => {
                 changeImage(currentImageIndex + 1);
             });
-
+            
             // Thumbnail tıklama olayları
             thumbnails.forEach(thumb => {
                 thumb.addEventListener('click', () => {
@@ -497,27 +454,14 @@
                     changeImage(index);
                 });
             });
-
-            // Favoriye ekleme fonksiyonu
-            document.querySelector('.favorite-button').addEventListener('click', function() {
-                const icon = this.querySelector('i');
-                icon.classList.toggle('far');
-                icon.classList.toggle('fas');
-                
-                if (icon.classList.contains('fas')) {
-                    this.querySelector('span').textContent = 'Favorilerden Çıkar';
-                } else {
-                    this.querySelector('span').textContent = 'Favorilere Ekle';
-                }
-            });
-
+            
             // Lightbox fonksiyonları
             const lightbox = document.getElementById('imageLightbox');
             const lightboxImage = document.getElementById('lightboxImage');
             const lightboxClose = document.querySelector('.lightbox-close');
             const lightboxPrev = document.querySelector('.lightbox-prev');
             const lightboxNext = document.querySelector('.lightbox-next');
-
+            
             // Ana görsele tıklandığında lightbox'ı aç
             mainImage.addEventListener('click', function(e) {
                 e.stopPropagation(); // Olayın yayılmasını engelle
@@ -525,7 +469,7 @@
                 lightbox.style.display = 'flex';
                 document.body.style.overflow = 'hidden'; // Sayfanın kaydırılmasını engelle
             });
-
+            
             // Thumbnail'lere tıklandığında da lightbox'ı aç
             thumbnails.forEach(thumb => {
                 thumb.addEventListener('click', function(e) {
@@ -537,13 +481,13 @@
                     document.body.style.overflow = 'hidden';
                 });
             });
-
+            
             // Lightbox'ı kapat
             lightboxClose.addEventListener('click', function() {
                 lightbox.style.display = 'none';
                 document.body.style.overflow = 'auto'; // Sayfanın kaydırılmasını tekrar etkinleştir
             });
-
+            
             // Lightbox dışına tıklandığında kapat
             lightbox.addEventListener('click', function(e) {
                 if (e.target === lightbox) {
@@ -551,19 +495,19 @@
                     document.body.style.overflow = 'auto';
                 }
             });
-
+            
             // Lightbox içinde önceki görsel
             lightboxPrev.addEventListener('click', function() {
                 changeImage(currentImageIndex - 1);
                 lightboxImage.src = images[currentImageIndex];
             });
-
+            
             // Lightbox içinde sonraki görsel
             lightboxNext.addEventListener('click', function() {
                 changeImage(currentImageIndex + 1);
                 lightboxImage.src = images[currentImageIndex];
             });
-
+            
             // Klavye ile gezinme
             document.addEventListener('keydown', function(e) {
                 if (lightbox.style.display === 'flex') {
@@ -579,27 +523,20 @@
                     }
                 }
             });
-
+            
             // Lightbox içinde dokunmatik kaydırma
             let lightboxTouchStartX = 0;
             let lightboxTouchEndX = 0;
-
+            
             lightboxImage.addEventListener('touchstart', function(e) {
                 lightboxTouchStartX = e.changedTouches[0].screenX;
             }, false);
-
+            
             lightboxImage.addEventListener('touchend', function(e) {
                 lightboxTouchEndX = e.changedTouches[0].screenX;
                 handleLightboxSwipe();
             }, false);
-
-            lightboxImage.addEventListener('touchmove', function(e) {
-                // Sadece lightbox içinde kaydırma yaparken sayfanın kaydırılmasını engelle
-                if (lightbox.style.display === 'flex') {
-                    e.preventDefault();
-                }
-            }, { passive: false });
-
+            
             function handleLightboxSwipe() {
                 const swipeThreshold = 50;
                 
@@ -615,6 +552,19 @@
                     lightboxImage.src = images[currentImageIndex];
                 }
             }
+            
+            // Favoriye ekleme fonksiyonu
+            document.querySelector('.favorite-button').addEventListener('click', function() {
+                const icon = this.querySelector('i');
+                icon.classList.toggle('far');
+                icon.classList.toggle('fas');
+                
+                if (icon.classList.contains('fas')) {
+                    this.querySelector('span').textContent = 'Favorilerden Çıkar';
+                } else {
+                    this.querySelector('span').textContent = 'Favorilere Ekle';
+                }
+            });
         }
 
         // Benzer ilanları yükle

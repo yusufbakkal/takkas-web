@@ -576,6 +576,87 @@
             const prevBtn = document.getElementById('prevImage');
             const nextBtn = document.getElementById('nextImage');
             
+            // Ana görsel container'ı
+            const mainImageContainer = document.querySelector('.main-image');
+            
+            // Dokunmatik kaydırma için değişkenler
+            let touchStartX = 0;
+            let touchEndX = 0;
+            
+            // Dokunmatik kaydırma olayları
+            mainImageContainer.addEventListener('touchstart', function(e) {
+                touchStartX = e.changedTouches[0].screenX;
+            }, false);
+            
+            mainImageContainer.addEventListener('touchend', function(e) {
+                touchEndX = e.changedTouches[0].screenX;
+                const diffX = touchEndX - touchStartX;
+                
+                // Eğer kaydırma mesafesi küçükse, bu bir dokunma olarak kabul edilir
+                if (Math.abs(diffX) < 10) {
+                    lightboxImage.src = images[currentImageIndex];
+                    lightbox.style.display = 'flex';
+                    document.body.style.overflow = 'hidden';
+                } else {
+                    handleSwipe();
+                }
+            }, false);
+            
+            // Kaydırma işlemini yönet
+            function handleSwipe() {
+                const swipeThreshold = 50; // En az 50px kaydırma gerekli
+                
+                if (touchEndX < touchStartX - swipeThreshold) {
+                    // Sola kaydırma
+                    changeImage(currentImageIndex + 1);
+                }
+                
+                if (touchEndX > touchStartX + swipeThreshold) {
+                    // Sağa kaydırma
+                    changeImage(currentImageIndex - 1);
+                }
+            }
+            
+            // Görsel değiştirme fonksiyonu
+            function changeImage(index) {
+                if (index < 0) index = images.length - 1;
+                if (index >= images.length) index = 0;
+                
+                currentImageIndex = index;
+                mainImage.src = images[index];
+                
+                // Aktif thumbnail'i güncelle
+                thumbnails.forEach(thumb => {
+                    thumb.classList.remove('active');
+                });
+                thumbnails[index].classList.add('active');
+            }
+            
+            // Önceki görsel butonu
+            prevBtn.addEventListener('click', () => {
+                changeImage(currentImageIndex - 1);
+            });
+            
+            // Sonraki görsel butonu
+            nextBtn.addEventListener('click', () => {
+                changeImage(currentImageIndex + 1);
+            });
+            
+            // Thumbnail tıklama olayları
+            thumbnails.forEach(thumb => {
+                thumb.addEventListener('click', () => {
+                    const index = parseInt(thumb.getAttribute('data-index'));
+                    changeImage(index);
+                });
+            });
+            
+            // Lightbox fonksiyonları
+            const lightbox = document.getElementById('imageLightbox');
+            const lightboxImage = document.getElementById('lightboxImage');
+            const lightboxClose = document.querySelector('.lightbox-close');
+            const lightboxPrev = document.querySelector('.lightbox-prev');
+            const lightboxNext = document.querySelector('.lightbox-next');
+            
             // Ana görsele tıklandığında lightbox'ı aç
             mainImage.addEventListener('click', function(e) {
                 e.stopPropagation(); // Olayın yayılmasını engelle
@@ -583,7 +664,7 @@
                 lightbox.style.display = 'flex';
                 document.body.style.overflow = 'hidden'; // Sayfanın kaydırılmasını engelle
             });
-
+            
             // Thumbnail'lere tıklandığında da lightbox'ı aç
             thumbnails.forEach(thumb => {
                 thumb.addEventListener('click', function(e) {
@@ -595,20 +676,13 @@
                     document.body.style.overflow = 'hidden';
                 });
             });
-
-            // Lightbox fonksiyonları
-            const lightbox = document.getElementById('imageLightbox');
-            const lightboxImage = document.getElementById('lightboxImage');
-            const lightboxClose = document.querySelector('.lightbox-close');
-            const lightboxPrev = document.querySelector('.lightbox-prev');
-            const lightboxNext = document.querySelector('.lightbox-next');
-
+            
             // Lightbox'ı kapat
             lightboxClose.addEventListener('click', function() {
                 lightbox.style.display = 'none';
                 document.body.style.overflow = 'auto'; // Sayfanın kaydırılmasını tekrar etkinleştir
             });
-
+            
             // Lightbox dışına tıklandığında kapat
             lightbox.addEventListener('click', function(e) {
                 if (e.target === lightbox) {
@@ -616,19 +690,19 @@
                     document.body.style.overflow = 'auto';
                 }
             });
-
+            
             // Lightbox içinde önceki görsel
             lightboxPrev.addEventListener('click', function() {
                 changeImage(currentImageIndex - 1);
                 lightboxImage.src = images[currentImageIndex];
             });
-
+            
             // Lightbox içinde sonraki görsel
             lightboxNext.addEventListener('click', function() {
                 changeImage(currentImageIndex + 1);
                 lightboxImage.src = images[currentImageIndex];
             });
-
+            
             // Klavye ile gezinme
             document.addEventListener('keydown', function(e) {
                 if (lightbox.style.display === 'flex') {
@@ -644,27 +718,20 @@
                     }
                 }
             });
-
+            
             // Lightbox içinde dokunmatik kaydırma
             let lightboxTouchStartX = 0;
             let lightboxTouchEndX = 0;
-
+            
             lightboxImage.addEventListener('touchstart', function(e) {
                 lightboxTouchStartX = e.changedTouches[0].screenX;
             }, false);
-
+            
             lightboxImage.addEventListener('touchend', function(e) {
                 lightboxTouchEndX = e.changedTouches[0].screenX;
                 handleLightboxSwipe();
             }, false);
-
-            lightboxImage.addEventListener('touchmove', function(e) {
-                // Sadece lightbox içinde kaydırma yaparken sayfanın kaydırılmasını engelle
-                if (lightbox.style.display === 'flex') {
-                    e.preventDefault();
-                }
-            }, { passive: false });
-
+            
             function handleLightboxSwipe() {
                 const swipeThreshold = 50;
                 
@@ -680,55 +747,7 @@
                     lightboxImage.src = images[currentImageIndex];
                 }
             }
-
-            // Kaydırma işlemini yönet
-            function handleSwipe() {
-                const swipeThreshold = 50; // En az 50px kaydırma gerekli
-                
-                if (touchEndX < touchStartX - swipeThreshold) {
-                    // Sola kaydırma
-                    changeImage(currentImageIndex + 1);
-                }
-                
-                if (touchEndX > touchStartX + swipeThreshold) {
-                    // Sağa kaydırma
-                    changeImage(currentImageIndex - 1);
-                }
-            }
-
-            // Görsel değiştirme fonksiyonu
-            function changeImage(index) {
-                if (index < 0) index = images.length - 1;
-                if (index >= images.length) index = 0;
-                
-                currentImageIndex = index;
-                mainImage.src = images[index];
-                
-                // Aktif thumbnail'i güncelle
-                thumbnails.forEach(thumb => {
-                    thumb.classList.remove('active');
-                });
-                thumbnails[index].classList.add('active');
-            }
-
-            // Önceki görsel butonu
-            prevBtn.addEventListener('click', () => {
-                changeImage(currentImageIndex - 1);
-            });
-
-            // Sonraki görsel butonu
-            nextBtn.addEventListener('click', () => {
-                changeImage(currentImageIndex + 1);
-            });
-
-            // Thumbnail tıklama olayları
-            thumbnails.forEach(thumb => {
-                thumb.addEventListener('click', () => {
-                    const index = parseInt(thumb.getAttribute('data-index'));
-                    changeImage(index);
-                });
-            });
-
+            
             // Favoriye ekleme fonksiyonu
             document.querySelector('.favorite-button').addEventListener('click', function() {
                 const icon = this.querySelector('i');
