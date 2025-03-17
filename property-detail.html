@@ -461,40 +461,40 @@
             const lightboxClose = document.querySelector('.lightbox-close');
             const lightboxPrev = document.querySelector('.lightbox-prev');
             const lightboxNext = document.querySelector('.lightbox-next');
+            const lightboxContent = document.querySelector('.lightbox-content');
             
             // Ana görsele tıklandığında lightbox'ı aç
-            mainImage.addEventListener('click', function(e) {
-                e.stopPropagation(); // Olayın yayılmasını engelle
-                lightboxImage.src = images[currentImageIndex];
-                lightbox.style.display = 'flex';
-                document.body.style.overflow = 'hidden'; // Sayfanın kaydırılmasını engelle
-            });
+            mainImage.addEventListener('click', openLightbox);
             
             // Thumbnail'lere tıklandığında da lightbox'ı aç
             thumbnails.forEach(thumb => {
-                thumb.addEventListener('click', function(e) {
-                    e.stopPropagation(); // Olayın yayılmasını engelle
-                    const index = parseInt(thumb.getAttribute('data-index'));
+                thumb.addEventListener('click', function() {
+                    const index = parseInt(this.getAttribute('data-index'));
                     changeImage(index);
-                    lightboxImage.src = images[index];
-                    lightbox.style.display = 'flex';
-                    document.body.style.overflow = 'hidden';
+                    openLightbox();
                 });
             });
             
+            function openLightbox() {
+                lightboxImage.src = images[currentImageIndex];
+                lightbox.style.display = 'flex';
+                document.body.style.overflow = 'hidden';
+            }
+            
             // Lightbox'ı kapat
-            lightboxClose.addEventListener('click', function() {
-                lightbox.style.display = 'none';
-                document.body.style.overflow = 'auto'; // Sayfanın kaydırılmasını tekrar etkinleştir
-            });
+            lightboxClose.addEventListener('click', closeLightbox);
             
             // Lightbox dışına tıklandığında kapat
             lightbox.addEventListener('click', function(e) {
                 if (e.target === lightbox) {
-                    lightbox.style.display = 'none';
-                    document.body.style.overflow = 'auto';
+                    closeLightbox();
                 }
             });
+            
+            function closeLightbox() {
+                lightbox.style.display = 'none';
+                document.body.style.overflow = 'auto';
+            }
             
             // Lightbox içinde önceki görsel
             lightboxPrev.addEventListener('click', function() {
@@ -518,8 +518,7 @@
                         changeImage(currentImageIndex + 1);
                         lightboxImage.src = images[currentImageIndex];
                     } else if (e.key === 'Escape') {
-                        lightbox.style.display = 'none';
-                        document.body.style.overflow = 'auto';
+                        closeLightbox();
                     }
                 }
             });
@@ -530,12 +529,12 @@
             
             lightboxImage.addEventListener('touchstart', function(e) {
                 lightboxTouchStartX = e.changedTouches[0].screenX;
-            }, false);
+            });
             
             lightboxImage.addEventListener('touchend', function(e) {
                 lightboxTouchEndX = e.changedTouches[0].screenX;
                 handleLightboxSwipe();
-            }, false);
+            });
             
             function handleLightboxSwipe() {
                 const swipeThreshold = 50;

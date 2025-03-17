@@ -706,6 +706,7 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
+    z-index: 10000;
 }
 
 .lightbox-image {
@@ -713,6 +714,7 @@ body {
     max-height: 100%;
     object-fit: contain;
     cursor: default;
+    pointer-events: none;
 }
 
 .lightbox-close {
@@ -723,7 +725,8 @@ body {
     font-size: 35px;
     font-weight: bold;
     cursor: pointer;
-    z-index: 10;
+    z-index: 10001;
+    padding: 10px;
 }
 
 .lightbox-nav {
@@ -742,6 +745,7 @@ body {
     color: white;
     font-size: 20px;
     transition: background-color 0.3s;
+    z-index: 10001;
 }
 
 .lightbox-nav:hover {
@@ -775,4 +779,9 @@ body {
     .lightbox-next {
         right: 10px;
     }
+}
+
+/* Make main image clickable */
+.main-image img {
+    cursor: pointer;
 } 
