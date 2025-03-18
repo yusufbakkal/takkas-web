@@ -205,29 +205,31 @@
             
             return `
                 <article class="car-card">
-                    <div class="car-content">
-                        <header class="car-header">
-                            <div class="car-title-row">
-                                <h2 class="car-name">${name}</h2>
-                                <button class="car-favorite" aria-label="Favorilere ekle">
-                                    <i class="far fa-heart"></i>
-                                </button>
-                            </div>
-                            <p class="car-type">${type}</p>
-                        </header>
-                        <img src="${image}" alt="${name}" class="car-image" onerror="this.onerror=null; this.src='${defaultImage}';">
-                        <footer class="car-details">
-                            <div class="car-specs">
-                                <div class="spec-item">
-                                    <i class="fas fa-cog spec-icon"></i>
-                                    <span>${transmission}</span>
+                    <a href="car-detail.html?id=${car.id}" class="car-link">
+                        <div class="car-content">
+                            <header class="car-header">
+                                <div class="car-title-row">
+                                    <h2 class="car-name">${name}</h2>
+                                    <button class="car-favorite" aria-label="Favorilere ekle" onclick="event.stopPropagation(); event.preventDefault();">
+                                        <i class="far fa-heart"></i>
+                                    </button>
                                 </div>
-                            </div>
-                            <p class="car-price">
-                                <span class="price-amount">${typeof price === 'number' ? price.toLocaleString() : price} TL</span>
-                            </p>
-                        </footer>
-                    </div>
+                                <p class="car-type">${type}</p>
+                            </header>
+                            <img src="${image}" alt="${name}" class="car-image" onerror="this.onerror=null; this.src='${defaultImage}';">
+                            <footer class="car-details">
+                                <div class="car-specs">
+                                    <div class="spec-item">
+                                        <i class="fas fa-cog spec-icon"></i>
+                                        <span>${transmission}</span>
+                                    </div>
+                                </div>
+                                <p class="car-price">
+                                    <span class="price-amount">${typeof price === 'number' ? price.toLocaleString() : price} TL</span>
+                                </p>
+                            </footer>
+                        </div>
+                    </a>
                 </article>
             `;
         }
