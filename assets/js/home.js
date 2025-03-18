@@ -28,16 +28,13 @@ async function fetchCarsAndCreateSlider() {
         const sliderContainer = document.querySelector('.car-slider-container');
         sliderContainer.innerHTML = '';
         
-        // En fazla 8 aracı göster (4 orijinal + 4 kopya)
-        const carsToShow = cars.slice(0, 8);
-        
-        // Araç kartlarını oluştur
-        carsToShow.forEach(car => {
+        // Tüm araçları göster
+        cars.forEach(car => {
             sliderContainer.appendChild(createCarCard(car));
         });
         
         // Sonsuz döngü için aynı kartların kopyasını ekle
-        carsToShow.forEach(car => {
+        cars.forEach(car => {
             sliderContainer.appendChild(createCarCard(car));
         });
         
