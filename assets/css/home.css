@@ -183,6 +183,7 @@
     padding: 0 40px;
     margin: 2rem 0;
     overflow: hidden;
+    touch-action: pan-y pinch-zoom; /* Dokunmatik kaydırmayı etkinleştir */
 }
 
 .car-slider-container {
@@ -190,6 +191,12 @@
     gap: 24px;
     transition: transform 0.5s ease;
     padding: 1rem 0;
+    cursor: grab; /* Kaydırılabilir olduğunu belirt */
+    user-select: none; /* Metin seçimini engelle */
+}
+
+.car-slider-container:active {
+    cursor: grabbing; /* Kaydırma sırasında cursor'ı değiştir */
 }
 
 .car-slider .car-card {
@@ -395,5 +402,21 @@
     
     .car-slider {
         padding: 0 20px;
+    }
+}
+
+/* Mobil cihazlar için düzenlemeler */
+@media (max-width: 768px) {
+    .car-slider {
+        padding: 0 20px;
+    }
+    
+    .car-slider .car-card {
+        width: calc(100% - 8px); /* Mobilde tek kart göster */
+        min-width: 280px;
+    }
+    
+    .slider-nav {
+        display: none; /* Mobilde ok butonlarını gizle */
     }
 } 

@@ -168,6 +168,9 @@ function initializeSlider() {
     const cardWidth = cards[0].offsetWidth;
     const gap = 24; // kartlar arası boşluk
     let currentIndex = 0;
+    let startX = 0;
+    let currentX = 0;
+    let isDragging = false;
     
     // Görünür kart sayısını hesapla
     const sliderWidth = document.querySelector('.car-slider').offsetWidth;
@@ -189,6 +192,42 @@ function initializeSlider() {
             <i class="fas fa-chevron-right"></i>
         </button>
     `);
+
+    // Dokunmatik olayları ekle
+    slider.addEventListener('touchstart', (e) => {
+        startX = e.touches[0].clientX;
+        currentX = startX;
+        isDragging = true;
+        slider.style.transition = 'none';
+    });
+
+    slider.addEventListener('touchmove', (e) => {
+        if (!isDragging) return;
+        e.preventDefault();
+        currentX = e.touches[0].clientX;
+        const diff = currentX - startX;
+        const currentTransform = currentIndex * (cardWidth + gap);
+        slider.style.transform = `translateX(${-currentTransform + diff}px)`;
+    });
+
+    slider.addEventListener('touchend', () => {
+        if (!isDragging) return;
+        isDragging = false;
+        const diff = currentX - startX;
+        
+        // Kaydırma mesafesine göre yönü belirle
+        if (Math.abs(diff) > cardWidth / 3) { // Kartın 1/3'ünden fazla kaydırıldıysa
+            if (diff > 0) {
+                slideCards('prev');
+            } else {
+                slideCards('next');
+            }
+        } else {
+            // Yeterli kaydırma yoksa mevcut pozisyona geri dön
+            slider.style.transition = 'transform 0.3s ease';
+            slider.style.transform = `translateX(-${currentIndex * (cardWidth + gap)}px)`;
+        }
+    });
 
     // Kaydırma fonksiyonu
     window.slideCards = function(direction) {
