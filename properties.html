@@ -54,9 +54,9 @@
         // API'den tüm emlakları çek
         async function fetchAllProperties() {
             try {
-                console.log('API isteği gönderiliyor:', 'https://takkas-api.onrender.com/api/estates');
+                console.log('API isteği gönderiliyor:', 'https://takkas-api.onrender.com/api/property-listings');
                 
-                const response = await fetch('https://takkas-api.onrender.com/api/estates');
+                const response = await fetch('https://takkas-api.onrender.com/api/property-listings');
                 console.log('API yanıt durumu:', response.status, response.statusText);
                 
                 if (!response.ok) {
@@ -154,7 +154,7 @@
                                 <div class="spec-item">
                                     <i class="fas fa-bed spec-icon"></i>
                                         <span>${rooms}</span>
-                                    </div>
+                                </div>
                             </div>
                             <p class="property-price">
                                     <span class="price-amount">${typeof price === 'number' ? price.toLocaleString() : price} TL</span>
