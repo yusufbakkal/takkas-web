@@ -178,40 +178,29 @@
 
 /* Araç Slider Stili */
 .car-slider {
-    width: 100%;
     position: relative;
-    padding: 20px 0;
-    margin: 40px 0;
+    width: 100%;
+    padding: 0 40px;
+    margin: 2rem 0;
     overflow: hidden;
 }
 
 .car-slider-container {
     display: flex;
     gap: 24px;
-    padding: 0 40px; /* Sadece yanlarda padding */
-    transition: transform 0.3s ease;
-    width: calc(100% - 80px); /* Ok butonları için kenar boşluğu */
-    margin: 0 auto;
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
-    scrollbar-width: none; /* Firefox için */
-}
-
-.car-slider-container::-webkit-scrollbar {
-    display: none; /* Chrome, Safari ve Opera için */
+    transition: transform 0.5s ease;
+    padding: 1rem 0;
 }
 
 .car-slider .car-card {
-    flex: 0 0 calc(25% - 30px); /* 4 kart için genişlik (24px gap ve margin hesaba katıldı) */
+    flex: 0 0 auto;
+    width: calc(25% - 18px); /* 4 kart yan yana */
+    min-width: 280px;
     background: white;
     border-radius: 12px;
-    padding: 12px;
     box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-    height: 340px; /* Yükseklik azaltıldı */
-    display: flex;
-    flex-direction: column;
-    min-width: 0;
-    transition: transform 0.3s;
+    overflow: hidden;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
 .car-slider .car-card:hover {
@@ -220,6 +209,7 @@
 }
 
 .car-slider .car-content {
+    padding: 12px;
     display: flex;
     flex-direction: column;
     height: 100%;
@@ -301,10 +291,11 @@
 
 .car-slider .car-image {
     width: 100%;
-    height: 180px; /* Görsel yüksekliği azaltıldı */
+    height: 200px;
     object-fit: cover;
-    border-radius: 8px;
-    margin: 8px 0;
+    border-radius: 8px 8px 0 0;
+    margin: 0;
+    padding: 0;
 }
 
 .car-slider .car-details {
@@ -384,71 +375,25 @@
     display: none;
 }
 
-/* Responsive */
+/* Responsive düzenlemeler */
 @media (max-width: 1200px) {
     .car-slider .car-card {
-        flex: 0 0 calc(33.333% - 24px); /* 3 kart */
+        width: calc(33.333% - 16px); /* 3 kart yan yana */
     }
 }
 
 @media (max-width: 992px) {
     .car-slider .car-card {
-        flex: 0 0 calc(50% - 24px); /* 2 kart */
-    }
-    
-    .car-slider-container {
-        padding: 0 20px;
-        width: calc(100% - 40px);
-    }
-}
-
-@media (max-width: 768px) {
-    .car-slider {
-        padding: 10px 0;
-        margin: 20px 0;
-    }
-    
-    .car-slider-container {
-        padding: 0 15px;
-        width: calc(100% - 30px);
-        gap: 15px;
-    }
-    
-    .slider-nav {
-        width: 30px;
-        height: 30px;
-    }
-    
-    .car-slider .car-specs {
-        gap: 10px;
-    }
-    
-    .car-slider .spec-item {
-        font-size: 12px;
-    }
-    
-    .car-slider .car-price {
-        font-size: 14px;
+        width: calc(50% - 12px); /* 2 kart yan yana */
     }
 }
 
 @media (max-width: 576px) {
     .car-slider .car-card {
-        flex: 0 0 calc(100% - 20px); /* 1 kart */
-        height: 320px;
+        width: calc(100% - 8px); /* 1 kart */
     }
     
-    .car-slider-container {
-        padding: 0 10px;
-        width: calc(100% - 20px);
-        gap: 10px;
-    }
-    
-    .car-slider .car-image {
-        height: 160px;
-    }
-    
-    .slider-nav {
-        display: none; /* Mobilde ok butonlarını gizle */
+    .car-slider {
+        padding: 0 20px;
     }
 } 

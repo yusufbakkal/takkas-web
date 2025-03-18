@@ -54,7 +54,7 @@ async function fetchCarsAndCreateSlider() {
 // API'den araçları çek
 async function fetchCars() {
     try {
-        const response = await fetch('https://takkas-api.onrender.com/api/vehicles');
+        const response = await fetch('https://takkas-api.onrender.com/api/vehicle-listings');
         
         if (!response.ok) {
             throw new Error(`API isteği başarısız oldu: ${response.status} ${response.statusText}`);
@@ -168,9 +168,14 @@ function createCarCard(car) {
 function initializeSlider() {
     const slider = document.querySelector('.car-slider-container');
     const cards = document.querySelectorAll('.car-card');
-    const cardWidth = cards[0].offsetWidth + 24; // 24px gap
+    const cardWidth = cards[0].offsetWidth;
+    const gap = 24; // kartlar arası boşluk
     let currentIndex = 0;
-
+    
+    // Görünür kart sayısını hesapla
+    const sliderWidth = document.querySelector('.car-slider').offsetWidth;
+    const visibleCards = Math.floor(sliderWidth / (cardWidth + gap));
+    
     // Kaydırma butonlarını ekle
     const sliderContainer = document.querySelector('.car-slider');
     
@@ -190,15 +195,26 @@ function initializeSlider() {
 
     // Kaydırma fonksiyonu
     window.slideCards = function(direction) {
-        const maxIndex = cards.length - 1;
+        const totalCards = cards.length;
+        const maxIndex = totalCards - visibleCards;
         
         if (direction === 'next') {
-            currentIndex = currentIndex >= maxIndex ? 0 : currentIndex + 1;
+            currentIndex = (currentIndex + visibleCards) >= maxIndex ? 0 : currentIndex + visibleCards;
         } else {
-            currentIndex = currentIndex <= 0 ? maxIndex : currentIndex - 1;
+            currentIndex = currentIndex <= 0 ? maxIndex - (maxIndex % visibleCards) : currentIndex - visibleCards;
         }
 
-        slider.style.transform = `translateX(-${currentIndex * cardWidth}px)`;
+        // Smooth scroll efekti ile kaydır
+        slider.style.transition = 'transform 0.5s ease';
+        slider.style.transform = `translateX(-${currentIndex * (cardWidth + gap)}px)`;
+        
+        // Sonsuz döngü için pozisyonu sıfırla
+        if (currentIndex === 0) {
+            setTimeout(() => {
+                slider.style.transition = 'none';
+                slider.style.transform = 'translateX(0)';
+            }, 500);
+        }
     };
 }
 
