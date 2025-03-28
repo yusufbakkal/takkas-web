@@ -1,97 +1,70 @@
 document.addEventListener('DOMContentLoaded', function() {
     const cardStack = document.querySelector('.card-stack');
     let currentCardIndex = 0;
+    let allCards = []; // API'den gelecek veriler için boş array
     
-    // Tüm kartların verisi
-    const allCards = [
-        {
-            id: 1,
-            title: 'BMW M4 Competition',
-            type: 'Spor Araç',
-            price: 2450000,
-            year: 2023,
-            mileage: 15000,
-            fuel: 'Benzin',
-            images: [
-                'https://images.unsplash.com/photo-1617814076367-b759c7d7e738',
-                'https://images.unsplash.com/photo-1580273916550-e323be2ae537',
-                'https://images.unsplash.com/photo-1614162692292-7ac56d7f7f1e'
-            ]
-        },
-        {
-            id: 2,
-            title: 'Mercedes-AMG GT',
-            type: 'Spor Araç',
-            price: 3250000,
-            year: 2022,
-            mileage: 8000,
-            fuel: 'Benzin',
-            images: [
-                'https://images.unsplash.com/photo-1618843479313-40f8afb4b4d8',
-                'https://images.unsplash.com/photo-1614200179396-2bdb77ebf81b',
-                'https://images.unsplash.com/photo-1606220838315-056192d5e927'
-            ]
-        },
-        {
-            id: 3,
-            title: 'Porsche 911 GT3',
-            type: 'Spor Araç',
-            price: 4150000,
-            year: 2023,
-            mileage: 3000,
-            fuel: 'Benzin',
-            images: [
-                'https://images.unsplash.com/photo-1603584173870-7f23fdae1b7a',
-                'https://images.unsplash.com/photo-1614162692292-7ac56d7f7f1e',
-                'https://images.unsplash.com/photo-1617814076367-b759c7d7e738'
-            ]
-        },
-        {
-            id: 4,
-            title: 'Audi RS7 Sportback',
-            type: 'Spor Araç',
-            price: 3850000,
-            year: 2022,
-            mileage: 12000,
-            fuel: 'Benzin',
-            images: [
-                'https://images.unsplash.com/photo-1544829099-b9a0c07fad1a',
-                'https://images.unsplash.com/photo-1606220838315-056192d5e927',
-                'https://images.unsplash.com/photo-1617814076367-b759c7d7e738'
-            ]
-        },
-        {
-            id: 5,
-            title: 'Tesla Model S Plaid',
-            type: 'Elektrik Araç',
-            price: 2950000,
-            year: 2023,
-            mileage: 5000,
-            fuel: 'Elektrik',
-            images: [
-                'https://images.unsplash.com/photo-1617814076367-b759c7d7e738',
-                'https://images.unsplash.com/photo-1580273916550-e323be2ae537',
-                'https://images.unsplash.com/photo-1614162692292-7ac56d7f7f1e'
-            ]
-        },
-        {
-            id: 6,
-            title: 'Lamborghini Huracán',
-            type: 'Spor Araç',
-            price: 5750000,
-            year: 2022,
-            mileage: 2000,
-            fuel: 'Benzin',
-            images: [
-                'https://images.unsplash.com/photo-1614162692292-7ac56d7f7f1e',
-                'https://images.unsplash.com/photo-1617814076367-b759c7d7e738',
-                'https://images.unsplash.com/photo-1603584173870-7f23fdae1b7a'
-            ]
+    // API'den araçları çek
+    async function fetchVehicles() {
+        try {
+            const response = await fetch('https://takkas-api.onrender.com/api/vehicle-listings');
+            if (!response.ok) {
+                throw new Error('API isteği başarısız oldu');
+            }
+            const data = await response.json();
+            console.log('API\'den gelen veriler:', data);
+            
+            // API'den gelen verileri formatlayarak allCards'a aktar
+            allCards = data.map(vehicle => ({
+                id: vehicle.id,
+                title: vehicle.title || `${vehicle.brand} ${vehicle.model}`,
+                type: vehicle.case_type || 'Araç',
+                price: parseFloat(vehicle.price),
+                year: vehicle.production_year,
+                mileage: vehicle.kilometer,
+                fuel: vehicle.fuel_type,
+                images: [
+                    // Eğer araç görseli yoksa varsayılan görseller kullan
+                    vehicle.image_url || 'https://images.unsplash.com/photo-1617814076367-b759c7d7e738',
+                    'https://images.unsplash.com/photo-1580273916550-e323be2ae537',
+                    'https://images.unsplash.com/photo-1614162692292-7ac56d7f7f1e'
+                ]
+            }));
+            
+            // İlk kartı göster
+            if (allCards.length > 0) {
+                renderCard(allCards[currentCardIndex]);
+            }
+        } catch (error) {
+            console.error('Araçlar yüklenirken hata:', error);
+            // Hata durumunda örnek verilerle devam et
+            loadSampleData();
         }
-    ];
+    }
 
-    // İlk kartı göster
-    renderCard(allCards[currentCardIndex]);
+    // Örnek veriler (sadece API hatası durumunda kullanılacak)
+    function loadSampleData() {
+        allCards = [
+            {
+                id: 1,
+                title: 'BMW M4 Competition',
+                type: 'Spor Araç',
+                price: 2450000,
+                year: 2023,
+                mileage: 15000,
+                fuel: 'Benzin',
+                images: [
+                    'https://images.unsplash.com/photo-1617814076367-b759c7d7e738',
+                    'https://images.unsplash.com/photo-1580273916550-e323be2ae537',
+                    'https://images.unsplash.com/photo-1614162692292-7ac56d7f7f1e'
+                ]
+            }
+            // Diğer örnek kartlar buraya eklenebilir
+        ];
+        renderCard(allCards[currentCardIndex]);
+    }
+
+    // Sayfa yüklendiğinde API'den verileri çek
+    fetchVehicles();
 
     function renderCard(cardData) {
         const cardHTML = `
