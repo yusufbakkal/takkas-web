@@ -57,86 +57,18 @@
             
             <h2 class="section-title">Araç Tipini Seçin</h2>
             
-            <div class="subcategory-list">
-                <!-- Otomobil Kategorisi -->
-                <div class="subcategory-card">
-                    <a href="create-listing-step3.html?category=vasita&subcategory=car" class="subcategory-link">
-                        <div class="subcategory-icon">
-                            <i class="fas fa-car"></i>
-                        </div>
-                        <div class="subcategory-details">
-                            <div class="subcategory-name">Otomobil</div>
-                            <div class="subcategory-description">Binek araçlar, sedan, hatchback, SUV</div>
-                        </div>
-                        <div class="subcategory-arrow">
-                            <i class="fas fa-chevron-right"></i>
-                        </div>
-                    </a>
-                </div>
-                
-                <!-- Arazi, SUV & Pickup Kategorisi -->
-                <div class="subcategory-card">
-                    <a href="create-listing-step3.html?category=vasita&subcategory=suv-pickup" class="subcategory-link">
-                        <div class="subcategory-icon">
-                            <i class="fas fa-truck-pickup"></i>
-                        </div>
-                        <div class="subcategory-details">
-                            <div class="subcategory-name">Arazi, SUV & Pickup</div>
-                            <div class="subcategory-description">Arazi araçları, SUV'lar ve pickup'lar</div>
-                        </div>
-                        <div class="subcategory-arrow">
-                            <i class="fas fa-chevron-right"></i>
-                        </div>
-                    </a>
-                </div>
-                
-                <!-- Karavan Kategorisi -->
-                <div class="subcategory-card">
-                    <a href="create-listing-step3.html?category=vasita&subcategory=caravan" class="subcategory-link">
-                        <div class="subcategory-icon">
-                            <i class="fas fa-caravan"></i>
-                        </div>
-                        <div class="subcategory-details">
-                            <div class="subcategory-name">Karavan</div>
-                            <div class="subcategory-description">Her türlü karavan ve motorkaravan</div>
-                        </div>
-                        <div class="subcategory-arrow">
-                            <i class="fas fa-chevron-right"></i>
-                        </div>
-                    </a>
-                </div>
-                
-                <!-- Elektrikli Araçlar Kategorisi -->
-                <div class="subcategory-card">
-                    <a href="create-listing-step3.html?category=vasita&subcategory=electric" class="subcategory-link">
-                        <div class="subcategory-icon">
-                            <i class="fas fa-charging-station"></i>
-                        </div>
-                        <div class="subcategory-details">
-                            <div class="subcategory-name">Elektrikli Araçlar</div>
-                            <div class="subcategory-description">Tam elektrikli ve hibrit araçlar</div>
-                        </div>
-                        <div class="subcategory-arrow">
-                            <i class="fas fa-chevron-right"></i>
-                        </div>
-                    </a>
-                </div>
-                
-                <!-- Motosiklet Kategorisi -->
-                <div class="subcategory-card">
-                    <a href="create-listing-step3.html?category=vasita&subcategory=motorcycle" class="subcategory-link">
-                        <div class="subcategory-icon">
-                            <i class="fas fa-motorcycle"></i>
-                        </div>
-                        <div class="subcategory-details">
-                            <div class="subcategory-name">Motosiklet</div>
-                            <div class="subcategory-description">Her türlü motosiklet ve scooter</div>
-                        </div>
-                        <div class="subcategory-arrow">
-                            <i class="fas fa-chevron-right"></i>
-                        </div>
-                    </a>
-                </div>
+            <div class="loading-spinner" id="categoryLoading">
+                <div class="spinner"></div>
+                <p>Alt kategoriler yükleniyor...</p>
+            </div>
+            
+            <div class="subcategory-list" id="subCategoryList" style="display: none;">
+                <!-- Alt kategoriler JavaScript ile eklenecek -->
+            </div>
+            
+            <div class="error-message" id="errorMessage" style="display: none;">
+                <p>Alt kategoriler yüklenirken bir hata oluştu. Lütfen sayfayı yenileyip tekrar deneyin.</p>
+                <a href="create-listing-step1.html" class="button">Ana Sayfaya Dön</a>
             </div>
         </div>
     </main>
@@ -155,10 +87,16 @@
         ]).then(([header, footer]) => {
             document.getElementById('header-component').innerHTML = header;
             document.getElementById('footer-component').innerHTML = footer;
+            
+            // Tamamlanmış adımların stilini ayarla
+            styleCompletedSteps();
+            
+            // Kategori verilerini yükle
+            loadCategories();
         });
         
         // Tamamlanmış adımların stilini ayarla
-        document.addEventListener('DOMContentLoaded', function() {
+        function styleCompletedSteps() {
             const completedSteps = document.querySelectorAll('.step.completed');
             completedSteps.forEach(step => {
                 const stepNumber = step.querySelector('.step-number');
@@ -171,7 +109,152 @@
             completedLines.forEach(line => {
                 line.style.backgroundColor = '#4CAF50';
             });
-        });
+        }
+        
+        // URL'den kategori ID'lerini al
+        function getCategoryIdsFromUrl() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const categoryIds = urlParams.get('categoryIds');
+            
+            if (categoryIds) {
+                return categoryIds.split(',').map(id => parseInt(id));
+            }
+            
+            return [];
+        }
+        
+        // API'den kategorileri yükle
+        async function loadCategories() {
+            const subCategoryList = document.getElementById('subCategoryList');
+            const loadingSpinner = document.getElementById('categoryLoading');
+            const errorMessage = document.getElementById('errorMessage');
+            
+            try {
+                // URL'den seçilen kategori ID'lerini al
+                const selectedCategoryIds = getCategoryIdsFromUrl();
+                
+                // Eğer kategori ID'leri yoksa hata göster
+                if (selectedCategoryIds.length === 0) {
+                    throw new Error('Seçili kategori bulunamadı');
+                }
+                
+                // Kategorileri API'den çek
+                const response = await fetch('https://takkas-api.onrender.com/api/categories');
+                if (!response.ok) {
+                    throw new Error(`API isteği başarısız oldu: ${response.status}`);
+                }
+                
+                const categories = await response.json();
+                console.log('Kategoriler:', categories);
+                
+                // Alt kategorileri içeren ana kategoriler ve alt kategorileri bul
+                const selectedMainCategories = categories.filter(cat => selectedCategoryIds.includes(cat.id));
+                
+                // Alt kategoriler ve ana kategorileri HTML olarak oluştur
+                let htmlContent = '';
+                
+                // Her ana kategoriyi ve alt kategorilerini göster
+                selectedMainCategories.forEach(mainCat => {
+                    // Ana kategori için alt kategorileri bul
+                    const subCategories = categories.filter(cat => cat.parent_id === mainCat.id);
+                    
+                    // Eğer alt kategoriler varsa onları listele
+                    if (subCategories.length > 0) {
+                        subCategories.forEach(subCat => {
+                            // Her alt kategori için icon belirleme
+                            let iconClass = 'fa-car';
+                            switch (subCat.name.toLowerCase()) {
+                                case 'sedan':
+                                    iconClass = 'fa-car';
+                                    break;
+                                case 'hatchback':
+                                    iconClass = 'fa-car';
+                                    break;
+                                case 'arsa':
+                                    iconClass = 'fa-map-marker-alt';
+                                    break;
+                                case 'konut':
+                                    iconClass = 'fa-home';
+                                    break;
+                                default:
+                                    iconClass = 'fa-car';
+                            }
+                            
+                            htmlContent += `
+                                <div class="subcategory-card">
+                                    <a href="create-listing-step3.html?category=vasita&subcategory=${subCat.id}" class="subcategory-link">
+                                        <div class="subcategory-icon">
+                                            <i class="fas ${iconClass}"></i>
+                                        </div>
+                                        <div class="subcategory-details">
+                                            <div class="subcategory-name">${subCat.name}</div>
+                                            <div class="subcategory-description">${subCat.description || mainCat.name + ' ' + subCat.name}</div>
+                                        </div>
+                                        <div class="subcategory-arrow">
+                                            <i class="fas fa-chevron-right"></i>
+                                        </div>
+                                    </a>
+                                </div>
+                            `;
+                        });
+                    } else {
+                        // Alt kategorisi yoksa doğrudan ana kategori
+                        let iconClass = 'fa-car';
+                        switch (mainCat.name.toLowerCase()) {
+                            case 'otomobil':
+                                iconClass = 'fa-car';
+                                break;
+                            case 'motorsiklet':
+                                iconClass = 'fa-motorcycle';
+                                break;
+                            case 'karavan':
+                                iconClass = 'fa-caravan';
+                                break;
+                            case 'elektrikli otomobil':
+                                iconClass = 'fa-charging-station';
+                                break;
+                            case 'off-road suv pickup':
+                                iconClass = 'fa-truck-pickup';
+                                break;
+                            default:
+                                iconClass = 'fa-car';
+                        }
+                        
+                        htmlContent += `
+                            <div class="subcategory-card">
+                                <a href="create-listing-step3.html?category=vasita&subcategory=${mainCat.id}" class="subcategory-link">
+                                    <div class="subcategory-icon">
+                                        <i class="fas ${iconClass}"></i>
+                                    </div>
+                                    <div class="subcategory-details">
+                                        <div class="subcategory-name">${mainCat.name}</div>
+                                        <div class="subcategory-description">${mainCat.description || 'Araç ilanı oluşturun'}</div>
+                                    </div>
+                                    <div class="subcategory-arrow">
+                                        <i class="fas fa-chevron-right"></i>
+                                    </div>
+                                </a>
+                            </div>
+                        `;
+                    }
+                });
+                
+                // Alt kategorileri sayfaya ekle
+                subCategoryList.innerHTML = htmlContent;
+                subCategoryList.style.display = 'block';
+                loadingSpinner.style.display = 'none';
+                
+            } catch (error) {
+                console.error('Alt kategoriler yüklenirken hata:', error);
+                loadingSpinner.style.display = 'none';
+                errorMessage.style.display = 'block';
+                
+                // 3 saniye sonra ana sayfaya yönlendir
+                setTimeout(() => {
+                    window.location.href = 'create-listing-step1.html';
+                }, 3000);
+            }
+        }
     </script>
 </body>
 </html> 
