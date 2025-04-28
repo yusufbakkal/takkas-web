@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>İlan Ver - Versiyon Seçimi - TAKKAS</title>
+    
+    <!-- CSS Bağlantıları -->
+    <link rel="stylesheet" href="assets/css/base.css">
+    <link rel="stylesheet" href="assets/css/property-detail-header.css">
+    <link rel="stylesheet" href="assets/css/footer.css">
+    <link rel="stylesheet" href="assets/css/create-listing.css">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <!-- Özel Header Bileşeni -->
+    <div id="header-component"></div>
+
+    <!-- Ana İçerik -->
+    <main class="create-listing-container">
+        <div class="create-listing-header">
+            <h1>İlan Ver</h1>
+            <div class="steps-container">
+                <div class="step completed">
+                    <div class="step-number"><i class="fas fa-check"></i></div>
+                    <div class="step-text">Kategori Seç</div>
+                </div>
+                <div class="step-line completed"></div>
+                <div class="step completed">
+                    <div class="step-number"><i class="fas fa-check"></i></div>
+                    <div class="step-text">Yıl Seç</div>
+                </div>
+                <div class="step-line completed"></div>
+                <div class="step completed">
+                    <div class="step-number"><i class="fas fa-check"></i></div>
+                    <div class="step-text">Marka Seç</div>
+                </div>
+                <div class="step-line completed"></div>
+                <div class="step completed">
+                    <div class="step-number"><i class="fas fa-check"></i></div>
+                    <div class="step-text">Model Seç</div>
+                </div>
+                <div class="step-line completed"></div>
+                <div class="step active">
+                    <div class="step-number">5</div>
+                    <div class="step-text">Versiyon Seç</div>
+                </div>
+                <div class="step-line"></div>
+                <div class="step">
+                    <div class="step-number">6</div>
+                    <div class="step-text">İlan Detayları</div>
+                </div>
+                <div class="step-line"></div>
+                <div class="step">
+                    <div class="step-number">7</div>
+                    <div class="step-text">Fotoğraf Ekle</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="create-listing-content">
+            <div class="category-path">
+                <a href="create-listing-step3-models.html" class="path-link">
+                    <i class="fas fa-arrow-left"></i> Modele Dön
+                </a>
+            </div>
+
+            <h2 class="section-title">Versiyon Seçin</h2>
+            
+            <div class="loading-spinner" id="versionsLoading">
+                <div class="spinner"></div>
+                <p>Versiyonlar yükleniyor...</p>
+            </div>
+            
+            <div class="version-list" id="versionList">
+                <!-- Versiyonlar JavaScript ile eklenecek -->
+            </div>
+            
+            <div class="error-message" id="errorMessage" style="display: none;">
+                <p>Versiyonlar yüklenirken bir hata oluştu. Lütfen sayfayı yenileyip tekrar deneyin.</p>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer Bileşeni -->
+    <div class="full-width-footer-wrapper">
+        <div id="footer-component"></div>
+    </div>
+
+    <!-- JavaScript -->
+    <script>
+        // URL'den parametreleri al
+        const urlParams = new URLSearchParams(window.location.search);
+        const categoryId = urlParams.get('categoryId');
+        const selectedYear = urlParams.get('year');
+        const brandName = urlParams.get('brands');
+        const modelName = urlParams.get('models');
+
+        console.log('URL Parametreleri:', {
+            categoryId,
+            selectedYear,
+            brandName,
+            modelName
+        });
+
+        // Bileşenleri yükle
+        Promise.all([
+            fetch('components/property-detail-header.html').then(response => response.text()),
+            fetch('components/footer.html').then(response => response.text())
+        ]).then(([header, footer]) => {
+            document.getElementById('header-component').innerHTML = header;
+            document.getElementById('footer-component').innerHTML = footer;
+            
+            // Versiyonları yükle
+            loadVersions();
+        });
+        
+        // API'den versiyonları yükle
+        async function loadVersions() {
+            const versionList = document.getElementById('versionList');
+            const loadingSpinner = document.getElementById('versionsLoading');
+            const errorMessage = document.getElementById('errorMessage');
+            
+            try {
+                // Versiyonları API'den çek
+                const response = await fetch(`https://takkas-api.onrender.com/api/v1/vehicles/brands/${encodeURIComponent(brandName)}/models/${encodeURIComponent(modelName)}`);
+                if (!response.ok) {
+                    throw new Error(`API isteği başarısız oldu: ${response.status}`);
+                }
+                
+                const versions = await response.json();
+                console.log('Versiyonlar:', versions);
+                
+                let htmlContent = '<ul class="versions">';
+                
+                // Tüm versiyonları göster
+                versions.forEach(version => {
+                    htmlContent += `
+                        <li class="version-item">
+                            <a href="create-listing-step5-details.html?categoryId=${categoryId}&year=${selectedYear}&brands=${encodeURIComponent(brandName)}&models=${encodeURIComponent(modelName)}&versions=${encodeURIComponent(version.name)}" class="version-link">
+                                ${version.name}
+                            </a>
+                        </li>
+                    `;
+                });
+
+                htmlContent += '</ul>';
+                
+                // Versiyonları sayfaya ekle
+                versionList.innerHTML = htmlContent;
+                versionList.style.display = 'block';
+                loadingSpinner.style.display = 'none';
+                
+            } catch (error) {
+                console.error('Versiyonlar yüklenirken hata:', error);
+                errorMessage.style.display = 'block';
+                loadingSpinner.style.display = 'none';
+            }
+        }
+    </script>
+
+    <style>
+        .version-list {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 1rem;
+        }
+
+        .versions {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            border: 1px solid #e0e0e0;
+            border-radius: 4px;
+            max-height: 400px;
+            overflow-y: auto;
+            background: white;
+            /* Özel kaydırma çubuğu stilleri */
+            scrollbar-width: thin;
+            scrollbar-color: #FF6370 #f0f0f0;
+        }
+
+        /* Webkit tarayıcılar için kaydırma çubuğu stilleri */
+        .versions::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .versions::-webkit-scrollbar-track {
+            background: #f0f0f0;
+            border-radius: 4px;
+        }
+
+        .versions::-webkit-scrollbar-thumb {
+            background-color: #FF6370;
+            border-radius: 4px;
+            border: 2px solid #f0f0f0;
+        }
+
+        .version-item {
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .version-item:last-child {
+            border-bottom: none;
+        }
+
+        .version-link {
+            display: block;
+            padding: 0.75rem 1rem;
+            color: #333;
+            text-decoration: none;
+            font-size: 1.1rem;
+            transition: all 0.2s;
+        }
+
+        .version-link:hover {
+            background-color: #f5f5f5;
+            color: #FF6370;
+            padding-left: 1.5rem;
+        }
+
+        .category-path {
+            padding: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .path-link {
+            display: inline-flex;
+            align-items: center;
+            color: #666;
+            text-decoration: none;
+            font-size: 0.9rem;
+        }
+
+        .path-link i {
+            margin-right: 0.5rem;
+        }
+
+        .path-link:hover {
+            color: #FF6370;
+        }
+
+        @media (max-width: 768px) {
+            .version-list {
+                padding: 0.5rem;
+            }
+
+            .versions {
+                max-height: 350px; /* Mobilde biraz daha küçük */
+            }
+
+            .version-link {
+                padding: 0.75rem;
+                font-size: 1rem;
+            }
+        }
+
+        /* Gölge efekti için */
+        .versions {
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            position: relative;
+        }
+
+        /* Kaydırma göstergesi için üst ve alt gölgeler */
+        .versions::before,
+        .versions::after {
+            content: '';
+            position: absolute;
+            left: 0;
+            right: 0;
+            height: 20px;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .versions::before {
+            top: 0;
+            background: linear-gradient(to bottom, rgba(255,255,255,0.9) 0%, rgba(255,255,255,0) 100%);
+        }
+
+        .versions::after {
+            bottom: 0;
+            background: linear-gradient(to top, rgba(255,255,255,0.9) 0%, rgba(255,255,255,0) 100%);
+        }
+    </style>
+</body>
+</html> 
