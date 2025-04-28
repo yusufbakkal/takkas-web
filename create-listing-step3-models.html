@@ -91,6 +91,12 @@
         const selectedYear = urlParams.get('year');
         const brandName = urlParams.get('brandName');
 
+        console.log('URL Parametreleri:', {
+            categoryId,
+            selectedYear,
+            brandName
+        });
+
         // Bileşenleri yükle
         Promise.all([
             fetch('components/property-detail-header.html').then(response => response.text()),
@@ -125,7 +131,7 @@
                 models.forEach(model => {
                     htmlContent += `
                         <li class="model-item">
-                            <a href="create-listing-step4-details.html?categoryId=${categoryId}&year=${selectedYear}&brandName=${encodeURIComponent(brandName)}&modelName=${encodeURIComponent(model.name)}" class="model-link">
+                            <a href="create-listing-step4-versions.html?categoryId=${categoryId}&year=${selectedYear}&brands=${encodeURIComponent(brandName)}&models=${encodeURIComponent(model.name)}" class="model-link">
                                 ${model.name}
                             </a>
                         </li>
