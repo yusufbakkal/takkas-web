@@ -90,11 +90,11 @@
         function loadYears() {
             const yearList = document.getElementById('yearList');
             const currentYear = new Date().getFullYear();
-            const startYear = 1980;
+            const startYear = currentYear - 80; // Şimdiki yıldan 80 yıl öncesine kadar
             
             let htmlContent = '<ul class="years">';
             
-            // Şimdiki yıldan 1980'e kadar yılları listele
+            // Şimdiki yıldan 80 yıl öncesine kadar yılları listele
             for (let year = currentYear; year >= startYear; year--) {
                 htmlContent += `
                     <li class="year-item">
