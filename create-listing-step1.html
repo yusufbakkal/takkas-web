@@ -97,46 +97,44 @@
                 const categories = await response.json();
                 console.log('Kategoriler:', categories);
                 
-                // Emlak ve Araç kategorilerini bul
-                const emlakCategory = categories.find(cat => cat.name === 'Emlak');
-                const vehicleCategories = categories.filter(cat => 
-                    cat.name === 'Otomobil' || 
-                    cat.name === 'Motorsiklet' || 
-                    cat.name === 'Karavan' || 
-                    cat.name === 'Elektrikli Otomobil' || 
-                    cat.name === 'Off-Road Suv Pickup'
-                );
-                
                 let htmlContent = '';
                 
-                // Emlak kategorisi
-                if (emlakCategory) {
+                // Tüm kategorileri göster
+                categories.forEach(category => {
+                    // Kategori için uygun ikon ve renk belirle
+                    let icon = 'fa-home';
+                    let color = '#FFA500';
+                    
+                    // Kategori adına göre ikon ve renk ayarla
+                    switch(category.name.toLowerCase()) {
+                        case 'otomobil':
+                        case 'motorsiklet':
+                        case 'karavan':
+                        case 'elektrikli otomobil':
+                        case 'off-road suv pickup':
+                            icon = 'fa-car';
+                            color = '#FF6370';
+                            break;
+                        case 'emlak':
+                            icon = 'fa-home';
+                            color = '#FFA500';
+                            break;
+                        default:
+                            icon = 'fa-tag';
+                            color = '#4CAF50';
+                    }
+                    
                     htmlContent += `
                         <div class="category-card">
-                            <a href="create-listing-step2-property.html?categoryId=${emlakCategory.id}" class="category-link">
-                                <div class="category-icon" style="background-color: #FFA500;">
-                                    <i class="fas fa-home"></i>
+                            <a href="create-listing-step2-vehicle.html?categoryId=${category.id}" class="category-link">
+                                <div class="category-icon" style="background-color: ${color};">
+                                    <i class="fas ${icon}"></i>
                                 </div>
-                                <div class="category-name">${emlakCategory.name}</div>
+                                <div class="category-name">${category.name}</div>
                             </a>
                         </div>
                     `;
-                }
-                
-                // Araç kategorisi (tüm araç kategorilerini tek bir kart olarak göster)
-                if (vehicleCategories.length > 0) {
-                    const vehicleCategoryIds = vehicleCategories.map(cat => cat.id).join(',');
-                    htmlContent += `
-                        <div class="category-card">
-                            <a href="create-listing-step2-vehicle.html?categoryIds=${vehicleCategoryIds}" class="category-link">
-                                <div class="category-icon" style="background-color: #FF6370;">
-                                    <i class="fas fa-car"></i>
-                                </div>
-                                <div class="category-name">Vasıta</div>
-                            </a>
-                        </div>
-                    `;
-                }
+                });
                 
                 // Kategorileri sayfaya ekle
                 categoryGrid.innerHTML = htmlContent;
