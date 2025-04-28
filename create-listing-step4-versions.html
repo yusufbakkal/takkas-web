@@ -136,9 +136,12 @@
                 
                 // Tüm versiyonları göster
                 versions.forEach(version => {
+                    // Versiyon ID'si varsa kullan, yoksa bir ID oluştur
+                    const versionId = version.id || `${brandName.substring(0, 3)}${modelName.substring(0, 3)}${version.name.substring(0, 3)}`.toUpperCase();
+                    
                     htmlContent += `
                         <li class="version-item">
-                            <a href="create-listing-step5-details.html?categoryId=${categoryId}&year=${selectedYear}&brands=${encodeURIComponent(brandName)}&models=${encodeURIComponent(modelName)}&versions=${encodeURIComponent(version.name)}" class="version-link">
+                            <a href="create-listing-step4-details.html?categoryId=${categoryId}&year=${selectedYear}&brands=${encodeURIComponent(brandName)}&models=${encodeURIComponent(modelName)}&versions=${encodeURIComponent(version.name)}&versionId=${encodeURIComponent(versionId)}" class="version-link">
                                 ${version.name}
                             </a>
                         </li>
