@@ -63,7 +63,7 @@
                 <p>Markalar yükleniyor...</p>
             </div>
             
-            <div class="brand-grid" id="brandGrid">
+            <div class="brand-list" id="brandList">
                 <!-- Markalar dinamik olarak JavaScript ile eklenecek -->
             </div>
             
@@ -98,7 +98,7 @@
         
         // API'den markaları yükle
         async function loadBrands() {
-            const brandGrid = document.getElementById('brandGrid');
+            const brandList = document.getElementById('brandList');
             const loadingSpinner = document.getElementById('brandsLoading');
             const errorMessage = document.getElementById('errorMessage');
             
@@ -112,25 +112,24 @@
                 const brands = await response.json();
                 console.log('Markalar:', brands);
                 
-                let htmlContent = '';
+                let htmlContent = '<ul class="brands">';
                 
                 // Tüm markaları göster
                 brands.forEach(brand => {
                     htmlContent += `
-                        <div class="brand-card" data-brand-id="${brand.id}">
+                        <li class="brand-item">
                             <a href="create-listing-step3-vehicle.html?categoryId=${categoryId}&brandId=${brand.id}" class="brand-link">
-                                <div class="brand-logo">
-                                    <img src="${brand.logo_url || 'assets/images/brands/default-brand.svg'}" alt="${brand.name}" onerror="this.src='assets/images/brands/default-brand.svg'">
-                                </div>
-                                <div class="brand-name">${brand.name}</div>
+                                ${brand.name}
                             </a>
-                        </div>
+                        </li>
                     `;
                 });
+
+                htmlContent += '</ul>';
                 
                 // Markaları sayfaya ekle
-                brandGrid.innerHTML = htmlContent;
-                brandGrid.style.display = 'grid';
+                brandList.innerHTML = htmlContent;
+                brandList.style.display = 'block';
                 loadingSpinner.style.display = 'none';
                 
             } catch (error) {
@@ -142,57 +141,38 @@
     </script>
 
     <style>
-        .brand-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-            gap: 1.5rem;
-            padding: 1rem;
-            max-width: 1200px;
+        .brand-list {
+            max-width: 800px;
             margin: 0 auto;
+            padding: 1rem;
         }
 
-        .brand-card {
-            background: white;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-            transition: transform 0.2s, box-shadow 0.2s;
-            overflow: hidden;
+        .brands {
+            list-style: none;
+            padding: 0;
+            margin: 0;
         }
 
-        .brand-card:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+        .brand-item {
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .brand-item:last-child {
+            border-bottom: none;
         }
 
         .brand-link {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            padding: 1.5rem;
-            text-decoration: none;
-            color: inherit;
-        }
-
-        .brand-logo {
-            width: 100px;
-            height: 100px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-bottom: 1rem;
-        }
-
-        .brand-logo img {
-            max-width: 100%;
-            max-height: 100%;
-            object-fit: contain;
-        }
-
-        .brand-name {
-            font-size: 1.1rem;
-            font-weight: 500;
-            text-align: center;
+            display: block;
+            padding: 1rem;
             color: #333;
+            text-decoration: none;
+            font-size: 1.1rem;
+            transition: background-color 0.2s;
+        }
+
+        .brand-link:hover {
+            background-color: #f5f5f5;
+            color: #FF6370;
         }
 
         .category-path {
@@ -217,18 +197,12 @@
         }
 
         @media (max-width: 768px) {
-            .brand-grid {
-                grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-                gap: 1rem;
+            .brand-list {
                 padding: 0.5rem;
             }
 
-            .brand-logo {
-                width: 80px;
-                height: 80px;
-            }
-
-            .brand-name {
+            .brand-link {
+                padding: 0.75rem;
                 font-size: 1rem;
             }
         }
