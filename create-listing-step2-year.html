@@ -122,35 +122,31 @@
             list-style: none;
             padding: 0;
             margin: 0;
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
-            gap: 1rem;
+            border: 1px solid #e0e0e0;
+            border-radius: 4px;
         }
 
         .year-item {
-            border: 1px solid #e0e0e0;
-            border-radius: 4px;
-            transition: all 0.2s;
+            border-bottom: 1px solid #e0e0e0;
         }
 
-        .year-item:hover {
-            border-color: #FF6370;
-            transform: translateY(-2px);
+        .year-item:last-child {
+            border-bottom: none;
         }
 
         .year-link {
             display: block;
-            padding: 1rem;
+            padding: 0.75rem 1rem;
             color: #333;
             text-decoration: none;
             font-size: 1.1rem;
-            text-align: center;
             transition: all 0.2s;
         }
 
         .year-link:hover {
             background-color: #f5f5f5;
             color: #FF6370;
+            padding-left: 1.5rem;
         }
 
         .category-path {
@@ -177,11 +173,6 @@
         @media (max-width: 768px) {
             .year-list {
                 padding: 0.5rem;
-            }
-
-            .years {
-                grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
-                gap: 0.5rem;
             }
 
             .year-link {
