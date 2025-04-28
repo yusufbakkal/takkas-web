@@ -89,7 +89,7 @@
             
             try {
                 // Kategorileri API'den çek
-                const response = await fetch('https://takkas-api.onrender.com/api/categories');
+                const response = await fetch('https://takkas-api.onrender.com/api/categories/root');
                 if (!response.ok) {
                     throw new Error(`API isteği başarısız oldu: ${response.status}`);
                 }
@@ -97,13 +97,9 @@
                 const categories = await response.json();
                 console.log('Kategoriler:', categories);
                 
-                // Ana kategorileri filtrele (parent_id null olanlar)
-                const mainCategories = categories.filter(cat => cat.parent_id === null);
-                console.log('Ana Kategoriler:', mainCategories);
-                
                 // Emlak ve Araç kategorilerini bul
-                const emlakCategory = mainCategories.find(cat => cat.name === 'Emlak');
-                const vehicleCategories = mainCategories.filter(cat => 
+                const emlakCategory = categories.find(cat => cat.name === 'Emlak');
+                const vehicleCategories = categories.filter(cat => 
                     cat.name === 'Otomobil' || 
                     cat.name === 'Motorsiklet' || 
                     cat.name === 'Karavan' || 
