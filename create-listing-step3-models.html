@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>İlan Ver - Araç Markası Seçimi - TAKKAS</title>
+    <title>İlan Ver - Model Seçimi - TAKKAS</title>
     
     <!-- CSS Bağlantıları -->
     <link rel="stylesheet" href="assets/css/base.css">
@@ -27,48 +27,53 @@
                     <div class="step-text">Kategori Seç</div>
                 </div>
                 <div class="step-line completed"></div>
+                <div class="step completed">
+                    <div class="step-number"><i class="fas fa-check"></i></div>
+                    <div class="step-text">Yıl Seç</div>
+                </div>
+                <div class="step-line completed"></div>
+                <div class="step completed">
+                    <div class="step-number"><i class="fas fa-check"></i></div>
+                    <div class="step-text">Marka Seç</div>
+                </div>
+                <div class="step-line completed"></div>
                 <div class="step active">
-                    <div class="step-number">2</div>
-                    <div class="step-text">Marka Model</div>
-                </div>
-                <div class="step-line"></div>
-                <div class="step">
-                    <div class="step-number">3</div>
-                    <div class="step-text">İlan Detayları</div>
-                </div>
-                <div class="step-line"></div>
-                <div class="step">
                     <div class="step-number">4</div>
-                    <div class="step-text">Fotoğraf Ekle</div>
+                    <div class="step-text">Model Seç</div>
                 </div>
                 <div class="step-line"></div>
                 <div class="step">
                     <div class="step-number">5</div>
-                    <div class="step-text">Önizleme</div>
+                    <div class="step-text">İlan Detayları</div>
+                </div>
+                <div class="step-line"></div>
+                <div class="step">
+                    <div class="step-number">6</div>
+                    <div class="step-text">Fotoğraf Ekle</div>
                 </div>
             </div>
         </div>
 
         <div class="create-listing-content">
             <div class="category-path">
-                <a href="create-listing-step1.html" class="path-link">
-                    <i class="fas fa-arrow-left"></i> Kategoriye Dön
+                <a href="create-listing-step2-vehicle.html" class="path-link">
+                    <i class="fas fa-arrow-left"></i> Markaya Dön
                 </a>
             </div>
 
-            <h2 class="section-title">Araç Markası Seçin</h2>
+            <h2 class="section-title">Model Seçin</h2>
             
-            <div class="loading-spinner" id="brandsLoading">
+            <div class="loading-spinner" id="modelsLoading">
                 <div class="spinner"></div>
-                <p>Markalar yükleniyor...</p>
+                <p>Modeller yükleniyor...</p>
             </div>
             
-            <div class="brand-list" id="brandList">
-                <!-- Markalar dinamik olarak JavaScript ile eklenecek -->
+            <div class="model-list" id="modelList">
+                <!-- Modeller JavaScript ile eklenecek -->
             </div>
             
             <div class="error-message" id="errorMessage" style="display: none;">
-                <p>Markalar yüklenirken bir hata oluştu. Lütfen sayfayı yenileyip tekrar deneyin.</p>
+                <p>Modeller yüklenirken bir hata oluştu. Lütfen sayfayı yenileyip tekrar deneyin.</p>
             </div>
         </div>
     </main>
@@ -80,10 +85,11 @@
 
     <!-- JavaScript -->
     <script>
-        // URL'den kategori ID'sini al
+        // URL'den parametreleri al
         const urlParams = new URLSearchParams(window.location.search);
         const categoryId = urlParams.get('categoryId');
         const selectedYear = urlParams.get('year');
+        const brandName = urlParams.get('brandName');
 
         // Bileşenleri yükle
         Promise.all([
@@ -93,34 +99,34 @@
             document.getElementById('header-component').innerHTML = header;
             document.getElementById('footer-component').innerHTML = footer;
             
-            // Markaları yükle
-            loadBrands();
+            // Modelleri yükle
+            loadModels();
         });
         
-        // API'den markaları yükle
-        async function loadBrands() {
-            const brandList = document.getElementById('brandList');
-            const loadingSpinner = document.getElementById('brandsLoading');
+        // API'den modelleri yükle
+        async function loadModels() {
+            const modelList = document.getElementById('modelList');
+            const loadingSpinner = document.getElementById('modelsLoading');
             const errorMessage = document.getElementById('errorMessage');
             
             try {
-                // Markaları API'den çek
-                const response = await fetch('https://takkas-api.onrender.com/api/v1/vehicles/brands');
+                // Modelleri API'den çek
+                const response = await fetch(`https://takkas-api.onrender.com/api/v1/vehicles/brands/${encodeURIComponent(brandName)}/models`);
                 if (!response.ok) {
                     throw new Error(`API isteği başarısız oldu: ${response.status}`);
                 }
                 
-                const brands = await response.json();
-                console.log('Markalar:', brands);
+                const models = await response.json();
+                console.log('Modeller:', models);
                 
-                let htmlContent = '<ul class="brands">';
+                let htmlContent = '<ul class="models">';
                 
-                // Tüm markaları göster
-                brands.forEach(brand => {
+                // Tüm modelleri göster
+                models.forEach(model => {
                     htmlContent += `
-                        <li class="brand-item">
-                            <a href="create-listing-step3-models.html?categoryId=${categoryId}&year=${selectedYear}&brandName=${encodeURIComponent(brand.name)}" class="brand-link">
-                                ${brand.name}
+                        <li class="model-item">
+                            <a href="create-listing-step4-details.html?categoryId=${categoryId}&year=${selectedYear}&brandName=${encodeURIComponent(brandName)}&modelName=${encodeURIComponent(model.name)}" class="model-link">
+                                ${model.name}
                             </a>
                         </li>
                     `;
@@ -128,13 +134,13 @@
 
                 htmlContent += '</ul>';
                 
-                // Markaları sayfaya ekle
-                brandList.innerHTML = htmlContent;
-                brandList.style.display = 'block';
+                // Modelleri sayfaya ekle
+                modelList.innerHTML = htmlContent;
+                modelList.style.display = 'block';
                 loadingSpinner.style.display = 'none';
                 
             } catch (error) {
-                console.error('Markalar yüklenirken hata:', error);
+                console.error('Modeller yüklenirken hata:', error);
                 errorMessage.style.display = 'block';
                 loadingSpinner.style.display = 'none';
             }
@@ -142,38 +148,63 @@
     </script>
 
     <style>
-        .brand-list {
+        .model-list {
             max-width: 800px;
             margin: 0 auto;
             padding: 1rem;
         }
 
-        .brands {
+        .models {
             list-style: none;
             padding: 0;
             margin: 0;
+            border: 1px solid #e0e0e0;
+            border-radius: 4px;
+            max-height: 400px;
+            overflow-y: auto;
+            background: white;
+            /* Özel kaydırma çubuğu stilleri */
+            scrollbar-width: thin;
+            scrollbar-color: #FF6370 #f0f0f0;
         }
 
-        .brand-item {
+        /* Webkit tarayıcılar için kaydırma çubuğu stilleri */
+        .models::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .models::-webkit-scrollbar-track {
+            background: #f0f0f0;
+            border-radius: 4px;
+        }
+
+        .models::-webkit-scrollbar-thumb {
+            background-color: #FF6370;
+            border-radius: 4px;
+            border: 2px solid #f0f0f0;
+        }
+
+        .model-item {
             border-bottom: 1px solid #e0e0e0;
         }
 
-        .brand-item:last-child {
+        .model-item:last-child {
             border-bottom: none;
         }
 
-        .brand-link {
+        .model-link {
             display: block;
-            padding: 1rem;
+            padding: 0.75rem 1rem;
             color: #333;
             text-decoration: none;
             font-size: 1.1rem;
-            transition: background-color 0.2s;
+            transition: all 0.2s;
         }
 
-        .brand-link:hover {
+        .model-link:hover {
             background-color: #f5f5f5;
             color: #FF6370;
+            padding-left: 1.5rem;
         }
 
         .category-path {
@@ -198,14 +229,46 @@
         }
 
         @media (max-width: 768px) {
-            .brand-list {
+            .model-list {
                 padding: 0.5rem;
             }
 
-            .brand-link {
+            .models {
+                max-height: 350px; /* Mobilde biraz daha küçük */
+            }
+
+            .model-link {
                 padding: 0.75rem;
                 font-size: 1rem;
             }
+        }
+
+        /* Gölge efekti için */
+        .models {
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            position: relative;
+        }
+
+        /* Kaydırma göstergesi için üst ve alt gölgeler */
+        .models::before,
+        .models::after {
+            content: '';
+            position: absolute;
+            left: 0;
+            right: 0;
+            height: 20px;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .models::before {
+            top: 0;
+            background: linear-gradient(to bottom, rgba(255,255,255,0.9) 0%, rgba(255,255,255,0) 100%);
+        }
+
+        .models::after {
+            bottom: 0;
+            background: linear-gradient(to top, rgba(255,255,255,0.9) 0%, rgba(255,255,255,0) 100%);
         }
     </style>
 </body>
