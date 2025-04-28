@@ -3,16 +3,6 @@
     <!-- Background Circle -->
     <circle cx="100" cy="100" r="90" fill="#f5f5f5" stroke="#e0e0e0" stroke-width="2"/>
     
-    <!-- Car Icon -->
-    <g transform="translate(50, 70)" fill="#999999">
-        <!-- Car Body -->
-        <path d="M100 40 C100 17.909 82.091 0 60 0 H40 C17.909 0 0 17.909 0 40 V60 C0 82.091 17.909 100 40 100 H60 C82.091 100 100 82.091 100 60 V40z M85 50 C85 69.33 69.33 85 50 85 C30.67 85 15 69.33 15 50 C15 30.67 30.67 15 50 15 C69.33 15 85 30.67 85 50z"/>
-        
-        <!-- Wheels -->
-        <circle cx="25" cy="75" r="10"/>
-        <circle cx="75" cy="75" r="10"/>
-    </g>
-    
     <!-- Brand Text -->
-    <text x="100" y="160" font-family="Arial, sans-serif" font-size="16" fill="#666666" text-anchor="middle">MARKA</text>
+    <text x="100" y="110" font-family="Arial, sans-serif" font-size="24" font-weight="bold" fill="#666666" text-anchor="middle">MARKA</text>
 </svg> 
