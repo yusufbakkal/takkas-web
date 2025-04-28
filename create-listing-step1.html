@@ -104,41 +104,33 @@
                     // Kategori için uygun ikon ve renk belirle
                     let icon = 'fa-home';
                     let color = '#FFA500';
+                    let nextStep = '';
                     
                     // Kategori adına göre ikon ve renk ayarla
                     switch(category.name.toLowerCase()) {
                         case 'otomobil':
+                        case 'motorsiklet':
+                        case 'karavan':
+                        case 'elektrikli otomobil':
+                        case 'off-road suv pickup':
                             icon = 'fa-car';
                             color = '#FF6370';
-                            break;
-                        case 'motorsiklet':
-                            icon = 'fa-motorcycle';
-                            color = '#FF6370';
-                            break;
-                        case 'karavan':
-                            icon = 'fa-caravan';
-                            color = '#FF6370';
-                            break;
-                        case 'elektrikli otomobil':
-                            icon = 'fa-charging-station';
-                            color = '#FF6370';
-                            break;
-                        case 'off-road suv pickup':
-                            icon = 'fa-truck-pickup';
-                            color = '#FF6370';
+                            nextStep = 'create-listing-step2-brand-model.html';
                             break;
                         case 'emlak':
                             icon = 'fa-house';
                             color = '#FFA500';
+                            nextStep = 'create-listing-step2-property.html';
                             break;
                         default:
                             icon = 'fa-tag';
                             color = '#4CAF50';
+                            nextStep = 'create-listing-step2-vehicle.html';
                     }
                     
                     htmlContent += `
                         <div class="category-card" data-category-id="${category.id}">
-                            <a href="#" class="category-link" onclick="loadSubcategories(${category.id}); return false;">
+                            <a href="${nextStep}?categoryId=${category.id}" class="category-link">
                                 <div class="category-icon" style="background-color: ${color};">
                                     <i class="fas ${icon}"></i>
                                 </div>

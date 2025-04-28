@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>İlan Ver - Marka Model Seçimi - TAKKAS</title>
+    
+    <!-- CSS Bağlantıları -->
+    <link rel="stylesheet" href="assets/css/base.css">
+    <link rel="stylesheet" href="assets/css/property-detail-header.css">
+    <link rel="stylesheet" href="assets/css/footer.css">
+    <link rel="stylesheet" href="assets/css/create-listing.css">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <!-- Özel Header Bileşeni -->
+    <div id="header-component"></div>
+
+    <!-- Ana İçerik -->
+    <main class="create-listing-container">
+        <div class="create-listing-header">
+            <h1>İlan Ver</h1>
+            <div class="steps-container">
+                <div class="step completed">
+                    <div class="step-number"><i class="fas fa-check"></i></div>
+                    <div class="step-text">Kategori Seç</div>
+                </div>
+                <div class="step-line completed"></div>
+                <div class="step active">
+                    <div class="step-number">2</div>
+                    <div class="step-text">Marka Model Seç</div>
+                </div>
+                <div class="step-line"></div>
+                <div class="step">
+                    <div class="step-number">3</div>
+                    <div class="step-text">İlan Detayları</div>
+                </div>
+                <div class="step-line"></div>
+                <div class="step">
+                    <div class="step-number">4</div>
+                    <div class="step-text">Fotoğraf Ekle</div>
+                </div>
+                <div class="step-line"></div>
+                <div class="step">
+                    <div class="step-number">5</div>
+                    <div class="step-text">Önizleme</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="create-listing-content">
+            <div class="brand-model-selection">
+                <div class="selection-group">
+                    <label for="brandSelect">Marka Seçin</label>
+                    <select id="brandSelect" class="form-select">
+                        <option value="">Marka Seçin</option>
+                    </select>
+                </div>
+
+                <div class="selection-group">
+                    <label for="modelSelect">Model Seçin</label>
+                    <select id="modelSelect" class="form-select" disabled>
+                        <option value="">Önce Marka Seçin</option>
+                    </select>
+                </div>
+
+                <div class="button-group">
+                    <a href="create-listing-step1.html" class="btn btn-secondary">Geri</a>
+                    <button onclick="proceedToNextStep()" class="btn btn-primary" disabled>Devam Et</button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer Bileşeni -->
+    <div class="full-width-footer-wrapper">
+        <div id="footer-component"></div>
+    </div>
+
+    <!-- JavaScript -->
+    <script>
+        // Bileşenleri yükle
+        Promise.all([
+            fetch('components/property-detail-header.html').then(response => response.text()),
+            fetch('components/footer.html').then(response => response.text())
+        ]).then(([header, footer]) => {
+            document.getElementById('header-component').innerHTML = header;
+            document.getElementById('footer-component').innerHTML = footer;
+            
+            // URL'den kategori ID'sini al
+            const urlParams = new URLSearchParams(window.location.search);
+            const categoryId = urlParams.get('categoryId');
+            
+            if (categoryId) {
+                loadBrands(categoryId);
+            }
+        });
+
+        // Markaları yükle
+        async function loadBrands(categoryId) {
+            const brandSelect = document.getElementById('brandSelect');
+            
+            try {
+                const response = await fetch(`https://takkas-api.onrender.com/api/brands/${categoryId}`);
+                if (!response.ok) {
+                    throw new Error('Markalar yüklenirken hata oluştu');
+                }
+                
+                const brands = await response.json();
+                
+                // Markaları select'e ekle
+                brands.forEach(brand => {
+                    const option = document.createElement('option');
+                    option.value = brand.id;
+                    option.textContent = brand.name;
+                    brandSelect.appendChild(option);
+                });
+                
+                // Marka seçimi değiştiğinde modelleri yükle
+                brandSelect.addEventListener('change', function() {
+                    if (this.value) {
+                        loadModels(this.value);
+                    } else {
+                        resetModelSelect();
+                    }
+                });
+                
+            } catch (error) {
+                console.error('Markalar yüklenirken hata:', error);
+                brandSelect.innerHTML = '<option value="">Markalar yüklenemedi</option>';
+            }
+        }
+
+        // Modelleri yükle
+        async function loadModels(brandId) {
+            const modelSelect = document.getElementById('modelSelect');
+            const continueButton = document.querySelector('.btn-primary');
+            
+            try {
+                modelSelect.disabled = true;
+                modelSelect.innerHTML = '<option value="">Modeller Yükleniyor...</option>';
+                
+                const response = await fetch(`https://takkas-api.onrender.com/api/models/${brandId}`);
+                if (!response.ok) {
+                    throw new Error('Modeller yüklenirken hata oluştu');
+                }
+                
+                const models = await response.json();
+                
+                modelSelect.innerHTML = '<option value="">Model Seçin</option>';
+                models.forEach(model => {
+                    const option = document.createElement('option');
+                    option.value = model.id;
+                    option.textContent = model.name;
+                    modelSelect.appendChild(option);
+                });
+                
+                modelSelect.disabled = false;
+                
+                // Model seçimi değiştiğinde devam butonunu aktifleştir
+                modelSelect.addEventListener('change', function() {
+                    continueButton.disabled = !this.value;
+                });
+                
+            } catch (error) {
+                console.error('Modeller yüklenirken hata:', error);
+                modelSelect.innerHTML = '<option value="">Modeller yüklenemedi</option>';
+                modelSelect.disabled = true;
+            }
+        }
+
+        // Model select'i sıfırla
+        function resetModelSelect() {
+            const modelSelect = document.getElementById('modelSelect');
+            const continueButton = document.querySelector('.btn-primary');
+            
+            modelSelect.innerHTML = '<option value="">Önce Marka Seçin</option>';
+            modelSelect.disabled = true;
+            continueButton.disabled = true;
+        }
+
+        // Sonraki adıma geç
+        function proceedToNextStep() {
+            const brandId = document.getElementById('brandSelect').value;
+            const modelId = document.getElementById('modelSelect').value;
+            const urlParams = new URLSearchParams(window.location.search);
+            const categoryId = urlParams.get('categoryId');
+            
+            if (brandId && modelId) {
+                window.location.href = `create-listing-step2-vehicle.html?categoryId=${categoryId}&brandId=${brandId}&modelId=${modelId}`;
+            }
+        }
+    </script>
+
+    <style>
+        .brand-model-selection {
+            max-width: 600px;
+            margin: 2rem auto;
+            padding: 2rem;
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .selection-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .selection-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: #333;
+        }
+
+        .form-select {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 1rem;
+            color: #333;
+            background-color: #fff;
+            cursor: pointer;
+            transition: border-color 0.2s;
+        }
+
+        .form-select:disabled {
+            background-color: #f5f5f5;
+            cursor: not-allowed;
+        }
+
+        .form-select:focus {
+            outline: none;
+            border-color: #FF6370;
+            box-shadow: 0 0 0 2px rgba(255, 99, 112, 0.1);
+        }
+
+        .button-group {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 2rem;
+        }
+
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-primary {
+            background-color: #FF6370;
+            color: white;
+        }
+
+        .btn-primary:disabled {
+            background-color: #ffb3b9;
+            cursor: not-allowed;
+        }
+
+        .btn-secondary {
+            background-color: #e0e0e0;
+            color: #333;
+        }
+
+        .btn:hover:not(:disabled) {
+            transform: translateY(-1px);
+        }
+
+        .btn-primary:hover:not(:disabled) {
+            background-color: #ff4957;
+        }
+
+        .btn-secondary:hover {
+            background-color: #d0d0d0;
+        }
+    </style>
+</body>
+</html> 
