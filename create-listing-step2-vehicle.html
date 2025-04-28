@@ -113,7 +113,7 @@
                 const brands = await response.json();
                 console.log('Markalar:', brands);
                 
-                let htmlContent = '<ul class="brands">';
+                let htmlContent = '<ul class="brands-list">';
                 
                 // Tüm markaları göster
                 brands.forEach(brand => {
@@ -148,10 +148,35 @@
             padding: 1rem;
         }
 
-        .brands {
+        .brands-list {
             list-style: none;
             padding: 0;
             margin: 0;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            background: white;
+            max-height: 600px;
+            overflow-y: auto;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            /* Özel kaydırma çubuğu stilleri */
+            scrollbar-width: thin;
+            scrollbar-color: #FF6370 #f0f0f0;
+        }
+
+        /* Webkit tarayıcılar için kaydırma çubuğu stilleri */
+        .brands-list::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .brands-list::-webkit-scrollbar-track {
+            background: #f0f0f0;
+            border-radius: 4px;
+        }
+
+        .brands-list::-webkit-scrollbar-thumb {
+            background-color: #FF6370;
+            border-radius: 4px;
+            border: 2px solid #f0f0f0;
         }
 
         .brand-item {
@@ -164,16 +189,17 @@
 
         .brand-link {
             display: block;
-            padding: 1rem;
+            padding: 0.75rem 1rem;
             color: #333;
             text-decoration: none;
             font-size: 1.1rem;
-            transition: background-color 0.2s;
+            transition: all 0.2s;
         }
 
         .brand-link:hover {
             background-color: #f5f5f5;
             color: #FF6370;
+            padding-left: 1.5rem;
         }
 
         .category-path {
@@ -200,6 +226,10 @@
         @media (max-width: 768px) {
             .brand-list {
                 padding: 0.5rem;
+            }
+
+            .brands-list {
+                max-height: 400px;
             }
 
             .brand-link {

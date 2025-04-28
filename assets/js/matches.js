@@ -44,23 +44,23 @@ document.addEventListener('DOMContentLoaded', function() {
     // Örnek veriler (sadece API hatası durumunda kullanılacak)
     function loadSampleData() {
         allCards = [
-            {
-                id: 1,
-                title: 'BMW M4 Competition',
-                type: 'Spor Araç',
-                price: 2450000,
-                year: 2023,
-                mileage: 15000,
-                fuel: 'Benzin',
-                images: [
-                    'https://images.unsplash.com/photo-1617814076367-b759c7d7e738',
-                    'https://images.unsplash.com/photo-1580273916550-e323be2ae537',
-                    'https://images.unsplash.com/photo-1614162692292-7ac56d7f7f1e'
-                ]
+        {
+            id: 1,
+            title: 'BMW M4 Competition',
+            type: 'Spor Araç',
+            price: 2450000,
+            year: 2023,
+            mileage: 15000,
+            fuel: 'Benzin',
+            images: [
+                'https://images.unsplash.com/photo-1617814076367-b759c7d7e738',
+                'https://images.unsplash.com/photo-1580273916550-e323be2ae537',
+                'https://images.unsplash.com/photo-1614162692292-7ac56d7f7f1e'
+            ]
             }
             // Diğer örnek kartlar buraya eklenebilir
         ];
-        renderCard(allCards[currentCardIndex]);
+    renderCard(allCards[currentCardIndex]);
     }
 
     // Sayfa yüklendiğinde API'den verileri çek

@@ -61,7 +61,7 @@
 
         <div class="create-listing-content">
             <div class="category-path">
-                <a href="create-listing-step3-models.html" class="path-link">
+                <a href="#" class="path-link">
                     <i class="fas fa-arrow-left"></i> Modele Dön
                 </a>
             </div>
@@ -94,14 +94,15 @@
         const urlParams = new URLSearchParams(window.location.search);
         const categoryId = urlParams.get('categoryId');
         const selectedYear = urlParams.get('year');
-        const brandName = urlParams.get('brands');
-        const modelName = urlParams.get('models');
+        const brandName = urlParams.get('brandName') || urlParams.get('brands') || '';
+        const modelName = urlParams.get('modelName') || urlParams.get('models') || '';
 
         console.log('URL Parametreleri:', {
             categoryId,
             selectedYear,
             brandName,
-            modelName
+            modelName,
+            rawUrl: window.location.search
         });
 
         // Bileşenleri yükle
@@ -112,52 +113,109 @@
             document.getElementById('header-component').innerHTML = header;
             document.getElementById('footer-component').innerHTML = footer;
             
+            // URL parametrelerini kontrol et
+            const usingBrandsFormat = urlParams.has('brands');
+            
+            // Modele Dön linkini güncelle
+            const backLink = document.querySelector('.category-path a');
+            if (backLink) {
+                const brandParam = usingBrandsFormat ? 'brands' : 'brandName';
+                backLink.href = `create-listing-step3-models.html?categoryId=${categoryId}&year=${selectedYear}&${brandParam}=${encodeURIComponent(brandName)}`;
+            }
+            
             // Versiyonları yükle
             loadVersions();
         });
-        
-        // API'den versiyonları yükle
+
+        // Versiyonları yükle
         async function loadVersions() {
             const versionList = document.getElementById('versionList');
             const loadingSpinner = document.getElementById('versionsLoading');
             const errorMessage = document.getElementById('errorMessage');
-            
+
             try {
-                // Versiyonları API'den çek
-                const response = await fetch(`https://takkas-api.onrender.com/api/v1/vehicles/brands/${encodeURIComponent(brandName)}/models/${encodeURIComponent(modelName)}`);
-                if (!response.ok) {
-                    throw new Error(`API isteği başarısız oldu: ${response.status}`);
+                loadingSpinner.style.display = 'block';
+                errorMessage.style.display = 'none';
+                versionList.innerHTML = '';
+
+                if (!brandName || !modelName) {
+                    throw new Error('Marka veya model parametresi eksik. URL: ' + window.location.href);
                 }
-                
-                const versions = await response.json();
-                console.log('Versiyonlar:', versions);
-                
-                let htmlContent = '<ul class="versions">';
-                
-                // Tüm versiyonları göster
-                versions.forEach(version => {
-                    // Versiyon ID'si varsa kullan, yoksa bir ID oluştur
-                    const versionId = version.id || `${brandName.substring(0, 3)}${modelName.substring(0, 3)}${version.name.substring(0, 3)}`.toUpperCase();
-                    
-                    htmlContent += `
-                        <li class="version-item">
-                            <a href="create-listing-step4-details.html?categoryId=${categoryId}&year=${selectedYear}&brands=${encodeURIComponent(brandName)}&models=${encodeURIComponent(modelName)}&versions=${encodeURIComponent(version.name)}&versionId=${encodeURIComponent(versionId)}" class="version-link">
-                                ${version.name}
-                            </a>
-                        </li>
-                    `;
+
+                // URL parametrelerini kontrol et
+                const usingBrandsFormat = urlParams.has('brands');
+                const brandParam = usingBrandsFormat ? 'brands' : 'brandName';
+                const modelParam = usingBrandsFormat ? 'models' : 'modelName';
+
+                // Türkçe karakterleri düzelt
+                const normalizedBrandName = brandName.replace('ş', 's').replace('ğ', 'g').replace('ı', 'i')
+                    .replace('ö', 'o').replace('ü', 'u').replace('ç', 'c')
+                    .replace('Ş', 'S').replace('Ğ', 'G').replace('İ', 'I')
+                    .replace('Ö', 'O').replace('Ü', 'U').replace('Ç', 'C');
+
+                const normalizedModelName = modelName.replace('ş', 's').replace('ğ', 'g').replace('ı', 'i')
+                    .replace('ö', 'o').replace('ü', 'u').replace('ç', 'c')
+                    .replace('Ş', 'S').replace('Ğ', 'G').replace('İ', 'I')
+                    .replace('Ö', 'O').replace('Ü', 'U').replace('Ç', 'C');
+
+                // API URL'sini oluştur ve konsola yazdır
+                const apiUrl = `https://takkas-api.onrender.com/api/v1/vehicles/brands/${encodeURIComponent(normalizedBrandName)}/models/${encodeURIComponent(normalizedModelName)}`;
+                console.log('API URL:', apiUrl);
+                console.log('Parametreler:', {
+                    orijinalBrandName: brandName,
+                    orijinalModelName: modelName,
+                    normalizedBrandName,
+                    normalizedModelName,
+                    encoded: {
+                        brandName: encodeURIComponent(normalizedBrandName),
+                        modelName: encodeURIComponent(normalizedModelName)
+                    }
                 });
 
-                htmlContent += '</ul>';
+                const response = await fetch(apiUrl);
+                console.log('API yanıt durumu:', response.status);
                 
-                // Versiyonları sayfaya ekle
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    console.error('API hata yanıtı:', errorText);
+                    throw new Error(`API hatası: ${response.status} - ${errorText}`);
+                }
+
+                const data = await response.json();
+                console.log('Alınan versiyon verileri:', data);
+
+                let htmlContent = '<ul class="versions">';
+
+                // Versiyon verisi kontrolü
+                if (!data || !data.versions || data.versions.length === 0) {
+                    console.log('Versiyon verisi bulunamadı');
+                    htmlContent += `
+                        <li class="version-item">
+                            <div class="version-link" style="text-align: center; color: #666;">
+                                Bu model için versiyon bilgisi bulunamadı
+                            </div>
+                        </li>
+                    `;
+                } else {
+                    data.versions.forEach(version => {
+                        htmlContent += `
+                            <li class="version-item">
+                                <a href="create-listing-step4-details.html?categoryId=${categoryId}&year=${selectedYear}&${brandParam}=${encodeURIComponent(brandName)}&${modelParam}=${encodeURIComponent(modelName)}&versionName=${encodeURIComponent(version.name)}&versionId=${encodeURIComponent(version.id)}" class="version-link">
+                                    ${version.name}
+                                </a>
+                            </li>
+                        `;
+                    });
+                }
+
+                htmlContent += '</ul>';
                 versionList.innerHTML = htmlContent;
                 versionList.style.display = 'block';
-                loadingSpinner.style.display = 'none';
-                
             } catch (error) {
-                console.error('Versiyonlar yüklenirken hata:', error);
+                console.error('Versiyon yükleme hatası:', error);
                 errorMessage.style.display = 'block';
+                errorMessage.querySelector('p').textContent = `Hata: ${error.message}`;
+            } finally {
                 loadingSpinner.style.display = 'none';
             }
         }
@@ -182,6 +240,8 @@
             /* Özel kaydırma çubuğu stilleri */
             scrollbar-width: thin;
             scrollbar-color: #FF6370 #f0f0f0;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            position: relative;
         }
 
         /* Webkit tarayıcılar için kaydırma çubuğu stilleri */
@@ -223,6 +283,28 @@
             padding-left: 1.5rem;
         }
 
+        /* Kaydırma göstergesi için üst ve alt gölgeler */
+        .versions::before,
+        .versions::after {
+            content: '';
+            position: absolute;
+            left: 0;
+            right: 0;
+            height: 20px;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .versions::before {
+            top: 0;
+            background: linear-gradient(to bottom, rgba(255,255,255,0.9) 0%, rgba(255,255,255,0) 100%);
+        }
+
+        .versions::after {
+            bottom: 0;
+            background: linear-gradient(to top, rgba(255,255,255,0.9) 0%, rgba(255,255,255,0) 100%);
+        }
+
         .category-path {
             padding: 1rem;
             margin-bottom: 1rem;
@@ -250,7 +332,7 @@
             }
 
             .versions {
-                max-height: 350px; /* Mobilde biraz daha küçük */
+                max-height: 350px;
             }
 
             .version-link {
@@ -259,32 +341,35 @@
             }
         }
 
-        /* Gölge efekti için */
-        .versions {
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-            position: relative;
+        .loading-spinner {
+            text-align: center;
+            padding: 2rem;
         }
 
-        /* Kaydırma göstergesi için üst ve alt gölgeler */
-        .versions::before,
-        .versions::after {
-            content: '';
-            position: absolute;
-            left: 0;
-            right: 0;
-            height: 20px;
-            pointer-events: none;
-            z-index: 1;
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #FF6370;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
         }
 
-        .versions::before {
-            top: 0;
-            background: linear-gradient(to bottom, rgba(255,255,255,0.9) 0%, rgba(255,255,255,0) 100%);
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
 
-        .versions::after {
-            bottom: 0;
-            background: linear-gradient(to top, rgba(255,255,255,0.9) 0%, rgba(255,255,255,0) 100%);
+        .error-message {
+            color: #dc3545;
+            background-color: #f8d7da;
+            border: 1px solid #f5c6cb;
+            border-radius: 4px;
+            padding: 1rem;
+            margin: 1rem auto;
+            max-width: 800px;
+            text-align: center;
         }
     </style>
 </body>

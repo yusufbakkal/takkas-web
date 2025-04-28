@@ -205,20 +205,15 @@
                     <div class="step-number"><i class="fas fa-check"></i></div>
                     <div class="step-text">Versiyon Seç</div>
                 </div>
-                <div class="step-line current"></div>
-                <div class="step current">
-                    <div class="step-number">5</div>
-                    <div class="step-text">Detay Bilgileri</div>
-                </div>
-                <div class="step-line"></div>
-                <div class="step">
+                <div class="step-line completed"></div>
+                <div class="step active">
                     <div class="step-number">6</div>
-                    <div class="step-text">Fotoğraflar</div>
+                    <div class="step-text">İlan Detayları</div>
                 </div>
                 <div class="step-line"></div>
                 <div class="step">
                     <div class="step-number">7</div>
-                    <div class="step-text">Önizleme</div>
+                    <div class="step-text">Fotoğraf Ekle</div>
                 </div>
             </div>
         </div>
@@ -408,7 +403,6 @@
                 <input type="hidden" id="userId" name="user_id" value="2"> <!-- Demo için sabit değer -->
                 <input type="hidden" id="versionId" name="version_id">
                 <input type="hidden" id="year" name="year">
-                <input type="hidden" id="caseType" name="case_type" value="sedan"> <!-- Varsayılan kasa tipi -->
                 
                 <div class="button-container">
                     <button type="button" class="btn btn-secondary" onclick="history.back()">Geri</button>
@@ -429,28 +423,19 @@
         const urlParams = new URLSearchParams(window.location.search);
         const categoryId = urlParams.get('categoryId');
         const selectedYear = urlParams.get('year');
-        const brandName = urlParams.get('brandName') || urlParams.get('brands') || '';
-        const modelName = urlParams.get('modelName') || urlParams.get('models') || '';
-        const versionName = urlParams.get('versionName') || urlParams.get('versions') || '';
+        const brandName = decodeURIComponent(urlParams.get('brandName') || urlParams.get('brands') || '');
+        const modelName = decodeURIComponent(urlParams.get('modelName') || urlParams.get('models') || '');
+        const versionName = decodeURIComponent(urlParams.get('versionName') || '');
         const versionId = urlParams.get('versionId') || '';
         
-        console.log('URL Parametreleri:', {
-            categoryId,
-            selectedYear,
-            brandName,
-            modelName,
-            versionName,
-            versionId
-        });
-
-        // Sayfada global olarak kullanmak için değişkenleri kaydet
-        window.vehicleData = {
-            brandName,
-            modelName,
-            versionName,
-            selectedYear,
-            versionId
-        };
+        // Debug bilgilerini alert olarak göster
+        alert('URL Parametreleri:\n' + 
+              'Kategori ID: ' + categoryId + '\n' +
+              'Yıl: ' + selectedYear + '\n' +
+              'Marka: ' + brandName + '\n' +
+              'Model: ' + modelName + '\n' +
+              'Versiyon: ' + versionName + '\n' +
+              'Versiyon ID: ' + versionId);
 
         // Bileşenleri yükle
         Promise.all([
@@ -461,24 +446,14 @@
             document.getElementById('footer-component').innerHTML = footer;
             
             // Gizli alanları doldur
-            document.getElementById('modelId').value = versionId || generateModelId(brandName, modelName);
+            document.getElementById('modelId').value = versionId;
             document.getElementById('categoryId').value = categoryId;
             document.getElementById('versionId').value = versionId;
             document.getElementById('year').value = selectedYear;
             
             // İlan başlığını ön doldur
-            document.getElementById('title').value = `${selectedYear} ${brandName} ${modelName} ${versionName}`.trim();
+            document.getElementById('title').value = `${selectedYear} ${brandName} ${modelName} ${versionName}`;
         });
-        
-        // Model ID oluşturmak için helper fonksiyon
-        function generateModelId(brand, model) {
-            if (!brand || !model) return '';
-            // Marka ve model adının ilk 3 harfini al ve büyük harf yap, sonra rastgele 3 rakam ekle
-            const brandPrefix = brand.substring(0, 3).toUpperCase();
-            const modelSuffix = model.substring(0, 3).toUpperCase();
-            const randomDigits = Math.floor(Math.random() * 900) + 100; // 100-999 arası
-            return `${brandPrefix}${modelSuffix}${randomDigits}`;
-        }
         
         // Form gönderimi
         document.getElementById('vehicleListingForm').addEventListener('submit', async function(e) {
@@ -490,54 +465,46 @@
             try {
                 // Form verilerini topla
                 const formData = new FormData(form);
-                const data = {};
-                
-                // Temel alanları ekle
+                const data = {
+                    // Temel araç bilgileri
+                    brand: brandName,
+                    model: modelName,
+                    version: versionName,
+                    production_year: Number(selectedYear),
+                    model_id: versionId, // Tam versiyon ID'sini kullan
+                    category_id: Number(categoryId),
+                    category_name: "Otomobil",
+                    
+                    // Kullanıcı bilgileri
+                    user_id: 2,
+                    user_name: "test_user",
+                    user_email: "test1@example.com",
+                    user_phone: "5551234568",
+                    
+                    // Sabit değerler
+                    listing_type: 'Sedan',
+                    case_type: 'sedan',
+                    currency: 'TRY',
+                    advert_status: true,
+                    is_open_to_estate_trade: false
+                };
+
+                // Form verilerini ekle
                 formData.forEach((value, key) => {
-                    // Boolean dönüşümü
                     if (value === 'true') {
                         data[key] = true;
                     } else if (value === 'false') {
                         data[key] = false;
                     } else if (!isNaN(value) && value !== '') {
-                        // Sayısal dönüşüm
                         data[key] = Number(value);
                     } else {
                         data[key] = value;
                     }
                 });
-                
-                // İlan tipi ve kasa tipi için veriyi kullan veya varsayılan değer ata
-                const caseType = formData.get('case_type') || 'sedan';
-                data.case_type = caseType;
-                data.listing_type = caseType.charAt(0).toUpperCase() + caseType.slice(1); // İlk harfi büyük yap
-                
-                // Para birimi ekle
-                data.currency = "TRY";
 
-                // Sabit değerler ata
-                data.fuel_consumption = data.fuel_consumption || '0';
-                data.fuel_tank_capacity = data.fuel_tank_capacity || 0;
-                
-                // URL'den gelen araç bilgilerini ekle
-                const vehicleYear = window.vehicleData.selectedYear;
-                const vehicleBrand = window.vehicleData.brandName;
-                const vehicleModel = window.vehicleData.modelName;
-                const vehicleVersion = window.vehicleData.versionName;
-                
-                // Üretim yılını ekle
-                data.production_year = vehicleYear;
-                
-                // Marka, model ve versiyon bilgilerini ekle
-                data.brand = vehicleBrand;
-                data.model = vehicleModel;
-                data.version = vehicleVersion;
-                
-                // Başlığı kontrol et, boşsa oluştur
-                if (!data.title || data.title.trim() === '') {
-                    data.title = `${vehicleYear} ${vehicleBrand} ${vehicleModel} ${vehicleVersion}`.trim();
-                }
-                
+                // Renk adını ekle
+                data.color_name = data.color;
+
                 // Donanım özelliklerini ekle
                 data.common_properties = {
                     airbag: !!formData.get('airbag'),
@@ -556,54 +523,30 @@
                     navigasyon: !!formData.get('navigasyon'),
                     bluetooth: !!formData.get('bluetooth')
                 };
-                
-                // İstenilen model_ids
-                data.desired_model_ids = [data.model_id];
-                
-                // Sabit demo adres ID'si
-                data.address_id = 1;
-                
-                // API'nin beklediği formatta olmayan gereksiz alanları temizle
-                delete data.airbag;
-                delete data.abs;
-                delete data.esp;
-                delete data.klima;
-                delete data.merkezi_kilit;
-                delete data.elektrikli_ayna;
-                delete data.sunroof;
-                delete data.leather_seats;
-                delete data.park_sensoru;
-                delete data.geri_gorus_kamera;
-                delete data.navigasyon;
-                delete data.bluetooth;
-                delete data.version_id; // API'de kullanılmıyor
-                delete data.selected_brand; // Artık data.brand kullanıyoruz
-                delete data.selected_model; // Artık data.model kullanıyoruz
-                delete data.selected_version; // Artık data.version kullanıyoruz
-                delete data.selected_year; // Artık data.production_year kullanıyoruz
-                
-                // Tarih ekle
-                data.created_at = new Date().toISOString();
-                
-                // İstek bilgilerini göster
-                console.log('Gönderilecek veri:', data);
+
+                // Debug için veriyi alert olarak göster
+                alert('API\'ye Gönderilecek Veri:\n' + JSON.stringify(data, null, 2));
                 
                 // API'ye gönder
                 const response = await fetch('https://takkas-api.onrender.com/api/vehicle-listings', {
                     method: 'POST',
                     headers: {
-                        'Content-Type': 'application/json'
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
                     },
                     body: JSON.stringify(data)
                 });
-                
+
                 if (!response.ok) {
                     const errorText = await response.text();
+                    alert('API Hatası:\n' + errorText);
                     throw new Error(`API Hatası: ${response.status} - ${errorText}`);
                 }
-                
+
                 const result = await response.json();
-                console.log('API yanıtı:', result);
+                
+                // API yanıtını alert olarak göster
+                alert('API Yanıtı:\n' + JSON.stringify(result, null, 2));
                 
                 // Başarı mesajı göster
                 alertBox.className = 'alert alert-success';
@@ -612,15 +555,11 @@
                 
                 // Başarı sayfasına yönlendir
                 setTimeout(() => {
-                    // İlan ID ve başlık bilgilerini ekleyerek yönlendir
                     const listingId = result.id || 'ID-' + Math.floor(Math.random() * 1000000);
                     const encodedTitle = encodeURIComponent(data.title);
-                    const encodedBrand = encodeURIComponent(vehicleBrand);
-                    const encodedModel = encodeURIComponent(vehicleModel);
-                    const encodedVersion = encodeURIComponent(vehicleVersion);
-                    const encodedColor = encodeURIComponent(data.color);
                     
-                    window.location.href = `listing-success.html?id=${listingId}&title=${encodedTitle}&brand=${encodedBrand}&model=${encodedModel}&version=${encodedVersion}&year=${vehicleYear}&color=${encodedColor}`;
+                    // URL parametrelerini direkt olarak kullan
+                    window.location.href = `listing-success.html?id=${listingId}&title=${encodedTitle}&brand=${brandName}&model=${modelName}&version=${versionName}&year=${selectedYear}&color=${data.color}`;
                 }, 1500);
                 
             } catch (error) {

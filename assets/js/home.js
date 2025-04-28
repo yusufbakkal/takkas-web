@@ -175,7 +175,7 @@ function initializeSlider() {
     // Görünür kart sayısını hesapla
     const sliderWidth = document.querySelector('.car-slider').offsetWidth;
     const visibleCards = Math.floor(sliderWidth / (cardWidth + gap));
-    
+
     // Kaydırma butonlarını ekle
     const sliderContainer = document.querySelector('.car-slider');
     

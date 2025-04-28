@@ -202,7 +202,6 @@
             const listingTitle = urlParams.get('title') || 'İlan başlığı bilgisi bulunamadı';
             const brandName = urlParams.get('brand') || '-';
             const modelName = urlParams.get('model') || '-';
-            const versionName = urlParams.get('version') || '';
             const year = urlParams.get('year') || '-';
             const color = urlParams.get('color') || '-';
             
@@ -213,17 +212,7 @@
             
             // Araç detaylarını göster
             const vehicleDetailsElement = document.getElementById('vehicleDetails');
-            let vehicleText = `${year} ${decodeURIComponent(brandName)} ${decodeURIComponent(modelName)}`;
-            
-            // Versiyon bilgisi varsa ekle
-            if (versionName && versionName !== 'null' && versionName !== '') {
-                vehicleText += ` ${decodeURIComponent(versionName)}`;
-            }
-            
-            // Renk bilgisini ekle
-            vehicleText += `, ${decodeURIComponent(color)}`;
-            
-            vehicleDetailsElement.textContent = vehicleText;
+            vehicleDetailsElement.textContent = `${year} ${decodeURIComponent(brandName)} ${decodeURIComponent(modelName)}, ${decodeURIComponent(color)}`;
             
             // Konfeti efekti
             createConfetti();
