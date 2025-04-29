@@ -1,0 +1,624 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>İlan Başarıyla Oluşturuldu - TAKKAS</title>
+    
+    <!-- CSS Bağlantıları -->
+    <link rel="stylesheet" href="assets/css/base.css">
+    <link rel="stylesheet" href="assets/css/property-detail-header.css">
+    <link rel="stylesheet" href="assets/css/footer.css">
+    <link rel="stylesheet" href="assets/css/create-listing.css">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #4F46E5;
+            --primary-hover: #4338CA;
+            --accent-color: #FF6370;
+            --accent-hover: #ff4956;
+            --success-color: #10B981;
+            --warning-color: #F59E0B;
+            --info-color: #3B82F6;
+            --gray-100: #F3F4F6;
+            --gray-200: #E5E7EB;
+            --gray-300: #D1D5DB;
+            --gray-400: #9CA3AF;
+            --gray-500: #6B7280;
+            --gray-600: #4B5563;
+            --gray-700: #374151;
+            --gray-800: #1F2937;
+            --gray-900: #111827;
+        }
+
+        body {
+            background-color: #f7f9fc;
+            color: var(--gray-700);
+        }
+
+        .success-page {
+            min-height: 75vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .success-container {
+            max-width: 900px;
+            margin: 3rem auto;
+            border-radius: 16px;
+            overflow: hidden;
+            background-color: white;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+            position: relative;
+            animation: slideUpFadeIn 0.6s ease-out forwards;
+        }
+
+        @keyframes slideUpFadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .success-header {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--accent-color) 100%);
+            padding: 2.5rem;
+            text-align: center;
+            color: white;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .success-header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.2) 0%, rgba(255,255,255,0) 60%);
+            animation: pulse 4s ease-out infinite;
+        }
+
+        @keyframes pulse {
+            0% {
+                transform: scale(0.8);
+                opacity: 0.3;
+            }
+            50% {
+                transform: scale(1);
+                opacity: 0.5;
+            }
+            100% {
+                transform: scale(0.8);
+                opacity: 0.3;
+            }
+        }
+
+        .success-icon {
+            font-size: 5rem;
+            margin-bottom: 1.5rem;
+            display: inline-block;
+            position: relative;
+            z-index: 1;
+            animation: bounceIn 1s 0.2s cubic-bezier(0.68, -0.55, 0.27, 1.55) forwards;
+            opacity: 0;
+            transform: scale(0.5);
+        }
+
+        @keyframes bounceIn {
+            0% {
+                opacity: 0;
+                transform: scale(0.3);
+            }
+            50% {
+                opacity: 1;
+                transform: scale(1.1);
+            }
+            70% {
+                transform: scale(0.9);
+            }
+            100% {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .success-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .success-subtitle {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            max-width: 80%;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+        }
+
+        .success-body {
+            padding: 2.5rem;
+        }
+
+        .success-info {
+            background-color: var(--gray-100);
+            border-radius: 12px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            position: relative;
+        }
+
+        .success-info-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--gray-200);
+        }
+
+        .success-info-header i {
+            font-size: 1.8rem;
+            color: var(--primary-color);
+            margin-right: 1rem;
+        }
+
+        .success-info-header h3 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--gray-800);
+            margin: 0;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1.5rem;
+        }
+
+        .info-item {
+            position: relative;
+            padding-left: 1.5rem;
+        }
+
+        .info-item::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 8px;
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background-color: var(--accent-color);
+        }
+
+        .info-label {
+            font-weight: 600;
+            color: var(--gray-600);
+            margin-bottom: 0.25rem;
+            font-size: 0.95rem;
+        }
+
+        .info-value {
+            font-size: 1.1rem;
+            color: var(--gray-800);
+        }
+
+        .vehicle-card {
+            border: 1px solid var(--gray-200);
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin-top: 2rem;
+            display: flex;
+            align-items: center;
+            background-color: white;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+            transition: all 0.3s ease;
+        }
+
+        .vehicle-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+        }
+
+        .vehicle-icon {
+            width: 70px;
+            height: 70px;
+            background-color: var(--primary-color);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 1.5rem;
+            flex-shrink: 0;
+        }
+
+        .vehicle-icon i {
+            font-size: 2rem;
+            color: white;
+        }
+
+        .vehicle-details h4 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--gray-800);
+            margin: 0 0 0.5rem 0;
+        }
+
+        .vehicle-details p {
+            margin: 0;
+            color: var(--gray-600);
+        }
+
+        .share-section {
+            margin-top: 2.5rem;
+            text-align: center;
+        }
+
+        .share-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: var(--gray-700);
+            margin-bottom: 1rem;
+        }
+
+        .share-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+        }
+
+        .share-button {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.25rem;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .share-button:hover {
+            transform: translateY(-3px);
+        }
+
+        .share-facebook {
+            background-color: #3b5998;
+        }
+
+        .share-twitter {
+            background-color: #1da1f2;
+        }
+
+        .share-whatsapp {
+            background-color: #25d366;
+        }
+
+        .share-email {
+            background-color: #ea4335;
+        }
+
+        .button-container {
+            display: flex;
+            gap: 1rem;
+            margin-top: 3rem;
+            justify-content: center;
+        }
+
+        .btn {
+            padding: 1rem 2rem;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            text-decoration: none;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--accent-color) 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: linear-gradient(135deg, var(--primary-hover) 0%, var(--accent-hover) 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .btn-secondary {
+            background-color: white;
+            color: var(--gray-700);
+            border: 1px solid var(--gray-300);
+        }
+
+        .btn-secondary:hover {
+            background-color: var(--gray-100);
+            color: var(--primary-color);
+            transform: translateY(-2px);
+        }
+
+        .confetti-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 999;
+            overflow: hidden;
+        }
+
+        .note-box {
+            background-color: #fff8e6;
+            border-left: 4px solid var(--warning-color);
+            padding: 1rem 1.5rem;
+            margin-top: 2rem;
+            border-radius: 6px;
+            display: flex;
+            align-items: flex-start;
+        }
+
+        .note-box i {
+            color: var(--warning-color);
+            font-size: 1.25rem;
+            margin-right: 1rem;
+            margin-top: 0.15rem;
+        }
+
+        .note-content {
+            flex: 1;
+        }
+
+        .note-content p {
+            margin: 0;
+            color: var(--gray-700);
+        }
+
+        @media (max-width: 768px) {
+            .success-container {
+                margin: 1.5rem;
+                border-radius: 12px;
+            }
+
+            .success-header {
+                padding: 2rem 1.5rem;
+            }
+
+            .success-body {
+                padding: 1.5rem;
+            }
+
+            .success-title {
+                font-size: 2rem;
+            }
+
+            .info-grid {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+
+            .button-container {
+                flex-direction: column;
+                gap: 0.75rem;
+            }
+
+            .success-info {
+                padding: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Özel Header Bileşeni -->
+    <div id="header-component"></div>
+
+    <!-- Konfeti animasyonu için konteyner -->
+    <div class="confetti-container" id="confetti-container"></div>
+
+    <!-- Ana İçerik -->
+    <main class="success-page">
+        <div class="success-container">
+            <div class="success-header">
+                <i class="fas fa-check-circle success-icon"></i>
+                <h1 class="success-title">İlanınız Başarıyla Oluşturuldu!</h1>
+                <p class="success-subtitle">
+                    Tebrikler! İlanınız sistemimize kaydedildi ve incelendikten sonra yayına alınacak.
+                </p>
+            </div>
+            
+            <div class="success-body">
+                <div class="success-info">
+                    <div class="success-info-header">
+                        <i class="fas fa-clipboard-list"></i>
+                        <h3>İlan Bilgileri</h3>
+                    </div>
+                    
+                    <div class="info-grid">
+                        <div class="info-item">
+                            <div class="info-label">İlan Numarası</div>
+                            <div class="info-value" id="listingId">-</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">Yayınlanma Tarihi</div>
+                            <div class="info-value" id="listingDate">-</div>
+                        </div>
+                        <div class="info-item" style="grid-column: span 2;">
+                            <div class="info-label">İlan Başlığı</div>
+                            <div class="info-value" id="listingTitle">-</div>
+                        </div>
+                    </div>
+                    
+                    <div class="vehicle-card">
+                        <div class="vehicle-icon">
+                            <i class="fas fa-car"></i>
+                        </div>
+                        <div class="vehicle-details">
+                            <h4>Araç Bilgileri</h4>
+                            <p id="vehicleDetails">-</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="note-box">
+                    <i class="fas fa-info-circle"></i>
+                    <div class="note-content">
+                        <p>İlanınız 24 saat içinde incelenerek onaylanacaktır. Onaylandıktan sonra size bildirim gönderilecek ve ilanınız yayına alınacaktır.</p>
+                    </div>
+                </div>
+                
+                <div class="share-section">
+                    <h3 class="share-title">İlanınızı Paylaşın</h3>
+                    <div class="share-buttons">
+                        <a class="share-button share-facebook" id="shareFacebook">
+                            <i class="fab fa-facebook-f"></i>
+                        </a>
+                        <a class="share-button share-twitter" id="shareTwitter">
+                            <i class="fab fa-twitter"></i>
+                        </a>
+                        <a class="share-button share-whatsapp" id="shareWhatsapp">
+                            <i class="fab fa-whatsapp"></i>
+                        </a>
+                        <a class="share-button share-email" id="shareEmail">
+                            <i class="fas fa-envelope"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <div class="button-container">
+                    <a href="index.html" class="btn btn-secondary">
+                        <i class="fas fa-home"></i> Ana Sayfaya Dön
+                    </a>
+                    <a href="listings.html" class="btn btn-primary">
+                        <i class="fas fa-list"></i> İlanlarım
+                    </a>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer Bileşeni -->
+    <div class="full-width-footer-wrapper">
+        <div id="footer-component"></div>
+    </div>
+
+    <!-- JavaScript - Konfeti animasyonu ve sayfa bilgileri -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
+    <script>
+        // Sayfayı yükle
+        document.addEventListener('DOMContentLoaded', function() {
+            // URL parametrelerini al
+            const urlParams = new URLSearchParams(window.location.search);
+            const listingId = urlParams.get('id') || 'ID-' + Math.floor(Math.random() * 1000000);
+            const listingTitle = urlParams.get('title') || 'İlan başlığı bilgisi bulunamadı';
+            const brandName = urlParams.get('brand') || '-';
+            const modelName = urlParams.get('model') || '-';
+            const version = urlParams.get('version') || '';
+            const year = urlParams.get('year') || '-';
+            const color = urlParams.get('color') || '-';
+            
+            // Sayfaya bilgileri yerleştir
+            document.getElementById('listingId').textContent = listingId;
+            document.getElementById('listingTitle').textContent = decodeURIComponent(listingTitle);
+            document.getElementById('listingDate').textContent = new Date().toLocaleDateString('tr-TR', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+            });
+            
+            // Araç detaylarını göster
+            const vehicleDetailsElement = document.getElementById('vehicleDetails');
+            const versionText = version ? `, ${decodeURIComponent(version)}` : '';
+            vehicleDetailsElement.textContent = `${year} ${decodeURIComponent(brandName)} ${decodeURIComponent(modelName)}${versionText}, ${decodeURIComponent(color)}`;
+            
+            // Konfeti efekti
+            createConfetti();
+            
+            // Header ve footer bileşenlerini yükle
+            Promise.all([
+                fetch('components/property-detail-header.html').then(response => response.text()),
+                fetch('components/footer.html').then(response => response.text())
+            ]).then(([header, footer]) => {
+                document.getElementById('header-component').innerHTML = header;
+                document.getElementById('footer-component').innerHTML = footer;
+            });
+            
+            // Paylaşım butonlarını ayarla
+            setupShareButtons(listingId, listingTitle);
+        });
+        
+        // Paylaşım butonlarını ayarla
+        function setupShareButtons(listingId, title) {
+            const shareUrl = window.location.origin + '/car-detail.html?id=' + listingId;
+            const shareTitle = decodeURIComponent(title);
+            
+            // Facebook
+            document.getElementById('shareFacebook').addEventListener('click', function() {
+                window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}`, '_blank');
+            });
+            
+            // Twitter
+            document.getElementById('shareTwitter').addEventListener('click', function() {
+                window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent('TAKKAS üzerinde yeni ilanım: ' + shareTitle)}&url=${encodeURIComponent(shareUrl)}`, '_blank');
+            });
+            
+            // WhatsApp
+            document.getElementById('shareWhatsapp').addEventListener('click', function() {
+                window.open(`https://wa.me/?text=${encodeURIComponent('TAKKAS üzerinde yeni ilanım: ' + shareTitle + ' ' + shareUrl)}`, '_blank');
+            });
+            
+            // Email
+            document.getElementById('shareEmail').addEventListener('click', function() {
+                window.location.href = `mailto:?subject=${encodeURIComponent('TAKKAS - Yeni İlan: ' + shareTitle)}&body=${encodeURIComponent('Merhaba,\n\nTAKKAS platformunda yeni bir ilan oluşturdum. Aşağıdaki bağlantıdan inceleyebilirsin:\n\n' + shareUrl + '\n\nSaygılarımla.')}`;
+            });
+        }
+        
+        // Konfeti animasyonu
+        function createConfetti() {
+            const duration = 4 * 1000;
+            const end = Date.now() + duration;
+            
+            (function frame() {
+                confetti({
+                    particleCount: 3,
+                    angle: 60,
+                    spread: 55,
+                    origin: { x: 0 },
+                    colors: ['#4F46E5', '#FF6370', '#10B981', '#F59E0B']
+                });
+                
+                confetti({
+                    particleCount: 3,
+                    angle: 120,
+                    spread: 55,
+                    origin: { x: 1 },
+                    colors: ['#4F46E5', '#FF6370', '#10B981', '#F59E0B']
+                });
+                
+                if (Date.now() < end) {
+                    requestAnimationFrame(frame);
+                }
+            }());
+        }
+    </script>
+</body>
+</html> 
