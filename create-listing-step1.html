@@ -233,7 +233,9 @@
                         case 'emlak':
                             icon = 'fa-house';  // Emlak için ev ikonu
                             color = '#FFA500';
-                            nextStep = 'create-listing-step2-property.html';
+                            nextStep = 'create-listing-step2-property.html'; // Emlak için farklı bir akış kullanılıyor
+                            // Burada nextStepInfo özelliği ekleyerek emlak için 4 adımlı süreci belirtebiliriz
+                            category.nextStepInfo = { totalSteps: 4, route: 'property' };
                             break;
                         case 'karavan':
                             icon = 'fa-caravan';  // Karavan için karavan ikonu
