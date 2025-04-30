@@ -12,6 +12,55 @@
     <link rel="stylesheet" href="assets/css/car-detail.css">
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        /* Adres bölümü için stiller */
+        .property-address {
+            background-color: #f8f9fa;
+            padding: 1.5rem;
+            border-radius: 10px;
+            margin-bottom: 2rem;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+            border: 1px solid #e9ecef;
+        }
+
+        .property-address h3 {
+            margin-bottom: 1rem;
+            font-size: 1.25rem;
+            color: #333;
+            border-bottom: 2px solid #4F46E5;
+            padding-bottom: 0.5rem;
+            display: inline-block;
+        }
+
+        .address-info {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .address-line {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-size: 1.1rem;
+        }
+
+        .address-line i {
+            color: #4F46E5;
+            font-size: 1.2rem;
+        }
+
+        .address-line span {
+            font-weight: 500;
+            color: #444;
+        }
+
+        @media (max-width: 768px) {
+            .property-address {
+                padding: 1rem;
+            }
+        }
+    </style>
 </head>
 <body>
     <!-- Özel Header Bileşeni -->
@@ -128,12 +177,39 @@
                     throw new Error(`API isteği başarısız oldu: ${response.status} ${response.statusText}`);
                 }
                 
-                const data = await response.json();
+                let data = await response.json();
                 console.log('API yanıtı:', data);
                 
                 // API boş veri döndürürse veya data null/undefined ise hata fırlat
                 if (!data || Object.keys(data).length === 0) {
                     throw new Error('İlan bulunamadı veya API boş veri döndürdü.');
+                }
+                
+                // Adres bilgilerini al
+                if (data.address_id) {
+                    try {
+                        const addressUrl = `https://takkas-api.onrender.com/api/addresses/${data.address_id}`;
+                        console.log('Adres bilgisi için API isteği:', addressUrl);
+                        
+                        const addressResponse = await fetch(addressUrl);
+                        
+                        if (addressResponse.ok) {
+                            const addressData = await addressResponse.json();
+                            console.log('Adres API yanıtı:', addressData);
+                            
+                            // Adres verilerini araba verilerine ekle
+                            data = { 
+                                ...data, 
+                                province_name: addressData.city,
+                                district_name: addressData.district,
+                                neighborhood_name: addressData.neighborhood
+                            };
+                        } else {
+                            console.error('Adres bilgileri alınamadı:', addressResponse.status);
+                        }
+                    } catch (addressError) {
+                        console.error('Adres bilgileri alınırken hata oluştu:', addressError);
+                    }
                 }
                 
                 return data;
@@ -169,7 +245,12 @@
                         category_id: 18,
                         category_name: "Sedan",
                         from_where: "bireysel",
-                        description: "Düşük kilometreli, mükemmel durumda 2023 model lüks sedan."
+                        description: "Düşük kilometreli, mükemmel durumda 2023 model lüks sedan.",
+                        // Adres bilgileri
+                        address_id: 123,
+                        province_name: "Antalya",
+                        district_name: "Kepez",
+                        neighborhood_name: "Habibler Mh."
                     },
                     {
                         id: 47,
@@ -195,7 +276,12 @@
                         category_id: 18,
                         category_name: "Sedan",
                         from_where: "bireysel",
-                        description: "Düşük kilometreli, mükemmel durumda 2023 model lüks sedan."
+                        description: "Düşük kilometreli, mükemmel durumda 2023 model lüks sedan.",
+                        // Adres bilgileri
+                        address_id: 124,
+                        province_name: "Antalya",
+                        district_name: "Kepez",
+                        neighborhood_name: "Habibler Mh."
                     },
                     {
                         id: 45,
@@ -221,7 +307,12 @@
                         category_id: 16,
                         category_name: "Elektrikli Otomobil",
                         from_where: "sahibinden",
-                        description: "tyt acted 9 bin yaptım bende doktor sayılırım doktordan temiz araba"
+                        description: "tyt acted 9 bin yaptım bende doktor sayılırım doktordan temiz araba",
+                        // Adres bilgileri
+                        address_id: 126,
+                        province_name: "Antalya",
+                        district_name: "Kepez",
+                        neighborhood_name: "Habibler Mh."
                     },
                     {
                         id: 43,
@@ -247,7 +338,12 @@
                         category_id: 16,
                         category_name: "Elektrikli Otomobil",
                         from_where: "Sahibinden",
-                        description: "test-aciklama"
+                        description: "test-aciklama",
+                        // Adres bilgileri
+                        address_id: 127,
+                        province_name: "Antalya",
+                        district_name: "Kepez",
+                        neighborhood_name: "Habibler Mh."
                     },
                     {
                         id: 42,
@@ -273,7 +369,12 @@
                         category_id: 16,
                         category_name: "Elektrikli Otomobil",
                         from_where: "test data",
-                        description: "test data"
+                        description: "test data",
+                        // Adres bilgileri
+                        address_id: 128,
+                        province_name: "Antalya",
+                        district_name: "Kepez",
+                        neighborhood_name: "Habibler Mh."
                     },
                     {
                         id: 41,
@@ -299,7 +400,12 @@
                         category_id: 1,
                         category_name: "Otomobil",
                         from_where: "data",
-                        description: "data"
+                        description: "data",
+                        // Adres bilgileri
+                        address_id: 129,
+                        province_name: "Antalya",
+                        district_name: "Kepez",
+                        neighborhood_name: "Habibler Mh."
                     },
                     {
                         id: 40,
@@ -325,7 +431,12 @@
                         category_id: 16,
                         category_name: "Elektrikli Otomobil",
                         from_where: "test",
-                        description: "test"
+                        description: "test",
+                        // Adres bilgileri
+                        address_id: 130,
+                        province_name: "Antalya",
+                        district_name: "Kepez",
+                        neighborhood_name: "Habibler Mh."
                     },
                     {
                         id: 39,
@@ -351,7 +462,12 @@
                         category_id: 16,
                         category_name: "Elektrikli Otomobil",
                         from_where: "bayi",
-                        description: "test-aciklama"
+                        description: "test-aciklama",
+                        // Adres bilgileri
+                        address_id: 131,
+                        province_name: "Antalya",
+                        district_name: "Kepez",
+                        neighborhood_name: "Habibler Mh."
                     }
                 ];
                 
@@ -483,6 +599,16 @@
                     <p>${car.description}</p>
                 </div>
 
+                <div class="property-address">
+                    <h3>Adres Bilgileri</h3>
+                    <div class="address-info">
+                        <div class="address-line">
+                            <i class="fas fa-map-marker-alt"></i>
+                            <span>${car.province_name || 'İl'} / ${car.district_name || 'İlçe'} / ${car.neighborhood_name || 'Mahalle'}</span>
+                        </div>
+                    </div>
+                </div>
+
                 <div class="property-details-grid">
                     <h3>Tüm Özellikler</h3>
                     <div class="details-grid">
@@ -561,6 +687,10 @@
                         <div class="detail-item">
                             <div class="detail-label">Kimden</div>
                             <div class="detail-value">${fromWhere}</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">Adres</div>
+                            <div class="detail-value">${car.province_name || 'İl'} / ${car.district_name || 'İlçe'} / ${car.neighborhood_name || 'Mahalle'}</div>
                         </div>
                     </div>
                 </div>
