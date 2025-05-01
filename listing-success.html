@@ -440,9 +440,9 @@
         <div class="success-container">
             <div class="success-header">
                 <i class="fas fa-check-circle success-icon"></i>
-                <h1 class="success-title">İlanınız Başarıyla Oluşturuldu!</h1>
+                <h1 class="success-title">Emlak İlanınız Başarıyla Oluşturuldu!</h1>
                 <p class="success-subtitle">
-                    Tebrikler! İlanınız sistemimize kaydedildi ve incelendikten sonra yayına alınacak.
+                    Tebrikler! Emlak ilanınız sistemimize kaydedildi ve incelendikten sonra yayına alınacak.
                 </p>
             </div>
             
@@ -468,13 +468,13 @@
                         </div>
                     </div>
                     
-                    <div class="vehicle-card">
+                    <div class="vehicle-card" id="estateCard">
                         <div class="vehicle-icon">
-                            <i class="fas fa-car"></i>
+                            <i class="fas fa-home" id="estateIcon"></i>
                         </div>
                         <div class="vehicle-details">
-                            <h4>Araç Bilgileri</h4>
-                            <p id="vehicleDetails">-</p>
+                            <h4>Emlak Bilgileri</h4>
+                            <p id="estateDetails">-</p>
                         </div>
                     </div>
                 </div>
@@ -482,7 +482,7 @@
                 <div class="note-box">
                     <i class="fas fa-info-circle"></i>
                     <div class="note-content">
-                        <p>İlanınız 24 saat içinde incelenerek onaylanacaktır. Onaylandıktan sonra size bildirim gönderilecek ve ilanınız yayına alınacaktır.</p>
+                        <p>Emlak ilanınız 24 saat içinde incelenerek onaylanacaktır. Onaylandıktan sonra size bildirim gönderilecek ve ilanınız yayına alınacaktır.</p>
                     </div>
                 </div>
                 
@@ -508,8 +508,8 @@
                     <a href="index.html" class="btn btn-secondary">
                         <i class="fas fa-home"></i> Ana Sayfaya Dön
                     </a>
-                    <a href="listings.html" class="btn btn-primary">
-                        <i class="fas fa-list"></i> İlanlarım
+                    <a href="my-estate-listings.html" class="btn btn-primary">
+                        <i class="fas fa-list"></i> Emlak İlanlarım
                     </a>
                 </div>
             </div>
@@ -530,11 +530,7 @@
             const urlParams = new URLSearchParams(window.location.search);
             const listingId = urlParams.get('id') || 'ID-' + Math.floor(Math.random() * 1000000);
             const listingTitle = urlParams.get('title') || 'İlan başlığı bilgisi bulunamadı';
-            const brandName = urlParams.get('brand') || '-';
-            const modelName = urlParams.get('model') || '-';
-            const version = urlParams.get('version') || '';
-            const year = urlParams.get('year') || '-';
-            const color = urlParams.get('color') || '-';
+            const listingType = urlParams.get('type') || 'apartment';
             
             // Sayfaya bilgileri yerleştir
             document.getElementById('listingId').textContent = listingId;
@@ -545,10 +541,20 @@
                 day: 'numeric'
             });
             
-            // Araç detaylarını göster
-            const vehicleDetailsElement = document.getElementById('vehicleDetails');
-            const versionText = version ? `, ${decodeURIComponent(version)}` : '';
-            vehicleDetailsElement.textContent = `${year} ${decodeURIComponent(brandName)} ${decodeURIComponent(modelName)}${versionText}, ${decodeURIComponent(color)}`;
+            // Emlak detaylarını göster
+            const estateDetailsElement = document.getElementById('estateDetails');
+            const estateIconElement = document.getElementById('estateIcon');
+            
+            if (listingType === 'apartment') {
+                estateDetailsElement.textContent = 'Konut Tipi Emlak İlanı';
+                estateIconElement.className = 'fas fa-home';
+            } else if (listingType === 'land') {
+                estateDetailsElement.textContent = 'Arsa Tipi Emlak İlanı';
+                estateIconElement.className = 'fas fa-map-marker-alt';
+            } else {
+                estateDetailsElement.textContent = 'Emlak İlanı';
+                estateIconElement.className = 'fas fa-building';
+            }
             
             // Konfeti efekti
             createConfetti();
@@ -563,12 +569,14 @@
             });
             
             // Paylaşım butonlarını ayarla
-            setupShareButtons(listingId, listingTitle);
+            setupShareButtons(listingId, listingTitle, listingType);
         });
         
         // Paylaşım butonlarını ayarla
-        function setupShareButtons(listingId, title) {
-            const shareUrl = window.location.origin + '/car-detail.html?id=' + listingId;
+        function setupShareButtons(listingId, title, type) {
+            // İlan tipine bağlı olarak doğru detay sayfasına yönlendir
+            const detailPage = type === 'land' ? 'property-detail.html' : 'property-detail.html';
+            const shareUrl = window.location.origin + `/${detailPage}?id=${listingId}`;
             const shareTitle = decodeURIComponent(title);
             
             // Facebook
@@ -578,17 +586,17 @@
             
             // Twitter
             document.getElementById('shareTwitter').addEventListener('click', function() {
-                window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent('TAKKAS üzerinde yeni ilanım: ' + shareTitle)}&url=${encodeURIComponent(shareUrl)}`, '_blank');
+                window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent('TAKKAS üzerinde yeni emlak ilanım: ' + shareTitle)}&url=${encodeURIComponent(shareUrl)}`, '_blank');
             });
             
             // WhatsApp
             document.getElementById('shareWhatsapp').addEventListener('click', function() {
-                window.open(`https://wa.me/?text=${encodeURIComponent('TAKKAS üzerinde yeni ilanım: ' + shareTitle + ' ' + shareUrl)}`, '_blank');
+                window.open(`https://wa.me/?text=${encodeURIComponent('TAKKAS üzerinde yeni emlak ilanım: ' + shareTitle + ' ' + shareUrl)}`, '_blank');
             });
             
             // Email
             document.getElementById('shareEmail').addEventListener('click', function() {
-                window.location.href = `mailto:?subject=${encodeURIComponent('TAKKAS - Yeni İlan: ' + shareTitle)}&body=${encodeURIComponent('Merhaba,\n\nTAKKAS platformunda yeni bir ilan oluşturdum. Aşağıdaki bağlantıdan inceleyebilirsin:\n\n' + shareUrl + '\n\nSaygılarımla.')}`;
+                window.location.href = `mailto:?subject=${encodeURIComponent('TAKKAS - Yeni Emlak İlanı: ' + shareTitle)}&body=${encodeURIComponent('Merhaba,\n\nTAKKAS platformunda yeni bir emlak ilanı oluşturdum. Aşağıdaki bağlantıdan inceleyebilirsin:\n\n' + shareUrl + '\n\nSaygılarımla.')}`;
             });
         }
         

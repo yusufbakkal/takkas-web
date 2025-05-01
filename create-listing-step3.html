@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>İlan Adım 3 - TAKKAS</title>
+    <script>
+        // URL'den parametreleri al
+        const urlParams = new URLSearchParams(window.location.search);
+        const category = urlParams.get('category');
+        const subcategory = urlParams.get('subcategory');
+
+        // Sayfa yüklendiğinde yönlendirme yap
+        window.onload = function() {
+            if (category === 'emlak') {
+                // Alt kategoriye göre yönlendirme
+                switch(subcategory) {
+                    case '24': // Arsa
+                        window.location.href = 'create-estate-land.html';
+                        break;
+                    case '25': // Daire
+                        window.location.href = 'create-estate-apartment.html';
+                        break;
+                    default:
+                        // Geçersiz alt kategori durumunda ana sayfaya yönlendir
+                        window.location.href = 'index.html';
+                        break;
+                }
+            } else {
+                // Geçersiz kategori durumunda ana sayfaya yönlendir
+                window.location.href = 'index.html';
+            }
+        };
+    </script>
+</head>
+<body>
+    <div style="text-align: center; margin-top: 50px;">
+        <h2>Yönlendiriliyor...</h2>
+        <p>Lütfen bekleyin, ilgili form sayfasına yönlendiriliyorsunuz.</p>
+    </div>
+</body>
+</html> 

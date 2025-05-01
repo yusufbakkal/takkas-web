@@ -4,21 +4,26 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Password toggle
     const passwordInput = document.getElementById('password');
-    const passwordToggle = document.querySelector('.password-toggle');
+    const togglePasswordButton = document.querySelector('.password-toggle');
     
     // Sosyal medya butonları
     const socialButtons = document.querySelectorAll('.google-button, .facebook-button');
     
     // Şifre göster/gizle
-    if (passwordToggle) {
-        passwordToggle.addEventListener('click', function() {
+    if (togglePasswordButton) {
+        togglePasswordButton.addEventListener('click', function() {
             const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
             passwordInput.setAttribute('type', type);
             
             // İkon değiştir
             const icon = this.querySelector('i');
-            icon.classList.toggle('fa-eye');
-            icon.classList.toggle('fa-eye-slash');
+            if (type === 'password') {
+                icon.classList.remove('fa-eye-slash');
+                icon.classList.add('fa-eye');
+            } else {
+                icon.classList.remove('fa-eye');
+                icon.classList.add('fa-eye-slash');
+            }
         });
     }
     
@@ -26,12 +31,13 @@ document.addEventListener('DOMContentLoaded', function() {
     if (loginForm) {
         console.log('Login form bulundu, event listener ekleniyor...');
         
-        loginForm.addEventListener('submit', async function(event) {
-            event.preventDefault();
+        loginForm.addEventListener('submit', async function(e) {
+            e.preventDefault();
             console.log('Form submit edildi');
             
             const email = document.getElementById('email').value;
-            const password = document.getElementById('password').value;
+            const password = passwordInput.value;
+            const rememberMe = document.querySelector('.checkbox').checked;
             
             console.log('Email:', email);
             console.log('Password girişi yapıldı (güvenlik için gösterilmiyor)');
@@ -51,20 +57,19 @@ document.addEventListener('DOMContentLoaded', function() {
                 const apiUrl = 'https://takkas-api.onrender.com/api/auth/login';
                 console.log('API URL:', apiUrl);
                 
-                const requestData = {
+                const formData = {
                     email: email,
                     password: password
                 };
                 
-                console.log('İstek verisi:', JSON.stringify(requestData));
+                console.log('İstek verisi:', JSON.stringify(formData));
                 
                 const response = await fetch(apiUrl, {
                     method: 'POST',
                     headers: {
-                        'Content-Type': 'application/json',
-                        'Accept': 'application/json'
+                        'Content-Type': 'application/json'
                     },
-                    body: JSON.stringify(requestData)
+                    body: JSON.stringify(formData)
                 });
                 
                 console.log('API yanıtı alındı, durum kodu:', response.status);
@@ -85,37 +90,30 @@ document.addEventListener('DOMContentLoaded', function() {
                     throw new Error(errorMessage);
                 }
                 
-                const responseText = await response.text();
-                console.log('API yanıt metni:', responseText);
+                const userData = await response.json();
+                console.log('Giriş başarılı:', userData);
                 
-                let data;
-                try {
-                    data = responseText ? JSON.parse(responseText) : {};
-                    console.log('Giriş başarılı:', data);
-                    
-                    // Token'ı localStorage'a kaydet
-                    if (data.token) {
-                        localStorage.setItem('authToken', data.token);
-                        localStorage.setItem('userData', JSON.stringify(data));
-                        console.log('Token ve kullanıcı verileri kaydedildi');
-                    } else {
-                        console.warn('Token bulunamadı!');
-                    }
-                    
-                    // Başarılı giriş sonrası kullanıcıyı ana sayfaya yönlendir
-                    alert('Giriş başarılı! Ana sayfaya yönlendiriliyorsunuz.');
-                    
-                    // Kısa bir gecikme ekleyerek alert'in görünmesini sağla
-                    setTimeout(function() {
-                        window.location.href = '../index.html';
-                    }, 1000);
-                    
-                    return; // İşlemi burada sonlandır
-                } catch (e) {
-                    console.error('Yanıt JSON olarak ayrıştırılamadı:', e);
-                    throw new Error('Sunucu yanıtı işlenemedi');
+                // Token ve kullanıcı bilgilerini localStorage'a kaydet
+                localStorage.setItem('authToken', userData.token);
+                localStorage.setItem('userId', userData.user.id);
+                localStorage.setItem('userEmail', userData.user.email);
+                localStorage.setItem('userName', userData.user.name);
+                
+                if (rememberMe) {
+                    localStorage.setItem('rememberMe', 'true');
+                } else {
+                    localStorage.removeItem('rememberMe');
                 }
                 
+                // Giriş başarılı mesajı
+                showNotification('Giriş başarılı! Yönlendiriliyorsunuz...', 'success');
+                
+                // Ana sayfaya yönlendir (1.5 saniye sonra)
+                setTimeout(() => {
+                    window.location.href = '../index.html';
+                }, 1500);
+                
+                return; // İşlemi burada sonlandır
             } catch (error) {
                 console.error('Giriş sırasında bir hata oluştu:', error);
                 hideLoading();
@@ -181,4 +179,71 @@ function hideLoading() {
         submitBtn.disabled = false;
         submitBtn.innerHTML = 'Giriş Yap';
     }
+}
+
+// Bildirim gösterme fonksiyonu
+function showNotification(message, type) {
+    // Eğer zaten bir bildirim varsa kaldır
+    const existingNotification = document.querySelector('.notification');
+    if (existingNotification) {
+        existingNotification.remove();
+    }
+
+    // Yeni bildirim oluştur
+    const notification = document.createElement('div');
+    notification.className = `notification ${type}`;
+    notification.innerHTML = `
+        <div class="notification-icon">
+            <i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle'}"></i>
+        </div>
+        <div class="notification-message">${message}</div>
+    `;
+
+    // Bildirim stillerini ekle
+    notification.style.position = 'fixed';
+    notification.style.top = '20px';
+    notification.style.right = '20px';
+    notification.style.padding = '15px 20px';
+    notification.style.borderRadius = '8px';
+    notification.style.display = 'flex';
+    notification.style.alignItems = 'center';
+    notification.style.gap = '10px';
+    notification.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.1)';
+    notification.style.zIndex = '9999';
+    notification.style.minWidth = '300px';
+    notification.style.transition = 'all 0.3s ease';
+    notification.style.animation = 'slideIn 0.3s ease forwards';
+
+    if (type === 'success') {
+        notification.style.backgroundColor = '#10B981';
+        notification.style.color = 'white';
+    } else {
+        notification.style.backgroundColor = '#EF4444';
+        notification.style.color = 'white';
+    }
+
+    // Stili için animation keyframes ekle
+    const styleSheet = document.createElement('style');
+    styleSheet.textContent = `
+        @keyframes slideIn {
+            0% { transform: translateX(100%); opacity: 0; }
+            100% { transform: translateX(0); opacity: 1; }
+        }
+        @keyframes slideOut {
+            0% { transform: translateX(0); opacity: 1; }
+            100% { transform: translateX(100%); opacity: 0; }
+        }
+    `;
+    document.head.appendChild(styleSheet);
+
+    // Bildirim ekle
+    document.body.appendChild(notification);
+
+    // 5 saniye sonra kaldır
+    setTimeout(() => {
+        notification.style.animation = 'slideOut 0.3s ease forwards';
+        setTimeout(() => {
+            notification.remove();
+        }, 300);
+    }, 5000);
 } 

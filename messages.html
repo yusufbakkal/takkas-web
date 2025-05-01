@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mesajlar</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="chat-container">
+        <!-- Sol panel - Mesaj listesi -->
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <h2>Messages</h2>
+                <button class="new-message-btn" id="newMessageBtn">
+                    <i class="fas fa-edit"></i>
+                </button>
+            </div>
+            <div class="search-container">
+                <i class="fas fa-search search-icon"></i>
+                <input type="text" id="searchInput" placeholder="Search...">
+            </div>
+            <div class="pinned-section">
+                <p class="section-title"><i class="fas fa-thumbtack"></i> PINNED</p>
+                <div class="contact-list" id="pinnedContacts">
+                    <!-- Sabitlenmiş kişiler burada listelenecek -->
+                </div>
+            </div>
+            <div class="all-messages-section">
+                <p class="section-title"><i class="far fa-envelope"></i> All Message</p>
+                <div class="contact-list" id="allContacts">
+                    <!-- Tüm kişiler burada listelenecek -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Sağ panel - Mesaj detayları -->
+        <div class="chat-area">
+            <div class="chat-header" id="chatHeader">
+                <!-- Aktif sohbet başlığı buraya gelecek -->
+            </div>
+            <div class="messages-container" id="messagesContainer">
+                <!-- Mesajlar burada görünecek -->
+            </div>
+            <div class="message-input-container">
+                <button class="attachment-btn">
+                    <i class="fas fa-paperclip"></i>
+                </button>
+                <input type="text" id="messageInput" placeholder="Type Something...">
+                <button class="send-btn" id="sendMessageBtn">
+                    <i class="fas fa-paper-plane"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html> 

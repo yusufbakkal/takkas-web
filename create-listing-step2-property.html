@@ -29,7 +29,7 @@
                 <div class="step-line completed"></div>
                 <div class="step active">
                     <div class="step-number">2</div>
-                    <div class="step-text">Emlak Tipi</div>
+                    <div class="step-text">Alt Kategori</div>
                 </div>
                 <div class="step-line"></div>
                 <div class="step">
@@ -50,7 +50,7 @@
                 <span class="current-category">Emlak</span>
             </div>
             
-            <h2 class="section-title">Emlak Tipini Seçin</h2>
+            <h2 class="section-title">Alt Kategori Seçin</h2>
             
             <div class="loading-spinner" id="categoryLoading">
                 <div class="spinner"></div>
@@ -201,7 +201,7 @@
                     
                     htmlContent += `
                         <div class="subcategory-card">
-                            <a href="create-listing-step3.html?category=emlak&subcategory=${subCat.id}" class="subcategory-link">
+                            <a href="${subCat.name.toLowerCase() === 'konut' ? 'create-estate-apartment.html' : subCat.name.toLowerCase() === 'arsa' ? 'create-estate-land.html' : 'create-listing-step3.html'}?category=emlak&subcategory=${subCat.id}" class="subcategory-link">
                                 <div class="subcategory-icon">
                                     <i class="fas ${iconClass}"></i>
                                 </div>
@@ -238,7 +238,7 @@
                 // Varsayılan alt kategoriler (API'den yeterli veri gelmediğinde)
                 htmlContent += `
                     <div class="subcategory-card">
-                        <a href="create-listing-step3.html?category=emlak&subcategory=konut" class="subcategory-link">
+                        <a href="create-estate-apartment.html?category=emlak&subcategory=konut" class="subcategory-link">
                             <div class="subcategory-icon">
                                 <i class="fas fa-home"></i>
                             </div>
@@ -253,7 +253,7 @@
                     </div>
                     
                     <div class="subcategory-card">
-                        <a href="create-listing-step3.html?category=emlak&subcategory=arsa" class="subcategory-link">
+                        <a href="create-estate-land.html?category=emlak&subcategory=arsa" class="subcategory-link">
                             <div class="subcategory-icon">
                                 <i class="fas fa-map-marker-alt"></i>
                             </div>
