@@ -1,17 +1,209 @@
-/* Ayarlar Container */
+/* Settings Container */
 .settings-container {
-    max-width: 1000px;
-    margin: 40px auto;
-    padding: 40px;
-    background: white;
-    border-radius: 20px;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    max-width: 800px;
+    margin: 2rem auto;
+    padding: 2rem;
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
 }
 
 .settings-container h1 {
-    font-size: 24px;
-    color: #242731;
-    margin-bottom: 30px;
+    font-size: 2rem;
+    color: #333;
+    margin-bottom: 2rem;
+    font-weight: 700;
+}
+
+/* Profile Header */
+.profile-header {
+    margin-bottom: 2rem;
+}
+
+.profile-header h2 {
+    font-size: 1.5rem;
+    color: #333;
+    margin-bottom: 0.5rem;
+}
+
+.settings-description {
+    color: #666;
+    font-size: 0.95rem;
+    margin-bottom: 1.5rem;
+}
+
+/* Form Styles */
+.settings-form {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+}
+
+.form-section {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.form-group label {
+    font-size: 0.9rem;
+    color: #555;
+    font-weight: 500;
+}
+
+.input-icon {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.input-icon i {
+    position: absolute;
+    left: 1rem;
+    color: #666;
+}
+
+.input-icon input {
+    width: 100%;
+    padding: 0.75rem 1rem 0.75rem 2.5rem;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    transition: all 0.3s ease;
+    background-color: #f8f9fa;
+}
+
+.input-icon input:focus {
+    border-color: #4a90e2;
+    box-shadow: 0 0 0 2px rgba(74, 144, 226, 0.1);
+    outline: none;
+}
+
+.input-icon input[readonly] {
+    background-color: #f1f3f5;
+    cursor: not-allowed;
+}
+
+/* Photo Section */
+.photo-section {
+    background: #f8f9fa;
+    padding: 1.5rem;
+    border-radius: 8px;
+    margin: 1rem 0;
+}
+
+.photo-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.photo-header h3 {
+    font-size: 1.1rem;
+    color: #333;
+    margin-bottom: 0.25rem;
+}
+
+.photo-header p {
+    color: #666;
+    font-size: 0.9rem;
+}
+
+.photo-actions {
+    display: flex;
+    gap: 1rem;
+}
+
+.photo-preview {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    overflow: hidden;
+    margin: 1rem auto;
+    border: 3px solid #fff;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.photo-preview img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* Buttons */
+.btn-delete, .btn-update {
+    padding: 0.75rem 1.5rem;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.btn-delete {
+    background-color: #fff;
+    color: #dc3545;
+    border: 1px solid #dc3545;
+}
+
+.btn-delete:hover {
+    background-color: #dc3545;
+    color: #fff;
+}
+
+.btn-update {
+    background-color: #4a90e2;
+    color: #fff;
+    border: none;
+}
+
+.btn-update:hover {
+    background-color: #357abd;
+}
+
+.form-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 1rem;
+    margin-top: 2rem;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .settings-container {
+        margin: 1rem;
+        padding: 1.5rem;
+    }
+
+    .photo-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+    }
+
+    .photo-actions {
+        width: 100%;
+        justify-content: space-between;
+    }
+
+    .form-actions {
+        flex-direction: column;
+    }
+
+    .btn-delete, .btn-update {
+        width: 100%;
+        justify-content: center;
+    }
 }
 
 /* Tabs */
@@ -53,143 +245,6 @@
 
 .tab-content.active {
     display: block;
-}
-
-/* Form Styles */
-.settings-form {
-    display: flex;
-    flex-direction: column;
-    gap: 40px;
-}
-
-.form-row {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 40px;
-}
-
-.form-group {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-}
-
-.form-group.full-width {
-    grid-column: 1 / -1;
-}
-
-.form-group label {
-    font-size: 14px;
-    color: #242731;
-}
-
-.input-icon {
-    position: relative;
-    display: flex;
-    align-items: center;
-}
-
-.input-icon i:first-child {
-    position: absolute;
-    left: 12px;
-    color: #72767C;
-}
-
-.input-icon input {
-    width: 100%;
-    padding: 12px 40px; /* Sağ ve sol tarafta ikonlar için boşluk */
-    border: 1px solid #E6E8EC;
-    border-radius: 8px;
-    font-size: 14px;
-}
-
-.toggle-password {
-    position: absolute;
-    right: 12px;
-    color: #72767C;
-    cursor: pointer;
-    background: none;
-    border: none;
-    padding: 0;
-}
-
-/* Kilit ikonunu içeri kaydır */
-.input-icon .fa-lock {
-    left: 12px;
-}
-
-/* Placeholder text'i input focus olduğunda kaybolsun */
-.input-icon input:focus::placeholder {
-    color: transparent;
-}
-
-/* Input'un value değeri varken placeholder'ı gizle */
-.input-icon input:not(:placeholder-shown) {
-    color: #242731;
-}
-
-/* Input focus olduğunda stil */
-.input-icon input:focus {
-    outline: none;
-    border-color: #FF6370;
-    background: white;
-}
-
-/* Photo Section */
-.photo-section {
-    padding: 24px;
-    background: #F9F9F9;
-    border-radius: 10px;
-}
-
-.photo-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    margin-bottom: 20px;
-}
-
-.photo-header h3 {
-    font-size: 16px;
-    color: #242731;
-    margin-bottom: 4px;
-}
-
-.photo-header p {
-    font-size: 14px;
-    color: #72767C;
-}
-
-.photo-actions {
-    display: flex;
-    gap: 12px;
-}
-
-.btn-delete,
-.btn-update {
-    padding: 8px 16px;
-    border-radius: 8px;
-    font-size: 14px;
-    cursor: pointer;
-}
-
-.btn-delete {
-    background: white;
-    border: 1px solid #E6E8EC;
-    color: #72767C;
-}
-
-.btn-update {
-    background: #FF6370;
-    border: none;
-    color: white;
-}
-
-.photo-preview img {
-    width: 80px;
-    height: 80px;
-    border-radius: 50%;
-    object-fit: cover;
 }
 
 /* Social Section */
@@ -236,54 +291,13 @@ input[type="checkbox"] {
     accent-color: #FF6370;
 }
 
-/* Responsive */
-@media (max-width: 1024px) {
-    .settings-container {
-        margin: 20px;
-        padding: 30px;
-    }
-
-    .form-row {
-        grid-template-columns: 1fr;
-    }
-
-    .settings-tabs {
-        overflow-x: auto;
-        padding-bottom: 10px;
-    }
-
-    .photo-header {
-        flex-direction: column;
-        gap: 16px;
-    }
-
-    .photo-actions {
-        width: 100%;
-    }
-
-    .btn-delete,
-    .btn-update {
-        flex: 1;
-        text-align: center;
-    }
-}
-
 /* Section başlıkları arası boşluk */
 .settings-content h2 {
     margin-bottom: 16px;
 }
 
-.settings-description {
-    margin-bottom: 40px;
-}
-
 .social-section .form-group {
     margin-bottom: 24px;
-}
-
-/* Hover durumları */
-.btn-update:hover {
-    background: #ff4957; /* Biraz daha koyu tonu */
 }
 
 /* Şifre gücü göstergesi renkleri */

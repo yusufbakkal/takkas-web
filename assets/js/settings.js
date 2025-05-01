@@ -30,19 +30,24 @@ document.addEventListener('DOMContentLoaded', function() {
             if (file) {
                 // Dosya türü kontrolü
                 if (!file.type.startsWith('image/')) {
-                    alert('Lütfen bir görsel dosyası seçin.');
+                    showNotification('Lütfen geçerli bir resim dosyası seçin.', 'error');
                     return;
                 }
 
-                // Dosya boyutu kontrolü (5MB)
+                // Dosya boyutu kontrolü (max 5MB)
                 if (file.size > 5 * 1024 * 1024) {
-                    alert('Dosya boyutu 5MB\'dan küçük olmalıdır.');
+                    showNotification('Dosya boyutu 5MB\'dan küçük olmalıdır.', 'error');
                     return;
                 }
 
                 const reader = new FileReader();
                 reader.onload = function(e) {
                     profilePhoto.src = e.target.result;
+                    
+                    // Profil fotoğrafını localStorage'a kaydet
+                    localStorage.setItem('profilePhoto', e.target.result);
+                    
+                    showNotification('Profil fotoğrafı başarıyla güncellendi.', 'success');
                 };
                 reader.readAsDataURL(file);
             }
@@ -55,6 +60,12 @@ document.addEventListener('DOMContentLoaded', function() {
         newPasswordInput.addEventListener('input', function(e) {
             checkPasswordStrength(e.target.value);
         });
+    }
+
+    // Sayfa yüklendiğinde profil fotoğrafını kontrol et
+    const savedPhoto = localStorage.getItem('profilePhoto');
+    if (savedPhoto) {
+        document.getElementById('profilePhoto').src = savedPhoto;
     }
 });
 
@@ -126,8 +137,78 @@ function checkPasswordStrength(password) {
 
 // Profil fotoğrafını sil
 function deletePhoto() {
-    const profilePhoto = document.getElementById('profilePhoto');
-    if (profilePhoto) {
-        profilePhoto.src = 'assets/images/avatar.png';
+    const img = document.getElementById('profilePhoto');
+    img.src = 'assets/images/avatar.png';
+    
+    // localStorage'dan profil fotoğrafını sil
+    localStorage.removeItem('profilePhoto');
+    
+    showNotification('Profil fotoğrafı başarıyla silindi.', 'success');
+}
+
+// Bildirim gösterme fonksiyonu
+function showNotification(message, type) {
+    // Eğer zaten bir bildirim varsa kaldır
+    const existingNotification = document.querySelector('.notification');
+    if (existingNotification) {
+        existingNotification.remove();
     }
+
+    // Yeni bildirim oluştur
+    const notification = document.createElement('div');
+    notification.className = `notification ${type}`;
+    notification.innerHTML = `
+        <div class="notification-icon">
+            <i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle'}"></i>
+        </div>
+        <div class="notification-message">${message}</div>
+    `;
+
+    // Bildirim stillerini ekle
+    notification.style.position = 'fixed';
+    notification.style.top = '20px';
+    notification.style.right = '20px';
+    notification.style.padding = '15px 20px';
+    notification.style.borderRadius = '8px';
+    notification.style.display = 'flex';
+    notification.style.alignItems = 'center';
+    notification.style.gap = '10px';
+    notification.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.1)';
+    notification.style.zIndex = '9999';
+    notification.style.minWidth = '300px';
+    notification.style.transition = 'all 0.3s ease';
+    notification.style.animation = 'slideIn 0.3s ease forwards';
+
+    if (type === 'success') {
+        notification.style.backgroundColor = '#10B981';
+        notification.style.color = 'white';
+    } else {
+        notification.style.backgroundColor = '#EF4444';
+        notification.style.color = 'white';
+    }
+
+    // Stili için animation keyframes ekle
+    const styleSheet = document.createElement('style');
+    styleSheet.textContent = `
+        @keyframes slideIn {
+            0% { transform: translateX(100%); opacity: 0; }
+            100% { transform: translateX(0); opacity: 1; }
+        }
+        @keyframes slideOut {
+            0% { transform: translateX(0); opacity: 1; }
+            100% { transform: translateX(100%); opacity: 0; }
+        }
+    `;
+    document.head.appendChild(styleSheet);
+
+    // Bildirim ekle
+    document.body.appendChild(notification);
+
+    // 3 saniye sonra kaldır
+    setTimeout(() => {
+        notification.style.animation = 'slideOut 0.3s ease forwards';
+        setTimeout(() => {
+            notification.remove();
+        }, 300);
+    }, 3000);
 }

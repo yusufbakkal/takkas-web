@@ -91,13 +91,32 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
                 
                 const userData = await response.json();
-                console.log('Giriş başarılı:', userData);
+                console.log('API Response (Raw):', userData);
+                console.log('API Response Structure:', {
+                    token: userData.token,
+                    name: userData.name,
+                    email: userData.email,
+                    phone: userData.phone,
+                    type: userData.type,
+                    created_at: userData.created_at
+                });
                 
                 // Token ve kullanıcı bilgilerini localStorage'a kaydet
                 localStorage.setItem('authToken', userData.token);
-                localStorage.setItem('userId', userData.id);
-                localStorage.setItem('userEmail', userData.email);
                 localStorage.setItem('userName', userData.name);
+                localStorage.setItem('userEmail', userData.email);
+                localStorage.setItem('userPhone', userData.phone || '');
+                localStorage.setItem('userType', userData.type || '');
+                localStorage.setItem('userCreatedAt', userData.created_at || '');
+                
+                // localStorage'a kaydedilen değerleri kontrol et
+                console.log('LocalStorage Values After Save:', {
+                    name: localStorage.getItem('userName'),
+                    email: localStorage.getItem('userEmail'),
+                    phone: localStorage.getItem('userPhone'),
+                    type: localStorage.getItem('userType'),
+                    created_at: localStorage.getItem('userCreatedAt')
+                });
                 
                 if (rememberMe) {
                     localStorage.setItem('rememberMe', 'true');
@@ -246,4 +265,22 @@ function showNotification(message, type) {
             notification.remove();
         }, 300);
     }, 5000);
-} 
+}
+
+// Çıkış yapma fonksiyonu
+function logout() {
+    // localStorage'dan tüm kullanıcı bilgilerini temizle
+    localStorage.removeItem('authToken');
+    localStorage.removeItem('userName');
+    localStorage.removeItem('userEmail');
+    localStorage.removeItem('userPhone');
+    localStorage.removeItem('userType');
+    localStorage.removeItem('userCreatedAt');
+    localStorage.removeItem('rememberMe');
+
+    // Ana sayfaya yönlendir
+    window.location.href = '../index.html';
+}
+
+// Global scope'a logout fonksiyonunu ekle
+window.logout = logout; 
