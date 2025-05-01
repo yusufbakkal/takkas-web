@@ -13,26 +13,59 @@
                 <i class="fas fa-bell"></i>
             </button>
             <div class="profile-dropdown">
-                <a href="settings.html" class="profile-link">
+                <a href="#" class="profile-link">
                     <div class="avatar-circle" id="userAvatar">
                         <span class="avatar-initials">G</span>
                     </div>
                 </a>
                 <div class="dropdown-menu">
-                    <div id="loggedInMenu" style="display: none;">
-                        <a href="settings.html" class="dropdown-item">
-                            <i class="fas fa-user"></i> Profil
-                        </a>
-                        <button onclick="logout()" class="dropdown-item">
-                            <i class="fas fa-sign-out-alt"></i> Çıkış Yap
-                        </button>
+                    <div id="loggedInMenu">
+                        <div class="dropdown-header">
+                            <div class="user-info">
+                                <div class="avatar-circle small">
+                                    <span class="avatar-initials"></span>
+                                </div>
+                                <div class="user-details">
+                                    <span class="user-name"></span>
+                                    <span class="user-email"></span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="dropdown-items">
+                            <a href="siparislerim.html" class="dropdown-item">
+                                <i class="fas fa-box"></i>
+                                <span>Siparişlerim</span>
+                                <i class="fas fa-chevron-right"></i>
+                            </a>
+                            <a href="mesajlarim.html" class="dropdown-item">
+                                <i class="fas fa-envelope"></i>
+                                <span>Mesajlarım</span>
+                                <i class="fas fa-chevron-right"></i>
+                            </a>
+                            <a href="degerlendirmelerim.html" class="dropdown-item">
+                                <i class="fas fa-star"></i>
+                                <span>Değerlendirmelerim</span>
+                                <i class="fas fa-chevron-right"></i>
+                            </a>
+                            <a href="listelerim.html" class="dropdown-item">
+                                <i class="fas fa-heart"></i>
+                                <span>Listelerim</span>
+                                <i class="fas fa-chevron-right"></i>
+                            </a>
+                            <a href="hediye-ceklerim.html" class="dropdown-item">
+                                <i class="fas fa-gift"></i>
+                                <span>Hediye Çeklerim</span>
+                                <i class="fas fa-chevron-right"></i>
+                            </a>
+                            <button onclick="logout()" class="dropdown-item logout">
+                                <i class="fas fa-sign-out-alt"></i>
+                                <span>Çıkış Yap</span>
+                            </button>
+                        </div>
                     </div>
-                    <div id="loggedOutMenu" style="display: none;">
-                        <a href="pages/signin.html" class="dropdown-item">
-                            <i class="fas fa-sign-in-alt"></i> Giriş Yap
-                        </a>
-                        <a href="pages/signup.html" class="dropdown-item">
-                            <i class="fas fa-user-plus"></i> Kayıt Ol
+                    <div id="loggedOutMenu">
+                        <a href="pages/signin.html" class="login-button">
+                            Giriş Yap / Hesap Oluştur
                         </a>
                     </div>
                 </div>
@@ -42,14 +75,17 @@
 </header> 
 
 <script>
-    // Kullanıcı bilgilerini yükle
     document.addEventListener('DOMContentLoaded', function() {
         const authToken = localStorage.getItem('authToken');
         const userName = localStorage.getItem('userName');
+        const userEmail = localStorage.getItem('userEmail');
         const loggedInMenu = document.getElementById('loggedInMenu');
         const loggedOutMenu = document.getElementById('loggedOutMenu');
         const avatarCircle = document.querySelector('.avatar-circle');
         const avatarInitials = document.querySelector('.avatar-initials');
+        const smallAvatarInitials = document.querySelector('.avatar-circle.small .avatar-initials');
+        const userNameElement = document.querySelector('.user-name');
+        const userEmailElement = document.querySelector('.user-email');
 
         if (authToken && userName) {
             // Kullanıcı giriş yapmış
@@ -63,8 +99,13 @@
                 .toUpperCase()
                 .substring(0, 2);
             
-            // Avatar'a baş harfleri yerleştir
+            // Avatar'lara baş harfleri yerleştir
             avatarInitials.textContent = initials;
+            smallAvatarInitials.textContent = initials;
+            
+            // Kullanıcı bilgilerini göster
+            userNameElement.textContent = userName;
+            userEmailElement.textContent = userEmail;
             
             // Avatar rengini ayarla
             const colors = [
@@ -72,7 +113,9 @@
                 '#795548', '#607D8B', '#3F51B5', '#009688', '#FFC107'
             ];
             const colorIndex = userName.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0) % colors.length;
-            avatarCircle.style.backgroundColor = colors[colorIndex];
+            const backgroundColor = colors[colorIndex];
+            avatarCircle.style.backgroundColor = backgroundColor;
+            document.querySelector('.avatar-circle.small').style.backgroundColor = backgroundColor;
         } else {
             // Kullanıcı giriş yapmamış
             loggedInMenu.style.display = 'none';
@@ -82,22 +125,6 @@
             avatarInitials.textContent = 'G';
             avatarCircle.style.backgroundColor = '#ccc';
         }
-
-        // Dropdown menüyü göster/gizle
-        const profileLink = document.querySelector('.profile-link');
-        const dropdownMenu = document.querySelector('.dropdown-menu');
-
-        profileLink.addEventListener('click', function(e) {
-            e.preventDefault();
-            dropdownMenu.classList.toggle('show');
-        });
-
-        // Dropdown dışına tıklandığında menüyü kapat
-        document.addEventListener('click', function(e) {
-            if (!e.target.closest('.profile-dropdown')) {
-                dropdownMenu.classList.remove('show');
-            }
-        });
     });
 </script>
 
@@ -113,44 +140,27 @@
     right: 0;
     top: 100%;
     background-color: white;
-    min-width: 160px;
-    box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+    min-width: 280px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
     border-radius: 8px;
     z-index: 1000;
     margin-top: 8px;
+    padding: 0;
 }
 
-.dropdown-menu.show {
+.profile-dropdown:hover .dropdown-menu {
     display: block;
 }
 
-.dropdown-item {
+.dropdown-header {
+    padding: 16px;
+    border-bottom: 1px solid #eee;
+}
+
+.user-info {
     display: flex;
     align-items: center;
-    padding: 12px 16px;
-    color: #333;
-    text-decoration: none;
-    transition: background-color 0.2s;
-    border: none;
-    background: none;
-    width: 100%;
-    text-align: left;
-    cursor: pointer;
-    font-size: 14px;
-}
-
-.dropdown-item:hover {
-    background-color: #f5f5f5;
-}
-
-.dropdown-item i {
-    margin-right: 8px;
-    width: 16px;
-    text-align: center;
-}
-
-.dropdown-item:last-child {
-    border-top: 1px solid #eee;
+    gap: 12px;
 }
 
 .avatar-circle {
@@ -166,7 +176,93 @@
     transition: transform 0.2s;
 }
 
-.avatar-circle:hover {
-    transform: scale(1.05);
+.avatar-circle.small {
+    width: 32px;
+    height: 32px;
+    font-size: 14px;
+}
+
+.user-details {
+    display: flex;
+    flex-direction: column;
+}
+
+.user-name {
+    font-weight: 500;
+    color: #333;
+    font-size: 14px;
+}
+
+.user-email {
+    color: #666;
+    font-size: 12px;
+}
+
+.dropdown-items {
+    padding: 8px 0;
+}
+
+.dropdown-item {
+    display: flex;
+    align-items: center;
+    padding: 12px 16px;
+    color: #333;
+    text-decoration: none;
+    transition: background-color 0.2s;
+    font-size: 14px;
+    border: none;
+    background: none;
+    width: 100%;
+    text-align: left;
+    cursor: pointer;
+    position: relative;
+}
+
+.dropdown-item:hover {
+    background-color: #f5f5f5;
+}
+
+.dropdown-item i:first-child {
+    margin-right: 12px;
+    width: 16px;
+    text-align: center;
+    color: #666;
+}
+
+.dropdown-item .fa-chevron-right {
+    position: absolute;
+    right: 16px;
+    color: #999;
+    font-size: 12px;
+}
+
+.dropdown-item span {
+    flex: 1;
+}
+
+.login-button {
+    display: block;
+    padding: 12px 24px;
+    background-color: #FF6B00;
+    color: white;
+    text-align: center;
+    text-decoration: none;
+    border-radius: 4px;
+    margin: 16px;
+    font-weight: 500;
+    transition: background-color 0.2s;
+}
+
+.login-button:hover {
+    background-color: #E65000;
+}
+
+.logout {
+    border-top: 1px solid #eee;
+    color: #FF4444;
+}
+
+.logout i {
+    color: #FF4444;
 }
 </style> 
