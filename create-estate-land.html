@@ -569,16 +569,7 @@
 
         // Sayfa yüklendiğinde
         document.addEventListener('DOMContentLoaded', function() {
-            // Kullanıcının giriş yapmış olduğunu kontrol et
-            const authToken = localStorage.getItem('authToken');
-            if (!authToken) {
-                // Giriş yapmamışsa bildirim göster ve yönlendir
-                alert('İlan verebilmek için giriş yapmanız gerekmektedir. Giriş sayfasına yönlendiriliyorsunuz.');
-                window.location.href = 'pages/signin.html';
-                return;
-            }
-            
-            // Giriş yapmışsa sayfayı normal yükle
+            // Sayfayı normal yükle
             loadProvinces();
         });
 
