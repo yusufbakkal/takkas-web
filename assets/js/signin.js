@@ -95,9 +95,9 @@ document.addEventListener('DOMContentLoaded', function() {
                 
                 // Token ve kullanıcı bilgilerini localStorage'a kaydet
                 localStorage.setItem('authToken', userData.token);
-                localStorage.setItem('userId', userData.user.id);
-                localStorage.setItem('userEmail', userData.user.email);
-                localStorage.setItem('userName', userData.user.name);
+                localStorage.setItem('userId', userData.id);
+                localStorage.setItem('userEmail', userData.email);
+                localStorage.setItem('userName', userData.name);
                 
                 if (rememberMe) {
                     localStorage.setItem('rememberMe', 'true');
