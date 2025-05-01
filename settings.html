@@ -12,6 +12,8 @@
     <link rel="stylesheet" href="assets/css/settings.css">
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
 </head>
 <body>
     <!-- Header Bileşeni -->
@@ -27,63 +29,52 @@
             
             <!-- Ayarlar Menüsü -->
             <div class="settings-tabs">
-                <button onclick="showTab('details')" class="tab-btn active">Kişisel Bilgiler</button>
-                <button onclick="showTab('profile')" class="tab-btn">Profil</button>
-                <button onclick="showTab('password')" class="tab-btn">Şifre</button>
-                <button onclick="showTab('email')" class="tab-btn">E-posta</button>
+                <button onclick="showTab('profile')" class="tab-btn active">Profil</button>
             </div>
 
-            <!-- Kişisel Bilgiler Sekmesi -->
-            <div id="details" class="tab-content active">
-                <h2>Kişisel Bilgiler</h2>
-                <p class="settings-description">Fotoğrafınızı ve kişisel bilgilerinizi güncelleyin.</p>
-
+            <!-- Profil Sekmesi -->
+            <div id="profile" class="tab-content active">
+                <h2>Profil Bilgileri</h2>
+                <p class="settings-description">Profil bilgilerinizi görüntüleyin.</p>
+                
                 <form class="settings-form">
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label>Yaşadığı Şehir</label>
-                            <div class="input-icon">
-                                <i class="fas fa-home"></i>
-                                <input type="text" placeholder="İstanbul, Türkiye">
-                            </div>
-                        </div>
-
-                        <div class="form-group">
-                            <label>Adres</label>
-                            <div class="input-icon">
-                                <i class="fas fa-map-marker-alt"></i>
-                                <input type="text" placeholder="Örnek: Bağdat Caddesi No:123">
-                            </div>
+                    <div class="form-group">
+                        <label>Ad Soyad</label>
+                        <div class="input-icon">
+                            <i class="fas fa-user"></i>
+                            <input type="text" id="userName" placeholder="Ad Soyad" readonly>
                         </div>
                     </div>
 
-                    <div class="form-group full-width">
-                        <label>E-posta Adresi</label>
+                    <div class="form-group">
+                        <label>E-posta</label>
                         <div class="input-icon">
                             <i class="fas fa-envelope"></i>
-                            <input type="email" placeholder="ornek@email.com">
+                            <input type="email" id="userEmail" placeholder="E-posta adresiniz" readonly>
                         </div>
                     </div>
 
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label>Doğum Tarihi</label>
-                            <div class="input-icon">
-                                <i class="fas fa-calendar"></i>
-                                <input type="date" value="1995-07-12">
-                            </div>
+                    <div class="form-group">
+                        <label>Telefon</label>
+                        <div class="input-icon">
+                            <i class="fas fa-phone"></i>
+                            <input type="text" id="userPhone" placeholder="Telefon numaranız" readonly>
                         </div>
+                    </div>
 
-                        <div class="form-group">
-                            <label>Cinsiyet</label>
-                            <div class="input-icon">
-                                <i class="fas fa-user"></i>
-                                <select>
-                                    <option value="male" selected>Erkek</option>
-                                    <option value="female">Kadın</option>
-                                    <option value="other">Diğer</option>
-                                </select>
-                            </div>
+                    <div class="form-group">
+                        <label>Kullanıcı Tipi</label>
+                        <div class="input-icon">
+                            <i class="fas fa-user-tag"></i>
+                            <input type="text" id="userType" placeholder="Kullanıcı tipi" readonly>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Kayıt Tarihi</label>
+                        <div class="input-icon">
+                            <i class="fas fa-calendar"></i>
+                            <input type="text" id="userCreatedAt" placeholder="Kayıt tarihi" readonly>
                         </div>
                     </div>
 
@@ -104,129 +95,6 @@
                             <img src="assets/images/avatar.png" alt="Profil Fotoğrafı" id="profilePhoto">
                         </div>
                     </div>
-
-                    <!-- Sosyal Medya -->
-                    <div class="social-section">
-                        <h3>Sosyal Medya Hesapları</h3>
-                        <div class="form-group">
-                            <div class="input-icon">
-                                <i class="fab fa-facebook"></i>
-                                <input type="url" placeholder="facebook.com/profiliniz">
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <div class="input-icon">
-                                <i class="fab fa-twitter"></i>
-                                <input type="url" placeholder="twitter.com/profiliniz">
-                            </div>
-                        </div>
-                    </div>
-                </form>
-            </div>
-
-            <!-- Profil Sekmesi -->
-            <div id="profile" class="tab-content">
-                <h2>Profil Bilgileri</h2>
-                <p class="settings-description">Profil bilgilerinizi güncelleyin.</p>
-                
-                <form class="settings-form">
-                    <div class="form-group">
-                        <label>Kullanıcı Adı</label>
-                        <div class="input-icon">
-                            <i class="fas fa-user"></i>
-                            <input type="text" placeholder="Kullanıcı adınız">
-                        </div>
-                    </div>
-
-                    <div class="form-group">
-                        <label>Hakkımda</label>
-                        <textarea placeholder="Kendinizi tanıtın..." rows="4"></textarea>
-                    </div>
-
-                    <div class="form-actions">
-                        <button type="button" class="btn-delete">İptal</button>
-                        <button type="submit" class="btn-update">Kaydet</button>
-                    </div>
-                </form>
-            </div>
-
-            <!-- Şifre Sekmesi -->
-            <div id="password" class="tab-content">
-                <h2>Şifre Değiştir</h2>
-                <p class="settings-description">Güvenliğiniz için güçlü bir şifre seçin.</p>
-                
-                <form class="settings-form">
-                    <div class="form-group">
-                        <label>Mevcut Şifre</label>
-                        <div class="input-icon">
-                            <i class="fas fa-lock"></i>
-                            <input type="password" placeholder="••••••••">
-                        </div>
-                    </div>
-
-                    <div class="form-group">
-                        <label>Yeni Şifre</label>
-                        <div class="input-icon">
-                            <i class="fas fa-lock"></i>
-                            <input type="password" id="newPassword" placeholder="••••••••">
-                            <i class="fas fa-eye toggle-password" onclick="togglePassword('newPassword')"></i>
-                        </div>
-                        <div class="password-strength">
-                            <div class="strength-bar"></div>
-                            <span class="strength-text">Şifre gücü: Zayıf</span>
-                        </div>
-                    </div>
-
-                    <div class="form-group">
-                        <label>Yeni Şifre (Tekrar)</label>
-                        <div class="input-icon">
-                            <i class="fas fa-lock"></i>
-                            <input type="password" id="confirmPassword" placeholder="••••••••">
-                            <i class="fas fa-eye toggle-password" onclick="togglePassword('confirmPassword')"></i>
-                        </div>
-                    </div>
-
-                    <div class="form-actions">
-                        <button type="button" class="btn-delete">İptal</button>
-                        <button type="submit" class="btn-update">Şifreyi Değiştir</button>
-                    </div>
-                </form>
-            </div>
-
-            <!-- Email Sekmesi -->
-            <div id="email" class="tab-content">
-                <h2>Email Ayarları</h2>
-                <p class="settings-description">Email adresinizi güncelleyin ve bildirim tercihlerinizi yönetin.</p>
-                
-                <form class="settings-form">
-                    <div class="form-group">
-                        <label>Email Adresi</label>
-                        <div class="input-icon">
-                            <i class="fas fa-envelope"></i>
-                            <input type="email" placeholder="Email adresiniz">
-                        </div>
-                    </div>
-
-                    <div class="form-group">
-                        <label class="checkbox-label">
-                            <input type="checkbox" checked>
-                            Bildirimler
-                        </label>
-                        <p class="checkbox-description">Önemli güncellemeler ve bildirimler için email alın.</p>
-                    </div>
-
-                    <div class="form-group">
-                        <label class="checkbox-label">
-                            <input type="checkbox" checked>
-                            Promosyonlar
-                        </label>
-                        <p class="checkbox-description">Özel teklifler ve kampanyalar hakkında email alın.</p>
-                    </div>
-
-                    <div class="form-actions">
-                        <button type="button" class="btn-delete">İptal</button>
-                        <button type="submit" class="btn-update">Kaydet</button>
-                    </div>
                 </form>
             </div>
         </div>
@@ -246,9 +114,76 @@
             .then(data => {
                 document.getElementById('navbar-component').innerHTML = data;
             });
+
+        // Çıkış yapma fonksiyonu
+        function logout() {
+            // localStorage'dan tüm kullanıcı bilgilerini temizle
+            localStorage.removeItem('authToken');
+            localStorage.removeItem('userName');
+            localStorage.removeItem('userEmail');
+            localStorage.removeItem('userPhone');
+            localStorage.removeItem('userType');
+            localStorage.removeItem('userCreatedAt');
+            localStorage.removeItem('rememberMe');
+
+            // Ana sayfaya yönlendir
+            window.location.href = 'index.html';
+        }
+
+        // Global scope'a logout fonksiyonunu ekle
+        window.logout = logout;
+
+        // Kullanıcı bilgilerini yükle
+        document.addEventListener('DOMContentLoaded', function() {
+            // Giriş kontrolü
+            const authToken = localStorage.getItem('authToken');
+            if (!authToken) {
+                // Giriş yapılmamışsa giriş sayfasına yönlendir
+                window.location.href = 'pages/signin.html';
+                return;
+            }
+
+            // localStorage'dan bilgileri al
+            const userName = localStorage.getItem('userName');
+            const userEmail = localStorage.getItem('userEmail');
+            const userPhone = localStorage.getItem('userPhone');
+            const userType = localStorage.getItem('userType');
+            const userCreatedAt = localStorage.getItem('userCreatedAt');
+
+            // Form elementlerini kontrol et
+            const nameInput = document.getElementById('userName');
+            const emailInput = document.getElementById('userEmail');
+            const phoneInput = document.getElementById('userPhone');
+            const typeInput = document.getElementById('userType');
+            const dateInput = document.getElementById('userCreatedAt');
+
+            // Bilgileri form alanlarına yerleştir
+            if (nameInput && userName) nameInput.value = userName;
+            if (emailInput && userEmail) emailInput.value = userEmail;
+            if (phoneInput && userPhone) phoneInput.value = userPhone;
+            if (typeInput && userType) typeInput.value = userType;
+            if (dateInput && userCreatedAt) {
+                try {
+                    // Tarihi formatla
+                    const date = new Date(userCreatedAt);
+                    const formattedDate = date.toLocaleDateString('tr-TR', {
+                        year: 'numeric',
+                        month: 'long',
+                        day: 'numeric',
+                        hour: '2-digit',
+                        minute: '2-digit'
+                    });
+                    dateInput.value = formattedDate;
+                } catch (error) {
+                    console.error('Tarih formatı hatası:', error);
+                    dateInput.value = userCreatedAt;
+                }
+            }
+        });
     </script>
 
     <!-- JavaScript bağlantılarını body tag'inin sonuna ekleyin -->
     <script src="assets/js/settings.js"></script>
+    <script src="assets/js/signin.js"></script>
 </body>
 </html> 
