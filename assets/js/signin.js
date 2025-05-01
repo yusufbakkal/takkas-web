@@ -100,7 +100,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     type: userData.type,
                     created_at: userData.created_at
                 });
-                
+                    
                 // Token ve kullanıcı bilgilerini localStorage'a kaydet
                 localStorage.setItem('authToken', userData.token);
                 localStorage.setItem('userName', userData.name);
@@ -120,19 +120,19 @@ document.addEventListener('DOMContentLoaded', function() {
                 
                 if (rememberMe) {
                     localStorage.setItem('rememberMe', 'true');
-                } else {
+                    } else {
                     localStorage.removeItem('rememberMe');
-                }
-                
+                    }
+                    
                 // Giriş başarılı mesajı
                 showNotification('Giriş başarılı! Yönlendiriliyorsunuz...', 'success');
-                
+                    
                 // Ana sayfaya yönlendir (1.5 saniye sonra)
                 setTimeout(() => {
-                    window.location.href = '../index.html';
+                        window.location.href = '../index.html';
                 }, 1500);
-                
-                return; // İşlemi burada sonlandır
+                    
+                    return; // İşlemi burada sonlandır
             } catch (error) {
                 console.error('Giriş sırasında bir hata oluştu:', error);
                 hideLoading();
@@ -198,7 +198,7 @@ function hideLoading() {
         submitBtn.disabled = false;
         submitBtn.innerHTML = 'Giriş Yap';
     }
-}
+} 
 
 // Bildirim gösterme fonksiyonu
 function showNotification(message, type) {

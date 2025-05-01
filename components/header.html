@@ -14,7 +14,7 @@
             </button>
             <div class="profile-dropdown">
                 <a href="#" class="profile-link">
-                    <div class="avatar-circle" id="userAvatar">
+                <div class="avatar-circle" id="userAvatar">
                         <span class="avatar-initials">G</span>
                     </div>
                 </a>
@@ -129,29 +129,29 @@
             // Kullanıcı giriş yapmış
             loggedInMenu.style.display = 'block';
             loggedOutMenu.style.display = 'none';
-            
-            // Kullanıcı adının baş harflerini al
-            const initials = userName.split(' ')
-                .map(name => name.charAt(0))
-                .join('')
-                .toUpperCase()
+        
+        // Kullanıcı adının baş harflerini al
+        const initials = userName.split(' ')
+            .map(name => name.charAt(0))
+            .join('')
+            .toUpperCase()
                 .substring(0, 2);
-            
+        
             // Avatar'lara baş harfleri yerleştir
             avatarInitials.textContent = initials;
             smallAvatarInitials.textContent = initials;
-            
+        
             // Kullanıcı bilgilerini göster
             userNameElement.textContent = userName;
             userEmailElement.textContent = userEmail;
             
             // Avatar rengini ayarla
-            const colors = [
-                '#FF6370', '#4CAF50', '#2196F3', '#9C27B0', '#FF9800', 
-                '#795548', '#607D8B', '#3F51B5', '#009688', '#FFC107'
-            ];
-            const colorIndex = userName.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0) % colors.length;
-            const backgroundColor = colors[colorIndex];
+        const colors = [
+            '#FF6370', '#4CAF50', '#2196F3', '#9C27B0', '#FF9800', 
+            '#795548', '#607D8B', '#3F51B5', '#009688', '#FFC107'
+        ];
+        const colorIndex = userName.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0) % colors.length;
+        const backgroundColor = colors[colorIndex];
             avatarCircle.style.backgroundColor = backgroundColor;
             document.querySelector('.avatar-circle.small').style.backgroundColor = backgroundColor;
         } else {
@@ -164,7 +164,7 @@
             avatarCircle.style.backgroundColor = '#ccc';
         }
     });
-</script>
+</script> 
 
 <style>
 .header-actions {
