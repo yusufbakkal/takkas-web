@@ -14,7 +14,7 @@
             </button>
             
             <!-- Oturum açık kullanıcılar için profil dropdown -->
-            <div id="userLoggedIn" class="profile-dropdown" style="display: none;">
+            <div id="userLoggedIn" class="profile-dropdown">
                 <a href="#" class="profile-link">
                     <div class="avatar-circle" id="userAvatar">
                         <span class="avatar-initials">G</span>
@@ -47,7 +47,7 @@
             </div>
             
             <!-- Oturum açmamış kullanıcılar için login butonu -->
-            <div id="userLoggedOut" style="display: none;">
+            <div id="userLoggedOut">
                 <a href="pages/signin.html" class="login-button">
                     Giriş Yap / Hesap Oluştur
                 </a>
@@ -62,11 +62,15 @@
         const userName = localStorage.getItem('userName');
         const userEmail = localStorage.getItem('userEmail');
         
-        // Oturum durumuna göre arayüz elementleri
+        // Varsayılan olarak profil simgesini göster, kullanıcı giriş yapmamışsa login butonu göster
         const userLoggedIn = document.getElementById('userLoggedIn');
         const userLoggedOut = document.getElementById('userLoggedOut');
         
-        if (authToken && userName) {
+        // Varsayılan durumu ayarla
+        if (!authToken || !userName) {
+            userLoggedIn.style.display = 'none';
+            userLoggedOut.style.display = 'block';
+        } else {
             // Kullanıcı giriş yapmış
             userLoggedIn.style.display = 'inline-block';
             userLoggedOut.style.display = 'none';
@@ -103,10 +107,6 @@
             const backgroundColor = colors[colorIndex];
             if (avatarCircle) avatarCircle.style.backgroundColor = backgroundColor;
             if (smallAvatar) smallAvatar.style.backgroundColor = backgroundColor;
-        } else {
-            // Kullanıcı giriş yapmamış
-            userLoggedIn.style.display = 'none';
-            userLoggedOut.style.display = 'inline-block';
         }
     });
 </script> 
@@ -117,6 +117,15 @@
     align-items: center;
     gap: 24px;
     margin-left: auto;
+}
+
+/* Varsayılan görünürlük ayarları */
+#userLoggedIn {
+    display: inline-block;
+}
+
+#userLoggedOut {
+    display: none;
 }
 
 .profile-dropdown {
