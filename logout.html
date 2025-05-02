@@ -9,6 +9,8 @@
         :root {
             --primary: #4F46E5;
             --primary-light: rgba(79, 70, 229, 0.1);
+            --primary-gradient: linear-gradient(90deg, #4F46E5, #6366F1);
+            --success: #10B981;
             --text-dark: #333;
             --text-muted: #666;
             --background: #f8fafc;
@@ -34,7 +36,7 @@
         }
         
         .logout-container {
-            width: 360px;
+            width: 400px;
             padding: 2.5rem;
             background: var(--card);
             border-radius: 12px;
@@ -46,9 +48,12 @@
         
         .icon-container {
             position: relative;
-            width: 72px;
-            height: 72px;
+            width: 80px;
+            height: 80px;
             margin: 0 auto 1.5rem;
+            display: flex;
+            justify-content: center;
+            align-items: center;
         }
         
         .circle-bg {
@@ -59,47 +64,125 @@
             display: flex;
             align-items: center;
             justify-content: center;
+            position: relative;
+            overflow: hidden;
         }
         
-        .icon {
-            font-size: 2rem;
-            color: var(--primary);
-            opacity: 0;
-        }
-        
-        .spinner {
+        .progress-circle {
             position: absolute;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            border: 3px solid var(--primary-light);
-            border-top-color: var(--primary);
+            background: conic-gradient(var(--primary) 0%, transparent 0%);
             border-radius: 50%;
+            transition: all 0.3s ease;
+        }
+        
+        .icon {
+            font-size: 2.2rem;
+            color: var(--success);
+            opacity: 0;
+            transform: scale(0.5);
+            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+            z-index: 10;
         }
         
         h1 {
             color: var(--text-dark);
-            font-size: 1.5rem;
+            font-size: 1.6rem;
             margin-bottom: 1rem;
             font-weight: 600;
         }
         
         p {
             color: var(--text-muted);
-            margin-bottom: 1.5rem;
+            margin-bottom: 1.8rem;
             line-height: 1.5;
+        }
+        
+        .progress-container {
+            margin-bottom: 1.5rem;
+        }
+        
+        .progress-bar {
+            height: 8px;
+            background-color: #e9ecef;
+            border-radius: 4px;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            width: 0;
+            background: var(--primary-gradient);
+            border-radius: 4px;
+            position: absolute;
+            transition: width 0.1s ease;
+        }
+        
+        .progress-text {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 8px;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+        
+        .progress-percentage {
+            font-weight: 600;
+            color: var(--primary);
+        }
+        
+        .progress-steps {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 5px;
+        }
+        
+        .step {
+            width: 20px;
+            height: 4px;
+            background-color: #e9ecef;
+            border-radius: 2px;
+            transition: background-color 0.3s ease;
+        }
+        
+        .step.active {
+            background-color: var(--primary);
         }
         
         .redirect-label {
             display: inline-block;
-            padding: 0.5rem 1rem;
+            padding: 0.6rem 1.2rem;
             background: var(--primary-light);
             color: var(--primary);
             border-radius: 20px;
-            font-size: 0.85rem;
+            font-size: 0.9rem;
             font-weight: 500;
             opacity: 0;
+            transition: all 0.3s ease;
+        }
+        
+        .logout-done .icon {
+            opacity: 1;
+            transform: scale(1);
+        }
+        
+        .logout-done .redirect-label {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        .pulse {
+            animation: pulse 1.5s ease-in-out infinite;
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
         }
     </style>
 </head>
@@ -107,51 +190,114 @@
     <div class="logout-container" id="logoutContainer">
         <div class="icon-container">
             <div class="circle-bg">
-                <i class="fas fa-check icon" id="checkIcon"></i>
+                <div class="progress-circle" id="progressCircle"></div>
+                <i class="fas fa-check-circle icon" id="checkIcon"></i>
             </div>
-            <div class="spinner" id="spinner"></div>
         </div>
         <h1>Çıkış Yapılıyor</h1>
         <p>Oturumunuz güvenli bir şekilde kapatılıyor...</p>
+        
+        <div class="progress-container">
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+            <div class="progress-text">
+                <span>İşlem sürüyor...</span>
+                <span class="progress-percentage" id="progressPercentage">0%</span>
+            </div>
+            <div class="progress-steps" id="progressSteps">
+                <div class="step" data-step="1"></div>
+                <div class="step" data-step="2"></div>
+                <div class="step" data-step="3"></div>
+                <div class="step" data-step="4"></div>
+                <div class="step" data-step="5"></div>
+            </div>
+        </div>
+        
         <div class="redirect-label" id="redirectLabel">Ana Sayfaya Yönlendiriliyorsunuz</div>
     </div>
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            const spinner = document.getElementById('spinner');
+            const progressFill = document.getElementById('progressFill');
+            const progressPercentage = document.getElementById('progressPercentage');
+            const progressSteps = document.getElementById('progressSteps');
+            const progressCircle = document.getElementById('progressCircle');
             const checkIcon = document.getElementById('checkIcon');
             const redirectLabel = document.getElementById('redirectLabel');
             const logoutContainer = document.getElementById('logoutContainer');
             
-            // Sayfa açılış animasyonu
+            const steps = Array.from(progressSteps.querySelectorAll('.step'));
+            let currentProgress = 0;
+            const totalTime = 2500; // Toplam işlem süresi (ms)
+            const updateInterval = 50; // Güncelleme aralığı (ms)
+            const incrementPerUpdate = 100 / (totalTime / updateInterval);
+            
+            // İlk görsel efekti başlat
             logoutContainer.style.opacity = '0';
             logoutContainer.style.transform = 'translateY(20px)';
             
             setTimeout(() => {
+                // Konteyner görünür yap
                 logoutContainer.style.opacity = '1';
                 logoutContainer.style.transform = 'translateY(0)';
-                
-                // Spinner animasyonu
-                spinner.style.animation = 'spin 1s linear infinite';
                 
                 // Oturum bilgilerini temizle
                 clearUserSession();
                 
-                // Çıkış işlemi tamamlandı
-                setTimeout(() => {
-                    completeLogout();
-                    
-                    // Ana sayfaya yönlendir
-                    setTimeout(() => {
-                        window.location.href = 'index.html';
-                    }, 1500);
-                }, 1800);
+                // İlerleme animasyonunu başlat
+                updateProgress();
             }, 300);
             
-            // Tüm oturum bilgilerini temizle
+            function updateProgress() {
+                const progressIntervalId = setInterval(() => {
+                    if (currentProgress >= 100) {
+                        clearInterval(progressIntervalId);
+                        completeLogout();
+                        return;
+                    }
+                    
+                    // İlerlemeyi artır
+                    currentProgress += incrementPerUpdate;
+                    if (currentProgress > 100) currentProgress = 100;
+                    
+                    // İlerleme çubuğunu güncelle
+                    progressFill.style.width = `${currentProgress}%`;
+                    progressPercentage.textContent = `${Math.floor(currentProgress)}%`;
+                    
+                    // İlerleme dairesini güncelle
+                    progressCircle.style.background = `conic-gradient(var(--primary) ${currentProgress}%, transparent ${currentProgress}%)`;
+                    
+                    // Adım göstergelerini güncelle
+                    const completedSteps = Math.floor((currentProgress / 100) * steps.length);
+                    steps.forEach((step, index) => {
+                        if (index < completedSteps) {
+                            step.classList.add('active');
+                        } else {
+                            step.classList.remove('active');
+                        }
+                    });
+                    
+                    // Metni güncelle
+                    if (currentProgress < 20) {
+                        document.querySelector('.progress-text span:first-child').textContent = 'Oturum kapatılıyor...';
+                    } else if (currentProgress < 50) {
+                        document.querySelector('.progress-text span:first-child').textContent = 'Veriler temizleniyor...';
+                    } else if (currentProgress < 80) {
+                        document.querySelector('.progress-text span:first-child').textContent = 'Çıkış işlemi tamamlanıyor...';
+                    } else {
+                        document.querySelector('.progress-text span:first-child').textContent = 'Tamamlandı!';
+                    }
+                    
+                    // Suni yavaşlatma
+                    if (currentProgress > 85 && currentProgress < 95) {
+                        incrementPerUpdate /= 1.2;
+                    }
+                }, updateInterval);
+            }
+            
             function clearUserSession() {
                 const keysToRemove = ['authToken', 'userName', 'userEmail', 'userId', 'userRole'];
-                
                 keysToRemove.forEach(key => localStorage.removeItem(key));
                 
                 // API isteği ile çıkış yap (opsiyonel)
@@ -167,36 +313,26 @@
                 }
             }
             
-            // Çıkış işlemi tamamlandı animasyonunu göster
             function completeLogout() {
-                // Spinner animasyonunu durdur
-                spinner.style.animation = 'none';
-                spinner.style.opacity = '0';
-                
-                // Onay işaretini göster
+                // Tamamlandı animasyonları
+                logoutContainer.classList.add('logout-done');
                 checkIcon.style.opacity = '1';
-                checkIcon.style.transform = 'scale(1.2)';
+                checkIcon.style.transform = 'scale(1)';
+                checkIcon.classList.add('pulse');
+                redirectLabel.style.opacity = '1';
+                redirectLabel.style.transform = 'translateY(0)';
                 
-                setTimeout(() => {
-                    checkIcon.style.transform = 'scale(1)';
-                }, 200);
+                // İlerleme metnini güncelle
+                document.querySelector('.progress-text span:first-child').textContent = 'İşlem başarıyla tamamlandı!';
+                progressPercentage.textContent = '100%';
                 
-                // Yönlendirme yazısını göster
+                // Ana sayfaya yönlendir
                 setTimeout(() => {
-                    redirectLabel.style.opacity = '1';
-                }, 300);
-            }
-            
-            // Spin animasyonu tanımı
-            if (!document.querySelector('@keyframes spin')) {
-                const style = document.createElement('style');
-                style.textContent = `
-                    @keyframes spin {
-                        0% { transform: rotate(0deg); }
-                        100% { transform: rotate(360deg); }
-                    }
-                `;
-                document.head.appendChild(style);
+                    redirectLabel.style.transform = 'scale(1.05)';
+                    setTimeout(() => {
+                        window.location.href = 'index.html';
+                    }, 500);
+                }, 1000);
             }
         });
     </script>
