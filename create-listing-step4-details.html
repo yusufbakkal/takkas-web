@@ -975,8 +975,8 @@
             
             const currentYear = new Date().getFullYear();
             
-            // Başlangıç yılları için seçenekler (1990'dan günümüze)
-            for (let year = currentYear; year >= 1990; year--) {
+            // Başlangıç yılları için seçenekler (1945'ten günümüze)
+            for (let year = currentYear; year >= 1945; year--) {
                 const startOption = document.createElement('option');
                 startOption.value = year;
                 startOption.textContent = year;
@@ -1098,13 +1098,24 @@
                         const option = document.createElement('option');
                         option.value = model.id;
                         option.textContent = model.name;
+                        // Model ID ve adını veri özniteliği olarak ekle
+                        option.setAttribute('data-model-id', model.id);
+                        option.setAttribute('data-model-name', model.name);
                         modelSelect.appendChild(option);
                     });
                     
                     // Model seçildiğinde versiyonları etkinleştir
                     modelSelect.addEventListener('change', function() {
                         const modelId = this.value;
+                        const selectedOption = this.options[this.selectedIndex];
+                        
                         if (modelId) {
+                            console.log('Seçilen model:', {
+                                id: modelId,
+                                name: selectedOption.textContent,
+                                dataModelId: selectedOption.getAttribute('data-model-id'),
+                                dataModelName: selectedOption.getAttribute('data-model-name')
+                            });
                             loadTradeVersions(modelId);
                         } else {
                             const versionSelect = document.getElementById('trade_version');
@@ -1120,9 +1131,9 @@
                 const selectedBrand = document.getElementById('trade_brand').options[document.getElementById('trade_brand').selectedIndex].textContent;
                 
                 const sampleModels = [
-                    {id: `${selectedBrand}001`, name: "Model 1"},
-                    {id: `${selectedBrand}002`, name: "Model 2"},
-                    {id: `${selectedBrand}003`, name: "Model 3"}
+                    {id: `${selectedBrand.replace(/\s+/g, '')}001`, name: `${selectedBrand} Model 1`},
+                    {id: `${selectedBrand.replace(/\s+/g, '')}002`, name: `${selectedBrand} Model 2`},
+                    {id: `${selectedBrand.replace(/\s+/g, '')}003`, name: `${selectedBrand} Model 3`}
                 ];
                 
                 modelSelect.disabled = false;
@@ -1131,6 +1142,8 @@
                     const option = document.createElement('option');
                     option.value = model.id;
                     option.textContent = model.name;
+                    option.setAttribute('data-model-id', model.id);
+                    option.setAttribute('data-model-name', model.name);
                     modelSelect.appendChild(option);
                 });
                 
@@ -1173,6 +1186,8 @@
                         const option = document.createElement('option');
                         option.value = version.id;
                         option.textContent = version.name;
+                        option.setAttribute('data-version-id', version.id);
+                        option.setAttribute('data-version-name', version.name);
                         versionSelect.appendChild(option);
                     });
                 }
@@ -1180,12 +1195,13 @@
                 console.error('Versiyonlar yüklenirken hata:', error);
                 
                 // Hata durumunda örnek versiyonlar
-                const selectedModel = document.getElementById('trade_model').options[document.getElementById('trade_model').selectedIndex].textContent;
+                const modelSelect = document.getElementById('trade_model');
+                const selectedModel = modelSelect.options[modelSelect.selectedIndex].textContent;
                 
                 const sampleVersions = [
-                    {id: `${selectedModel}V1`, name: `${selectedModel} 1.6`},
-                    {id: `${selectedModel}V2`, name: `${selectedModel} 2.0`},
-                    {id: `${selectedModel}V3`, name: `${selectedModel} 1.8 TSI`}
+                    {id: `${modelId}V1`, name: `${selectedModel} 1.6`},
+                    {id: `${modelId}V2`, name: `${selectedModel} 2.0`},
+                    {id: `${modelId}V3`, name: `${selectedModel} 1.8 TSI`}
                 ];
                 
                 versionSelect.disabled = false;
@@ -1194,6 +1210,8 @@
                     const option = document.createElement('option');
                     option.value = version.id;
                     option.textContent = version.name;
+                    option.setAttribute('data-version-id', version.id);
+                    option.setAttribute('data-version-name', version.name);
                     versionSelect.appendChild(option);
                 });
             }
@@ -1368,27 +1386,62 @@
                 
                 // Takas isteniyorsa, takas detaylarını hazırla
                 if (wantsTrade) {
+                    // Form elemanlarını al
+                    const tradeBrandSelect = document.getElementById('trade_brand');
+                    const tradeModelSelect = document.getElementById('trade_model');
+                    const tradeVersionSelect = document.getElementById('trade_version');
+                    const tradeYearStartSelect = document.getElementById('trade_year_start');
+                    const tradeYearEndSelect = document.getElementById('trade_year_end');
+                    
+                    // Seçili değerleri al
+                    const selectedBrandIndex = tradeBrandSelect.selectedIndex;
+                    const selectedModelIndex = tradeModelSelect.selectedIndex;
+                    const selectedVersionIndex = tradeVersionSelect.selectedIndex;
+                    
+                    // Seçili marka, model ve versiyon adlarını al
+                    const brandName = selectedBrandIndex > 0 ? tradeBrandSelect.options[selectedBrandIndex].textContent : '';
+                    const modelName = selectedModelIndex > 0 ? tradeModelSelect.options[selectedModelIndex].textContent : '';
+                    const versionName = selectedVersionIndex > 0 ? tradeVersionSelect.options[selectedVersionIndex].textContent : '';
+                    
+                    // Seçili ID'leri al
+                    const versionId = tradeVersionSelect.value || '';
+                    const modelId = tradeModelSelect.value || '';
+                    
+                    // Yıl aralığını al
+                    const startYear = parseInt(tradeYearStartSelect.value) || new Date().getFullYear() - 5;
+                    const endYear = parseInt(tradeYearEndSelect.value) || new Date().getFullYear();
+                    
+                    console.log('Takas modeli bilgileri:', {
+                        brandName,
+                        modelName,
+                        versionName,
+                        versionId,
+                        modelId,
+                        startYear,
+                        endYear
+                    });
+                    
                     // Takas modelleri için bir dizi oluştur
                     const tradeModelData = {
-                        version_id: document.getElementById('trade_version').value || '',
-                        brand: document.getElementById('trade_brand').options[document.getElementById('trade_brand').selectedIndex]?.textContent || '',
-                        model: document.getElementById('trade_model').options[document.getElementById('trade_model').selectedIndex]?.textContent || '',
-                        version: document.getElementById('trade_version').options[document.getElementById('trade_version').selectedIndex]?.textContent || '',
-                        model_id: document.getElementById('trade_model').value || '',
+                        version_id: versionId,
+                        brand: brandName,
+                        model: modelName,
+                        version: versionName,
+                        model_id: modelId,
                         year_range: [
                             {
-                                start_year: parseInt(document.getElementById('trade_year_start').value) || new Date().getFullYear() - 5,
-                                end_year: parseInt(document.getElementById('trade_year_end').value) || new Date().getFullYear()
+                                start_year: startYear,
+                                end_year: endYear
                             }
                         ],
-                        year_range_start: parseInt(document.getElementById('trade_year_start').value) || new Date().getFullYear() - 5,
-                        year_range_end: parseInt(document.getElementById('trade_year_end').value) || new Date().getFullYear(),
+                        year_range_start: startYear,
+                        year_range_end: endYear,
                         vehicle_details: {
-                            brand: document.getElementById('trade_brand').options[document.getElementById('trade_brand').selectedIndex]?.textContent || '',
-                            model: document.getElementById('trade_model').options[document.getElementById('trade_model').selectedIndex]?.textContent || '',
-                            version: document.getElementById('trade_version').options[document.getElementById('trade_version').selectedIndex]?.textContent || '',
-                            version_id: document.getElementById('trade_version').value || '',
-                            model_id: document.getElementById('trade_model').value || ''
+                            brand: brandName,
+                            model: modelName,
+                            version: versionName,
+                            version_id: versionId,
+                            model_id: modelId
                         }
                     };
                     
@@ -1423,6 +1476,15 @@
                     try {
                         const vehicleListingId = jsonData.id;
                         
+                        // Trade model için gerekli verilerin varlığını kontrol et
+                        const tradeBrandName = data.trade_models[0].brand;
+                        const tradeModelName = data.trade_models[0].model;
+                        
+                        if (!tradeBrandName || !tradeModelName) {
+                            console.warn('Takas modeli için marka veya model eksik. Takas modeli eklenmeyecek.');
+                            throw new Error('Takas modeli için gerekli alanlar eksik');
+                        }
+                        
                         const tradeModelPostData = {
                             user_id: 2, // Demo için sabit değer
                             vehicle_listing_id: vehicleListingId,
@@ -1443,10 +1505,21 @@
                         if (!tradeResponse.ok) {
                             const tradeErrorText = await tradeResponse.text();
                             console.error('Takas modeli API Hatası:', tradeErrorText);
-                            // Takas modeli hatası olsa bile ana ilanı kaydettiğimiz için devam ediyoruz
+                            
+                            // Hata durumunu kullanıcıya bildir ama işlem durdurma
+                            const alertWarning = document.createElement('div');
+                            alertWarning.className = 'alert alert-warning';
+                            alertWarning.innerHTML = `<i class="fas fa-exclamation-triangle"></i> İlanınız oluşturuldu ancak takas bilgileri kaydedilemedi. <small>(${tradeErrorText})</small>`;
+                            document.getElementById('alertBox').appendChild(alertWarning);
                         } else {
                             const tradeJsonData = await tradeResponse.json();
                             console.log('Takas modeli API Yanıtı:', tradeJsonData);
+                            
+                            // Başarı durumunda kullanıcıya bildir
+                            const alertSuccess = document.createElement('div');
+                            alertSuccess.className = 'alert alert-success';
+                            alertSuccess.innerHTML = `<i class="fas fa-check-circle"></i> Takas bilgileri başarıyla kaydedildi!`;
+                            document.getElementById('alertBox').appendChild(alertSuccess);
                         }
                     } catch (tradeError) {
                         console.error('Takas modeli eklenirken hata:', tradeError);

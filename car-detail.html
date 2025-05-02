@@ -879,18 +879,35 @@
                     const tradeModels = tradeModelData.trade_models || [tradeModelData];
                     
                     tradeModels.forEach(model => {
+                        // API yanıtındaki farklı veri yapılarını ele alabilmek için koruma
                         const brandName = model.brand || model.vehicle_details?.brand || 'Belirtilmemiş';
                         const modelName = model.model || model.vehicle_details?.model || 'Belirtilmemiş';
                         const versionName = model.version || model.vehicle_details?.version || '';
                         
+                        // Yıl aralığı verisini al (birden fazla yapıda gelebilir)
                         const yearRanges = model.year_range || [];
                         let yearRangeText = '';
                         
                         if (yearRanges.length > 0) {
-                            yearRangeText = `${yearRanges[0].start_year || model.year_range_start} - ${yearRanges[0].end_year || model.year_range_end}`;
+                            // Yıl aralığı dizideki ilk eleman olarak geldi
+                            if (yearRanges[0].start_year !== undefined && yearRanges[0].end_year !== undefined) {
+                                yearRangeText = `${yearRanges[0].start_year} - ${yearRanges[0].end_year}`;
+                            } else if (yearRanges[0].startYear !== undefined && yearRanges[0].endYear !== undefined) {
+                                yearRangeText = `${yearRanges[0].startYear} - ${yearRanges[0].endYear}`;
+                            }
                         } else if (model.year_range_start && model.year_range_end) {
+                            // Yıl aralığı doğrudan nesnede
                             yearRangeText = `${model.year_range_start} - ${model.year_range_end}`;
                         }
+                        
+                        // Debug
+                        console.log('Takas modeli:', {
+                            brand: brandName,
+                            model: modelName,
+                            version: versionName,
+                            yearRange: yearRangeText,
+                            originalData: model
+                        });
                         
                         tradeModelsHtml += `
                             <div class="trade-model-card">
@@ -916,6 +933,11 @@
                         `;
                     });
                 });
+                
+                // Eğer takas modeli varsa ama HTML oluşturulmadıysa
+                if (!tradeModelsHtml) {
+                    tradeModelsHtml = `<p class="no-trade-models">Takas modeli verilerinde sorun var. Lütfen ilan sahibiyle iletişime geçin.</p>`;
+                }
                 
                 // Takas modelleri içeriğini güncelle
                 tradeModelsList.innerHTML = tradeModelsHtml;
