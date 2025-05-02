@@ -19,7 +19,7 @@
                     </div>
                 </a>
                 <div class="dropdown-menu">
-                    <div id="loggedInMenu" style="display: none;">
+                    <div id="loggedInMenu">
                         <div class="dropdown-header">
                             <div class="user-info">
                                 <div class="avatar-circle small">
@@ -43,7 +43,7 @@
                             </a>
                         </div>
                     </div>
-                    <div id="loggedOutMenu" style="display: none;">
+                    <div id="loggedOutMenu">
                         <a href="pages/signin.html" class="login-button">
                             Giriş Yap / Hesap Oluştur
                         </a>
@@ -70,8 +70,8 @@
 
         if (authToken && userName) {
             // Kullanıcı giriş yapmış
-            loggedInMenu.style.display = 'block';
-            loggedOutMenu.style.display = 'none';
+            if (loggedInMenu) loggedInMenu.classList.add('active');
+            if (loggedOutMenu) loggedOutMenu.classList.remove('active');
         
             // Kullanıcı adının baş harflerini al
             const initials = userName.split(' ')
@@ -82,11 +82,11 @@
         
             // Avatar'lara baş harfleri yerleştir
             avatarInitials.textContent = initials;
-            smallAvatarInitials.textContent = initials;
+            if (smallAvatarInitials) smallAvatarInitials.textContent = initials;
         
             // Kullanıcı bilgilerini göster
-            userNameElement.textContent = userName;
-            userEmailElement.textContent = userEmail;
+            if (userNameElement) userNameElement.textContent = userName;
+            if (userEmailElement) userEmailElement.textContent = userEmail;
             
             // Avatar rengini ayarla
             const colors = [
@@ -96,7 +96,9 @@
             const colorIndex = userName.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0) % colors.length;
             const backgroundColor = colors[colorIndex];
             avatarCircle.style.backgroundColor = backgroundColor;
-            document.querySelector('.avatar-circle.small').style.backgroundColor = backgroundColor;
+            
+            const smallAvatar = document.querySelector('.avatar-circle.small');
+            if (smallAvatar) smallAvatar.style.backgroundColor = backgroundColor;
             
             // Bildirim butonunu göster
             if (notificationBtn) {
@@ -104,8 +106,8 @@
             }
         } else {
             // Kullanıcı giriş yapmamış
-            loggedInMenu.style.display = 'none';
-            loggedOutMenu.style.display = 'block';
+            if (loggedInMenu) loggedInMenu.classList.remove('active');
+            if (loggedOutMenu) loggedOutMenu.classList.add('active');
             
             // Varsayılan görünüm
             avatarInitials.textContent = 'G';
@@ -135,7 +137,6 @@
 }
 
 .dropdown-menu {
-    display: none;
     position: absolute;
     right: -24px;
     top: 45px;
@@ -146,6 +147,10 @@
     z-index: 1000;
     padding: 0;
     border: 1px solid #eef0f2;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.2s ease;
+    transform: translateY(-10px);
 }
 
 .profile-dropdown::after {
@@ -166,14 +171,6 @@
     right: -50px;
     height: 20px;
     background: transparent;
-}
-
-.profile-dropdown .dropdown-menu {
-    display: block;
-    opacity: 0;
-    visibility: hidden;
-    transition: all 0.2s ease;
-    transform: translateY(-10px);
 }
 
 .profile-dropdown:hover .dropdown-menu {
@@ -340,5 +337,15 @@
 .notification-btn:hover {
     background-color: #f8f9fa;
     color: #FF6B00;
+}
+
+#loggedInMenu,
+#loggedOutMenu {
+    display: none;
+}
+
+#loggedInMenu.active,
+#loggedOutMenu.active {
+    display: block;
 }
 </style> 
