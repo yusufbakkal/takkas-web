@@ -4,16 +4,15 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Çıkış Yapılıyor - TAKKAS</title>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <style>
         :root {
             --primary: #FF6B00;
-            --primary-dark: #E55A00;
-            --background: #121212;
-            --surface: #1E1E1E;
-            --text: #FFFFFF;
-            --text-secondary: rgba(255, 255, 255, 0.7);
+            --background: #FAFAFA;
+            --surface: #FFFFFF;
+            --text: #202020;
+            --text-light: #707070;
             --success: #4CAF50;
         }
         
@@ -24,31 +23,13 @@
         }
         
         body {
-            font-family: 'Roboto', sans-serif;
+            font-family: 'Inter', sans-serif;
             height: 100vh;
             background: var(--background);
-            overflow: hidden;
             color: var(--text);
-            position: relative;
-        }
-        
-        #canvas-container {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: 0;
-        }
-        
-        .content-wrapper {
-            position: relative;
-            z-index: 1;
-            width: 100%;
-            height: 100vh;
             display: flex;
-            justify-content: center;
             align-items: center;
+            justify-content: center;
         }
         
         .logout-container {
@@ -58,222 +39,108 @@
             justify-content: center;
             text-align: center;
             padding: 2.5rem;
-            border-radius: 20px;
-            background: rgba(30, 30, 30, 0.85);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
-            max-width: 440px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: var(--surface);
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+            max-width: 360px;
         }
         
         .logout-title {
-            font-size: 2.4rem;
-            font-weight: 700;
-            margin-bottom: 1rem;
-            background: linear-gradient(90deg, var(--primary), #FF9800);
-            -webkit-background-clip: text;
-            background-clip: text;
-            -webkit-text-fill-color: transparent;
-            text-fill-color: transparent;
+            font-size: 1.6rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: var(--text);
         }
         
         .logout-message {
-            color: var(--text-secondary);
+            color: var(--text-light);
             margin-bottom: 2rem;
             font-weight: 300;
-            font-size: 1.1rem;
+            font-size: 0.9rem;
         }
         
-        .progress-bar-container {
+        .progress-container {
             width: 100%;
-            height: 6px;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 3px;
-            margin-bottom: 10px;
-            overflow: hidden;
+            margin-bottom: 3rem;
+            position: relative;
         }
         
         .progress-bar {
+            width: 100%;
+            height: 4px;
+            background-color: #f0f0f0;
+            border-radius: 2px;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
             height: 100%;
             width: 0%;
-            background: linear-gradient(90deg, var(--primary), #FF9800);
-            border-radius: 3px;
+            background-color: var(--primary);
+            border-radius: 2px;
             transition: width 0.05s ease;
         }
         
-        .progress-text {
-            font-size: 14px;
-            color: var(--text-secondary);
-            margin-bottom: 1.5rem;
+        .progress-percentage {
+            position: absolute;
+            top: 8px;
+            right: 0;
+            font-size: 0.75rem;
+            color: var(--text-light);
         }
         
-        .icon-container {
-            position: relative;
-            width: 120px;
-            height: 120px;
+        #canvas-container {
+            width: 100px;
+            height: 100px;
             margin-bottom: 2rem;
-        }
-        
-        .pulse {
-            animation: pulse 2s infinite;
-        }
-        
-        @keyframes pulse {
-            0% { transform: scale(1); opacity: 1; }
-            50% { transform: scale(1.3); opacity: 0.7; }
-            100% { transform: scale(1); opacity: 1; }
-        }
-        
-        .checkmark {
-            display: none;
-            width: 80px;
-            height: 80px;
-            margin-bottom: 30px;
-        }
-        
-        .checkmark.show {
-            display: block;
-            animation: scale-in 0.5s ease forwards;
-        }
-        
-        @keyframes scale-in {
-            from { transform: scale(0); opacity: 0; }
-            to { transform: scale(1); opacity: 1; }
-        }
-        
-        .checkmark__circle {
-            stroke-dasharray: 166;
-            stroke-dashoffset: 166;
-            stroke-width: 2;
-            stroke-miterlimit: 10;
-            stroke: var(--success);
-            fill: none;
-            animation: stroke 0.6s cubic-bezier(0.65, 0, 0.45, 1) forwards;
-        }
-        
-        .checkmark__check {
-            transform-origin: 50% 50%;
-            stroke-dasharray: 48;
-            stroke-dashoffset: 48;
-            animation: stroke 0.3s cubic-bezier(0.65, 0, 0.45, 1) 0.8s forwards;
-        }
-        
-        @keyframes stroke {
-            100% { stroke-dashoffset: 0; }
         }
     </style>
 </head>
 <body>
-    <div id="canvas-container"></div>
-    
-    <div class="content-wrapper">
-        <div class="logout-container">
-            <div class="icon-container" id="icon-container">
-                <!-- Three.js will render here -->
+    <div class="logout-container">
+        <div id="canvas-container"></div>
+        
+        <h1 class="logout-title">Çıkış Yapılıyor</h1>
+        <p class="logout-message">Oturumunuz kapatılıyor, lütfen bekleyin...</p>
+        
+        <div class="progress-container">
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill"></div>
             </div>
-            
-            <svg class="checkmark" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 52 52" id="checkmark">
-                <circle class="checkmark__circle" cx="26" cy="26" r="25" fill="none"/>
-                <path class="checkmark__check" fill="none" d="M14.1 27.2l7.1 7.2 16.7-16.8"/>
-            </svg>
-            
-            <h1 class="logout-title">Çıkış Yapılıyor</h1>
-            <p class="logout-message" id="logoutMessage">Oturumunuz güvenli bir şekilde kapatılıyor...</p>
-            
-            <div class="progress-bar-container">
-                <div class="progress-bar" id="progressBar"></div>
-            </div>
-            <div class="progress-text">
-                <span id="progressText">0%</span>
-            </div>
+            <div class="progress-percentage" id="progressPercentage">0%</div>
         </div>
     </div>
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            const progressBar = document.getElementById('progressBar');
-            const progressText = document.getElementById('progressText');
-            const logoutMessage = document.getElementById('logoutMessage');
-            const checkmark = document.getElementById('checkmark');
-            const iconContainer = document.getElementById('icon-container');
-            
+            const progressFill = document.getElementById('progressFill');
+            const progressPercentage = document.getElementById('progressPercentage');
             let progress = 0;
-            const messages = [
-                "Oturumunuz güvenli bir şekilde kapatılıyor...",
-                "Çıkış verileriniz işleniyor...",
-                "Oturum bilgileri temizleniyor...",
-                "Çıkış tamamlanıyor..."
-            ];
+            
+            // 3D animasyonu başlat
+            setupCanvas();
             
             // Oturum bilgilerini temizle
             clearUserSession();
             
-            // Three.js animasyonu başlat
-            setupThreeJsAnimation();
-            setupBackgroundAnimation();
-            
-            // İlerleme animasyonunu başlat
+            // İlerleme animasyonu
             const interval = setInterval(() => {
                 progress += 1;
                 
                 if (progress <= 100) {
-                    progressBar.style.width = `${progress}%`;
-                    progressText.textContent = `${progress}%`;
-                    
-                    // Mesajları değiştir
-                    if (progress < 30) {
-                        logoutMessage.textContent = messages[0];
-                    } else if (progress < 60) {
-                        logoutMessage.textContent = messages[1];
-                    } else if (progress < 85) {
-                        logoutMessage.textContent = messages[2];
-                    } else {
-                        logoutMessage.textContent = messages[3];
-                    }
-                    
-                    // İlerleme yavaşlat
-                    if (progress > 85) {
-                        clearInterval(interval);
-                        slowProgress();
-                    }
-                }
-            }, 30);
-            
-            function slowProgress() {
-                const slowInterval = setInterval(() => {
-                    progress += 0.5;
+                    progressFill.style.width = `${progress}%`;
+                    progressPercentage.textContent = `${progress}%`;
                     
                     if (progress >= 100) {
-                        clearInterval(slowInterval);
-                        completeLogout();
-                        return;
+                        clearInterval(interval);
+                        
+                        // İşlem tamamlandı, ana sayfaya yönlendir
+                        setTimeout(() => {
+                            window.location.href = 'index.html';
+                        }, 800);
                     }
-                    
-                    progressBar.style.width = `${progress}%`;
-                    progressText.textContent = `${progress}%`;
-                }, 80);
-            }
-            
-            function completeLogout() {
-                // 3D animasyonu durdur ve kaldır
-                if (window.animationActive) {
-                    window.animationActive = false;
-                    iconContainer.style.display = 'none';
                 }
-                
-                // Tamamlandı işareti göster
-                checkmark.classList.add('show');
-                
-                // Mesajı güncelle
-                logoutMessage.textContent = "Çıkış işleminiz başarıyla tamamlandı!";
-                progressText.textContent = "100%";
-                
-                // Yönlendirme
-                setTimeout(() => {
-                    window.location.href = 'index.html';
-                }, 2000);
-            }
+            }, 35);
             
             function clearUserSession() {
                 const keysToRemove = ['authToken', 'userName', 'userEmail', 'userId', 'userRole'];
@@ -292,170 +159,52 @@
                 }
             }
             
-            // Icon container için Three.js animasyonu
-            function setupThreeJsAnimation() {
-                const container = document.getElementById('icon-container');
+            function setupCanvas() {
+                const container = document.getElementById('canvas-container');
                 const width = container.clientWidth;
                 const height = container.clientHeight;
                 
+                // Sahne ayarla
                 const scene = new THREE.Scene();
-                const camera = new THREE.PerspectiveCamera(45, width / height, 0.1, 1000);
+                const camera = new THREE.PerspectiveCamera(50, width / height, 0.1, 1000);
                 camera.position.z = 5;
                 
-                const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+                // Renderer ayarla
+                const renderer = new THREE.WebGLRenderer({ 
+                    antialias: true, 
+                    alpha: true
+                });
                 renderer.setSize(width, height);
                 renderer.setClearColor(0x000000, 0);
                 container.appendChild(renderer.domElement);
                 
-                // Tetrahedron geometry (pyramid-like)
-                const geometry = new THREE.TetrahedronGeometry(1.2, 1);
-                
-                // Material with wireframe
-                const material = new THREE.MeshPhongMaterial({
+                // Basit bir torus (donut şekli) oluştur
+                const geometry = new THREE.TorusGeometry(1.5, 0.5, 16, 50);
+                const material = new THREE.MeshBasicMaterial({ 
                     color: 0xFF6B00,
                     wireframe: true,
-                    emissive: 0xFF6B00,
-                    emissiveIntensity: 0.3,
-                    transparent: true,
-                    opacity: 0.9
-                });
-                
-                const mesh = new THREE.Mesh(geometry, material);
-                scene.add(mesh);
-                
-                // İç dolgu ekle
-                const innerGeometry = new THREE.TetrahedronGeometry(1, 0);
-                const innerMaterial = new THREE.MeshPhongMaterial({
-                    color: 0xFF9800,
-                    transparent: true,
-                    opacity: 0.2,
-                    side: THREE.DoubleSide
-                });
-                
-                const innerMesh = new THREE.Mesh(innerGeometry, innerMaterial);
-                scene.add(innerMesh);
-                
-                // Işıklar ekle
-                const light1 = new THREE.PointLight(0xFFFFFF, 1);
-                light1.position.set(5, 3, 5);
-                scene.add(light1);
-                
-                const light2 = new THREE.PointLight(0xFF6B00, 1);
-                light2.position.set(-5, -3, -5);
-                scene.add(light2);
-                
-                const ambientLight = new THREE.AmbientLight(0x404040, 0.5);
-                scene.add(ambientLight);
-                
-                // Animasyon
-                window.animationActive = true;
-                function animate() {
-                    if (!window.animationActive) return;
-                    requestAnimationFrame(animate);
-                    
-                    mesh.rotation.x += 0.01;
-                    mesh.rotation.y += 0.02;
-                    
-                    innerMesh.rotation.x += 0.01;
-                    innerMesh.rotation.y -= 0.01;
-                    
-                    renderer.render(scene, camera);
-                }
-                
-                animate();
-                
-                // Pencere boyutu değiştiğinde
-                window.addEventListener('resize', () => {
-                    const newWidth = container.clientWidth;
-                    const newHeight = container.clientHeight;
-                    
-                    camera.aspect = newWidth / newHeight;
-                    camera.updateProjectionMatrix();
-                    
-                    renderer.setSize(newWidth, newHeight);
-                });
-            }
-            
-            // Arka plan için Three.js animasyonu
-            function setupBackgroundAnimation() {
-                const container = document.getElementById('canvas-container');
-                
-                const scene = new THREE.Scene();
-                const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-                camera.position.z = 20;
-                
-                const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
-                renderer.setSize(window.innerWidth, window.innerHeight);
-                renderer.setClearColor(0x121212, 1);
-                container.appendChild(renderer.domElement);
-                
-                // Particle sistemi oluştur
-                const particleCount = 1000;
-                const particles = new THREE.BufferGeometry();
-                const positions = new Float32Array(particleCount * 3);
-                const colors = new Float32Array(particleCount * 3);
-                const sizes = new Float32Array(particleCount);
-                
-                // Parçacıkları rastgele dağıt
-                for (let i = 0; i < particleCount; i++) {
-                    positions[i * 3] = (Math.random() - 0.5) * 100;     // x
-                    positions[i * 3 + 1] = (Math.random() - 0.5) * 100; // y
-                    positions[i * 3 + 2] = (Math.random() - 0.5) * 100; // z
-                    
-                    // Rastgele renk
-                    const color = new THREE.Color();
-                    
-                    if (Math.random() > 0.8) {
-                        // Some particles are orange (primary color)
-                        color.setHSL(0.08, 1, 0.5 + Math.random() * 0.2); // Orange
-                    } else {
-                        // Most particles are blue-ish grey
-                        color.setHSL(0.6, 0.2, 0.4 + Math.random() * 0.2);
-                    }
-                    
-                    colors[i * 3] = color.r;
-                    colors[i * 3 + 1] = color.g;
-                    colors[i * 3 + 2] = color.b;
-                    
-                    // Parçacık boyutu
-                    sizes[i] = Math.random() * 0.5;
-                }
-                
-                particles.setAttribute('position', new THREE.BufferAttribute(positions, 3));
-                particles.setAttribute('color', new THREE.BufferAttribute(colors, 3));
-                particles.setAttribute('size', new THREE.BufferAttribute(sizes, 1));
-                
-                // Shader materyal
-                const particleMaterial = new THREE.PointsMaterial({
-                    size: 0.4,
-                    vertexColors: true, 
                     transparent: true,
                     opacity: 0.8
                 });
                 
-                // Particle sistemi oluştur
-                const particleSystem = new THREE.Points(particles, particleMaterial);
-                scene.add(particleSystem);
+                const torus = new THREE.Mesh(geometry, material);
+                scene.add(torus);
+                
+                // Işık ekle
+                const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
+                scene.add(ambientLight);
                 
                 // Animasyon
                 function animate() {
-                    if (!window.animationActive) return;
                     requestAnimationFrame(animate);
                     
-                    particleSystem.rotation.y += 0.0005;
-                    particleSystem.rotation.x += 0.0002;
+                    torus.rotation.x += 0.01;
+                    torus.rotation.y += 0.01;
                     
                     renderer.render(scene, camera);
                 }
                 
                 animate();
-                
-                // Pencere boyutu değiştiğinde
-                window.addEventListener('resize', () => {
-                    camera.aspect = window.innerWidth / window.innerHeight;
-                    camera.updateProjectionMatrix();
-                    renderer.setSize(window.innerWidth, window.innerHeight);
-                });
             }
         });
     </script>
