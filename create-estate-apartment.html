@@ -562,7 +562,7 @@
                     credit_status: formData.get('credit_status') === 'on',
                     from_where: "Emlakçı",
                     user_id: parseInt(localStorage.getItem('userId')) || 0,
-                    category_id: 20,
+                    category_id: getCategoryIdFromUrl(),
                     // Arsa ile ilgili alanlar (null olarak belirt)
                     ada_no: null,
                     parsel_no: null,
@@ -663,10 +663,29 @@
             }
         });
 
+        // URL'den kategori ve alt kategori bilgilerini al
+        function getCategoryIdFromUrl() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const subcategoryId = urlParams.get('subcategory');
+            
+            if (subcategoryId && !isNaN(subcategoryId)) {
+                // URL'de alt kategori ID'si varsa, onu kullan
+                console.log('URL\'den alınan alt kategori ID:', subcategoryId);
+                return parseInt(subcategoryId);
+            }
+            
+            // Alt kategori ID'si yoksa, Konut kategori ID'si (25) kullan
+            console.log('Alt kategori ID bulunamadı, varsayılan konut kategori ID kullanılıyor: 25');
+            return 25; // Konut kategori ID
+        }
+
         // Sayfa yüklendiğinde
         document.addEventListener('DOMContentLoaded', function() {
             // Sayfayı normal yükle
             loadProvinces();
+            
+            // URL parametrelerini kontrol et
+            console.log('URL Parametreleri:', new URLSearchParams(window.location.search).toString());
         });
 
         // Bileşenleri yükle

@@ -310,7 +310,7 @@
                 <!-- Gizli alanlar -->
                 <input type="hidden" id="estate_type" name="estate_type" value="arsa">
                 <input type="hidden" id="from_where" name="from_where" value="Emlakçı ofisinden">
-                <input type="hidden" id="category_id" name="category_id" value="20">
+                <input type="hidden" id="category_id" name="category_id" value="24">
                 <input type="hidden" id="credit_status" name="credit_status" value="true">
                 
                 <div class="button-container">
@@ -456,7 +456,7 @@
                     credit_status: true,
                     from_where: "Emlakçı",
                     user_id: parseInt(localStorage.getItem('userId')) || 0,
-                    category_id: 20,
+                    category_id: getCategoryIdFromUrl(),
                     // Konut için gerekli alanlar (null olarak belirtildi)
                     square_meters_gross: null,
                     room_number: null,
@@ -567,10 +567,29 @@
             }
         });
 
+        // URL'den kategori ve alt kategori bilgilerini al
+        function getCategoryIdFromUrl() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const subcategoryId = urlParams.get('subcategory');
+            
+            if (subcategoryId && !isNaN(subcategoryId)) {
+                // URL'de alt kategori ID'si varsa, onu kullan
+                console.log('URL\'den alınan alt kategori ID:', subcategoryId);
+                return parseInt(subcategoryId);
+            }
+            
+            // Alt kategori ID'si yoksa, Arsa kategori ID'si (24) kullan
+            console.log('Alt kategori ID bulunamadı, varsayılan arsa kategori ID kullanılıyor: 24');
+            return 24; // Arsa kategori ID
+        }
+
         // Sayfa yüklendiğinde
         document.addEventListener('DOMContentLoaded', function() {
             // Sayfayı normal yükle
             loadProvinces();
+            
+            // URL parametrelerini kontrol et
+            console.log('URL Parametreleri:', new URLSearchParams(window.location.search).toString());
         });
 
         // Bileşenleri yükle

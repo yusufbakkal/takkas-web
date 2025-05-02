@@ -228,6 +228,28 @@
                     }
                 }
                 
+                // Kategori bilgilerini al
+                if (data.category_id) {
+                    try {
+                        const categoryUrl = `https://takkas-api.onrender.com/api/categories/${data.category_id}`;
+                        console.log('Kategori bilgisi için API isteği:', categoryUrl);
+                        
+                        const categoryResponse = await fetch(categoryUrl);
+                        
+                        if (categoryResponse.ok) {
+                            const categoryData = await categoryResponse.json();
+                            console.log('Kategori API yanıtı:', categoryData);
+                            
+                            // Kategori adını emlak verilerine ekle
+                            data.category_name = categoryData.name;
+                        } else {
+                            console.error('Kategori bilgileri alınamadı:', categoryResponse.status);
+                        }
+                    } catch (categoryError) {
+                        console.error('Kategori bilgileri alınırken hata oluştu:', categoryError);
+                    }
+                }
+                
                 return data;
             } catch (error) {
                 console.error('İlan detayları çekilirken hata oluştu:', error);
@@ -379,7 +401,7 @@
                 <div class="property-header">
                     <h1 class="property-title">${property.title}</h1>
                     <div class="property-meta">
-                        <span class="property-type">${isLand ? 'ARSA' : property.estate_type.toUpperCase()}</span>
+                        <span class="property-type">${property.category_name || (isLand ? 'ARSA' : property.estate_type.toUpperCase())}</span>
                         <span class="property-date">İlan Tarihi: ${formattedDate}</span>
                     </div>
                 </div>
@@ -454,8 +476,8 @@
                     <h3>Tüm Özellikler</h3>
                     <div class="details-grid">
                         ${isLand ? generateLandDetailsHTML(property) : generateApartmentDetailsHTML(property)}
-                    </div>
-                </div>
+                        </div>
+                        </div>
             `;
 
             document.getElementById('propertyDetail').innerHTML = propertyDetailHtml;
@@ -475,11 +497,11 @@
                         <div class="message-user-info">
                             <div class="message-user-avatar">
                                 <i class="fas fa-user"></i>
-                            </div>
+                        </div>
                             <div class="message-user-details">
                                 <div class="message-user-name">${fromWhere}</div>
                                 <div class="message-user-type">Platinum Üye</div>
-                            </div>
+                        </div>
                         </div>
                         <div class="message-quick-buttons">
                             <button type="button" class="quick-message-btn">Hala satılık mı?</button>
@@ -491,7 +513,7 @@
                             <div class="form-group">
                                 <textarea id="messageText" rows="4" placeholder="Mesaj yazın" required></textarea>
                                 <div class="character-count">En az 10 karakter kullanmalısın · 8000 karakter kaldı</div>
-                            </div>
+                        </div>
                             <button type="submit" class="send-message-button">Gönder</button>
                         </form>
                     </div>
