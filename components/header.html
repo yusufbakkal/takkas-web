@@ -67,29 +67,10 @@
         const userNameElement = document.querySelector('.user-name');
         const userEmailElement = document.querySelector('.user-email');
 
-        // Logout butonuna özel işleyici ekle
-        const logoutButton = document.querySelector('.logout');
-        if (logoutButton) {
-            logoutButton.addEventListener('click', function(e) {
-                e.preventDefault();
-                
-                // Çıkış yap işlemini gerçekleştir
-                localStorage.removeItem('authToken');
-                localStorage.removeItem('userName');
-                localStorage.removeItem('userEmail');
-                localStorage.removeItem('userId');
-                
-                alert('Başarıyla çıkış yapıldı');
-                
-                // Ana sayfaya yönlendir
-                window.location.href = '/index.html';
-            });
-        }
-
         if (authToken && userName) {
             // Kullanıcı giriş yapmış
-            loggedInMenu.style.display = 'block';
-            loggedOutMenu.style.display = 'none';
+            if (loggedInMenu) loggedInMenu.style.display = 'block';
+            if (loggedOutMenu) loggedOutMenu.style.display = 'none';
         
             // Kullanıcı adının baş harflerini al
             const initials = userName.split(' ')
@@ -99,12 +80,12 @@
                 .substring(0, 2);
         
             // Avatar'lara baş harfleri yerleştir
-            avatarInitials.textContent = initials;
-            smallAvatarInitials.textContent = initials;
+            if (avatarInitials) avatarInitials.textContent = initials;
+            if (smallAvatarInitials) smallAvatarInitials.textContent = initials;
         
             // Kullanıcı bilgilerini göster
-            userNameElement.textContent = userName;
-            userEmailElement.textContent = userEmail;
+            if (userNameElement) userNameElement.textContent = userName;
+            if (userEmailElement) userEmailElement.textContent = userEmail;
             
             // Avatar rengini ayarla
             const colors = [
@@ -113,16 +94,26 @@
             ];
             const colorIndex = userName.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0) % colors.length;
             const backgroundColor = colors[colorIndex];
-            avatarCircle.style.backgroundColor = backgroundColor;
-            document.querySelector('.avatar-circle.small').style.backgroundColor = backgroundColor;
+            if (avatarCircle) avatarCircle.style.backgroundColor = backgroundColor;
+            const smallAvatar = document.querySelector('.avatar-circle.small');
+            if (smallAvatar) smallAvatar.style.backgroundColor = backgroundColor;
         } else {
             // Kullanıcı giriş yapmamış
-            loggedInMenu.style.display = 'none';
-            loggedOutMenu.style.display = 'block';
+            if (loggedInMenu) loggedInMenu.style.display = 'none';
+            if (loggedOutMenu) loggedOutMenu.style.display = 'block';
             
             // Varsayılan görünüm
-            avatarInitials.textContent = 'G';
-            avatarCircle.style.backgroundColor = '#ccc';
+            if (avatarInitials) avatarInitials.textContent = 'G';
+            if (avatarCircle) avatarCircle.style.backgroundColor = '#ccc';
+        }
+
+        // Logout butonuna özel işleyici ekle
+        const logoutButton = document.querySelector('.logout');
+        if (logoutButton) {
+            logoutButton.addEventListener('click', function(e) {
+                e.preventDefault();
+                window.location.href = '/logout.html';
+            });
         }
     });
 </script> 
