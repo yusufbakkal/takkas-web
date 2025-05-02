@@ -6,456 +6,155 @@
     <title>Çıkış Yapılıyor - TAKKAS</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
+        :root {
+            --primary: #4F46E5;
+            --primary-light: rgba(79, 70, 229, 0.1);
+            --text-dark: #333;
+            --text-muted: #666;
+            --background: #f8fafc;
+            --card: #fff;
+            --shadow: 0 8px 24px rgba(0,0,0,0.08);
+            --transition: all 0.3s ease;
+        }
+        
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             display: flex;
             align-items: center;
             justify-content: center;
             height: 100vh;
-            margin: 0;
-            background: linear-gradient(135deg, #f5f7fa 0%, #e4eaef 100%);
-            text-align: center;
+            background: var(--background);
             overflow: hidden;
         }
         
         .logout-container {
-            padding: 3rem;
-            background-color: white;
-            border-radius: 16px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.08);
-            max-width: 420px;
-            transform: translateY(30px);
-            opacity: 0;
-            animation: slideUp 0.6s ease forwards;
+            width: 360px;
+            padding: 2.5rem;
+            background: var(--card);
+            border-radius: 12px;
+            box-shadow: var(--shadow);
+            text-align: center;
+            transition: var(--transition);
             position: relative;
-            overflow: hidden;
         }
         
-        .logout-container.visible {
-            opacity: 1;
-            transform: translateY(0);
+        .icon-container {
+            position: relative;
+            width: 72px;
+            height: 72px;
+            margin: 0 auto 1.5rem;
         }
         
-        .logout-container::before {
-            content: "";
+        .circle-bg {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            background: var(--primary-light);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .icon {
+            font-size: 2rem;
+            color: var(--primary);
+            opacity: 0;
+        }
+        
+        .spinner {
             position: absolute;
             top: 0;
             left: 0;
-            width: 6px;
+            width: 100%;
             height: 100%;
-            background: linear-gradient(180deg, #4F46E5, #8e85ff);
-            border-top-left-radius: 16px;
-            border-bottom-left-radius: 16px;
+            border: 3px solid var(--primary-light);
+            border-top-color: var(--primary);
+            border-radius: 50%;
         }
         
         h1 {
-            color: #333;
+            color: var(--text-dark);
+            font-size: 1.5rem;
             margin-bottom: 1rem;
             font-weight: 600;
-            position: relative;
-            display: inline-block;
-            animation: fadeIn 1s ease 0.3s forwards;
-            opacity: 0;
-        }
-        
-        h1.visible {
-            opacity: 1;
-        }
-        
-        h1::after {
-            content: "";
-            position: absolute;
-            bottom: -8px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 40px;
-            height: 3px;
-            background: #4F46E5;
-            border-radius: 2px;
         }
         
         p {
-            margin-bottom: 2rem;
-            color: #666;
-            font-size: 1.1rem;
-            line-height: 1.6;
-            animation: fadeIn 1s ease 0.5s forwards;
-            opacity: 0;
+            color: var(--text-muted);
+            margin-bottom: 1.5rem;
+            line-height: 1.5;
         }
         
-        p.visible {
-            opacity: 1;
-        }
-        
-        .loader-container {
-            position: relative;
-            width: 80px;
-            height: 80px;
-            margin: 0 auto 2rem;
-            animation: fadeIn 1s ease 0.7s forwards;
-            opacity: 0;
-        }
-        
-        .circle-loader {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            border: 4px solid rgba(79, 70, 229, 0.1);
-            border-top-color: #4F46E5;
-            border-radius: 50%;
-            animation: spin 1.2s cubic-bezier(0.68, -0.55, 0.27, 1.55) infinite;
-        }
-        
-        .checkmark {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%) scale(0);
-            color: #4F46E5;
-            font-size: 2.5rem;
-            opacity: 0;
-        }
-        
-        .redirecting {
+        .redirect-label {
             display: inline-block;
-            margin-top: 20px;
-            padding: 10px 16px;
-            background-color: rgba(79, 70, 229, 0.1);
-            color: #4F46E5;
-            border-radius: 30px;
-            font-size: 0.9rem;
+            padding: 0.5rem 1rem;
+            background: var(--primary-light);
+            color: var(--primary);
+            border-radius: 20px;
+            font-size: 0.85rem;
             font-weight: 500;
             opacity: 0;
-            transform: translateY(10px);
-            animation: fadeUp 0.5s ease 2s forwards;
-        }
-        
-        /* İlerleme çubuğu stilleri */
-        .progress-container {
-            width: 100%;
-            height: 8px;
-            background-color: rgba(79, 70, 229, 0.1);
-            border-radius: 10px;
-            margin-top: 20px;
-            overflow: hidden;
-            opacity: 0;
-            transform: translateY(10px);
-            transition: all 0.3s ease;
-        }
-        
-        .progress-bar {
-            height: 100%;
-            width: 0%;
-            background: linear-gradient(90deg, #4F46E5, #8e85ff);
-            border-radius: 10px;
-            transition: width 0.1s linear;
-        }
-        
-        /* Konfeti efekti */
-        .confetti {
-            position: fixed;
-            width: 10px;
-            height: 10px;
-            background-color: #4F46E5;
-            border-radius: 2px;
-            animation: confetti-fall 3s ease-in-out forwards;
-            z-index: 1000;
-        }
-        
-        /* Dalgalanma Efekti Stilleri */
-        .ripple-container {
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 0;
-            height: 0;
-            z-index: -1;
-        }
-        
-        .ripple {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 0px;
-            height: 0px;
-            border: 2px solid rgba(79, 70, 229, 0.15);
-            border-radius: 50%;
-            animation: ripple 4s ease-out infinite;
-        }
-        
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-        
-        @keyframes slideUp {
-            0% { transform: translateY(30px); opacity: 0; }
-            100% { transform: translateY(0); opacity: 1; }
-        }
-        
-        @keyframes fadeIn {
-            0% { opacity: 0; }
-            100% { opacity: 1; }
-        }
-        
-        @keyframes fadeUp {
-            0% { opacity: 0; transform: translateY(10px); }
-            100% { opacity: 1; transform: translateY(0); }
-        }
-        
-        @keyframes checkmarkAppear {
-            0% { transform: translate(-50%, -50%) scale(0); opacity: 0; }
-            60% { transform: translate(-50%, -50%) scale(1.2); opacity: 1; }
-            100% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
-        }
-        
-        @keyframes confetti-fall {
-            0% { 
-                transform: translateY(-10px) rotate(0deg); 
-                opacity: 1; 
-            }
-            100% { 
-                transform: translateY(100vh) rotate(720deg); 
-                opacity: 0; 
-            }
-        }
-        
-        @keyframes ripple {
-            0% {
-                width: 0px;
-                height: 0px;
-                opacity: 0.8;
-            }
-            100% {
-                width: 900px;
-                height: 900px;
-                opacity: 0;
-            }
-        }
-        
-        .particles {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            pointer-events: none;
-            z-index: -1;
-        }
-        
-        .particle {
-            position: absolute;
-            width: 10px;
-            height: 10px;
-            background-color: rgba(79, 70, 229, 0.2);
-            border-radius: 50%;
-            animation: float 15s linear infinite;
-        }
-        
-        @keyframes float {
-            0% { transform: translateY(0) translateX(0); opacity: 0; }
-            10% { opacity: 1; }
-            90% { opacity: 0.5; }
-            100% { transform: translateY(-150vh) translateX(150px); opacity: 0; }
         }
     </style>
 </head>
 <body>
-    <!-- Arka plan parçacıkları -->
-    <div class="particles" id="particles"></div>
-    
-    <div class="logout-container">
-        <div class="loader-container">
-            <div class="circle-loader"></div>
-            <i class="fas fa-check-circle checkmark" id="checkmark"></i>
+    <div class="logout-container" id="logoutContainer">
+        <div class="icon-container">
+            <div class="circle-bg">
+                <i class="fas fa-check icon" id="checkIcon"></i>
+            </div>
+            <div class="spinner" id="spinner"></div>
         </div>
         <h1>Çıkış Yapılıyor</h1>
         <p>Oturumunuz güvenli bir şekilde kapatılıyor...</p>
-        <div id="progressBarContainer" class="progress-container">
-            <div id="progressBar" class="progress-bar"></div>
-        </div>
-        <div class="redirecting" id="redirecting">Ana Sayfaya Yönlendiriliyorsunuz...</div>
+        <div class="redirect-label" id="redirectLabel">Ana Sayfaya Yönlendiriliyorsunuz</div>
     </div>
 
     <script>
-        // Arka plan parçacıkları oluştur
-        function createParticles() {
-            const particlesContainer = document.getElementById('particles');
-            const particleCount = 20;
+        document.addEventListener('DOMContentLoaded', () => {
+            const spinner = document.getElementById('spinner');
+            const checkIcon = document.getElementById('checkIcon');
+            const redirectLabel = document.getElementById('redirectLabel');
+            const logoutContainer = document.getElementById('logoutContainer');
             
-            for (let i = 0; i < particleCount; i++) {
-                const particle = document.createElement('div');
-                particle.classList.add('particle');
-                
-                // Rastgele boyut
-                const size = Math.random() * 8 + 3;
-                particle.style.width = `${size}px`;
-                particle.style.height = `${size}px`;
-                
-                // Rastgele pozisyon
-                particle.style.left = `${Math.random() * 100}%`;
-                particle.style.top = `${Math.random() * 100}%`;
-                
-                // Rastgele opaklık
-                particle.style.opacity = Math.random() * 0.5 + 0.1;
-                
-                // Rastgele animasyon süresi
-                const duration = Math.random() * 10 + 10;
-                particle.style.animationDuration = `${duration}s`;
-                
-                // Rastgele gecikme
-                const delay = Math.random() * 5;
-                particle.style.animationDelay = `${delay}s`;
-                
-                particlesContainer.appendChild(particle);
-            }
-        }
-
-        // Yaşıl hare efekti oluştur
-        function createRippleEffect() {
-            const rippleContainer = document.createElement('div');
-            rippleContainer.classList.add('ripple-container');
-            document.body.appendChild(rippleContainer);
+            // Sayfa açılış animasyonu
+            logoutContainer.style.opacity = '0';
+            logoutContainer.style.transform = 'translateY(20px)';
             
-            for (let i = 0; i < 3; i++) {
-                const ripple = document.createElement('div');
-                ripple.classList.add('ripple');
-                ripple.style.animationDelay = `${i * 1.5}s`;
-                rippleContainer.appendChild(ripple);
-            }
-        }
-        
-        // İlerleme barı animasyonu
-        function animateProgressBar() {
-            const progressBar = document.getElementById('progressBar');
-            if (!progressBar) return;
-            
-            let width = 0;
-            const interval = setInterval(() => {
-                if (width >= 100) {
-                    clearInterval(interval);
-                } else {
-                    width += 1;
-                    progressBar.style.width = width + '%';
-                }
-            }, 30);
-        }
-        
-        // Animasyonları sekans halinde çalıştır
-        function runAnimationSequence() {
-            const container = document.querySelector('.logout-container');
-            const h1 = document.querySelector('h1');
-            const p = document.querySelector('p');
-            const redirectingText = document.getElementById('redirecting');
-            
-            // Daha yumuşak geçişler için GSAP benzeri zamanlama
-            setTimeout(() => container.classList.add('visible'), 100);
-            setTimeout(() => h1.classList.add('visible'), 600);
-            setTimeout(() => p.classList.add('visible'), 900);
-            
-            // Animasyon tamamlandıktan sonra onay işareti göster
             setTimeout(() => {
-                const loader = document.querySelector('.circle-loader');
-                const checkmark = document.getElementById('checkmark');
+                logoutContainer.style.opacity = '1';
+                logoutContainer.style.transform = 'translateY(0)';
                 
-                loader.style.animation = 'none';
-                loader.style.borderColor = 'rgba(79, 70, 229, 0.1)';
-                loader.style.borderLeftColor = 'rgba(79, 70, 229, 0.1)';
-                loader.style.borderTopColor = 'rgba(79, 70, 229, 0.1)';
+                // Spinner animasyonu
+                spinner.style.animation = 'spin 1s linear infinite';
                 
-                checkmark.style.animation = 'checkmarkAppear 0.5s cubic-bezier(0.68, -0.55, 0.27, 1.55) forwards';
-                playSuccessSound();
+                // Oturum bilgilerini temizle
+                clearUserSession();
                 
-                // İlerleme çubuğunu göster
+                // Çıkış işlemi tamamlandı
                 setTimeout(() => {
-                    document.getElementById('progressBarContainer').style.opacity = '1';
-                    document.getElementById('progressBarContainer').style.transform = 'translateY(0)';
-                    animateProgressBar();
-                }, 600);
-                
-                // Konfeti efekti göster
-                setTimeout(() => {
-                    showConfetti();
-                }, 300);
-                
-                // Kısa bir gecikme ile ana sayfaya yönlendir
-                setTimeout(() => {
-                    window.location.href = 'index.html';
-                }, 3500);
-            }, 1800);
+                    completeLogout();
+                    
+                    // Ana sayfaya yönlendir
+                    setTimeout(() => {
+                        window.location.href = 'index.html';
+                    }, 1500);
+                }, 1800);
+            }, 300);
             
-            // Redirecting yazısını göster
-            setTimeout(() => {
-                redirectingText.style.opacity = '1';
-                redirectingText.style.transform = 'translateY(0)';
-            }, 2500);
-        }
-        
-        // Konfeti efektini göster
-        function showConfetti() {
-            const container = document.querySelector('.logout-container');
-            
-            for (let i = 0; i < 50; i++) {
-                const confetti = document.createElement('div');
-                confetti.classList.add('confetti');
+            // Tüm oturum bilgilerini temizle
+            function clearUserSession() {
+                const keysToRemove = ['authToken', 'userName', 'userEmail', 'userId', 'userRole'];
                 
-                // Rastgele renk
-                const colors = ['#4F46E5', '#8e85ff', '#FF6B00', '#00CCBB', '#9333EA'];
-                const colorIndex = Math.floor(Math.random() * colors.length);
-                confetti.style.backgroundColor = colors[colorIndex];
+                keysToRemove.forEach(key => localStorage.removeItem(key));
                 
-                // Rastgele boyut
-                const size = Math.random() * 8 + 5;
-                confetti.style.width = `${size}px`;
-                confetti.style.height = `${size}px`;
-                
-                // Rastgele pozisyon
-                confetti.style.left = `${Math.random() * 100}%`;
-                confetti.style.top = `-10px`;
-                
-                // Rastgele animasyon
-                confetti.style.animationDuration = `${Math.random() * 3 + 2}s`;
-                confetti.style.animationDelay = `${Math.random() * 0.5}s`;
-                
-                // Rastgele dönüş
-                confetti.style.transform = `rotate(${Math.random() * 360}deg)`;
-                
-                document.body.appendChild(confetti);
-            }
-        }
-        
-        // Başarı sesi çal
-        function playSuccessSound() {
-            try {
-                const audio = new Audio('data:audio/mp3;base64,SUQzBAAAAAABEVRYWFgAAAAtAAADY29tbWVudABCaWdTb3VuZEJhbmsuY29tIC8gTGFTb25vdGhlcXVlLm9yZwBURU5DAAAAHQAAA1N3aXRjaCBQbHVzIMKpIE5DSCBTb2Z0d2FyZQBUSVQyAAAABgAAAzIyMzUAVFNTRQAAAA8AAANMYXZmNTcuODMuMTAwAAAAAAAAAAAAAAD/80DEAAAAA0gAAAAATEFNRTMuMTAwVVVVVVVVVVVVVUxBTUUzLjEwMFVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVf/zQsRbAAADSAAAAABVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVf/zQMSkAAADSAAAAABVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV');
-                audio.play();
-            } catch (err) {
-                console.log('Ses çalınamadı', err);
-            }
-        }
-
-        document.addEventListener('DOMContentLoaded', function() {
-            // Arka plan parçacıklarını oluştur
-            createParticles();
-            
-            // Dalgalanma efektini ekle
-            createRippleEffect();
-            
-            // Animasyon sekansını başlat
-            runAnimationSequence();
-            
-            // Oturum bilgilerini temizle
-            localStorage.removeItem('authToken');
-            localStorage.removeItem('userName');
-            localStorage.removeItem('userEmail');
-            localStorage.removeItem('userId');
-            
-            try {
-                // API ile çıkış işlemi (opsiyonel)
+                // API isteği ile çıkış yap (opsiyonel)
                 const token = localStorage.getItem('authToken');
                 if (token) {
                     fetch('https://takkas-api.onrender.com/api/auth/logout', {
@@ -466,8 +165,38 @@
                         }
                     }).catch(error => console.error('API çıkış hatası:', error));
                 }
-            } catch (error) {
-                console.error('Çıkış işlemi hatası:', error);
+            }
+            
+            // Çıkış işlemi tamamlandı animasyonunu göster
+            function completeLogout() {
+                // Spinner animasyonunu durdur
+                spinner.style.animation = 'none';
+                spinner.style.opacity = '0';
+                
+                // Onay işaretini göster
+                checkIcon.style.opacity = '1';
+                checkIcon.style.transform = 'scale(1.2)';
+                
+                setTimeout(() => {
+                    checkIcon.style.transform = 'scale(1)';
+                }, 200);
+                
+                // Yönlendirme yazısını göster
+                setTimeout(() => {
+                    redirectLabel.style.opacity = '1';
+                }, 300);
+            }
+            
+            // Spin animasyonu tanımı
+            if (!document.querySelector('@keyframes spin')) {
+                const style = document.createElement('style');
+                style.textContent = `
+                    @keyframes spin {
+                        0% { transform: rotate(0deg); }
+                        100% { transform: rotate(360deg); }
+                    }
+                `;
+                document.head.appendChild(style);
             }
         });
     </script>
