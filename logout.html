@@ -220,9 +220,138 @@
             }
         }
 
+        // Fare hareketi ile parçacıkları etkileşimli yap
+        function initializeParticleInteraction() {
+            const particles = document.querySelectorAll('.particle');
+            
+            document.addEventListener('mousemove', function(e) {
+                const mouseX = e.clientX;
+                const mouseY = e.clientY;
+                
+                particles.forEach(particle => {
+                    const particleRect = particle.getBoundingClientRect();
+                    const particleX = particleRect.left + particleRect.width / 2;
+                    const particleY = particleRect.top + particleRect.height / 2;
+                    
+                    const distanceX = mouseX - particleX;
+                    const distanceY = mouseY - particleY;
+                    const distance = Math.sqrt(distanceX * distanceX + distanceY * distanceY);
+                    
+                    if (distance < 150) {
+                        const angle = Math.atan2(distanceY, distanceX);
+                        const strength = (150 - distance) / 15;
+                        
+                        // Fare imlecinden kaçma efekti
+                        particle.style.transform = `translate(${-Math.cos(angle) * strength}px, ${-Math.sin(angle) * strength}px)`;
+                    } else {
+                        particle.style.transform = '';
+                    }
+                });
+            });
+        }
+
+        // Sayfa geçişi animasyonu
+        function initializePageTransition() {
+            // Çıkış işlemi başladığında
+            const logoutContainer = document.querySelector('.logout-container');
+            logoutContainer.style.transform = 'translateY(0)';
+            logoutContainer.style.opacity = '1';
+            
+            // Sayfa yönlendirmesi öncesi animasyon
+            const redirectToHomePage = () => {
+                // Fade out animasyonu
+                logoutContainer.style.transition = 'transform 0.5s ease, opacity 0.5s ease';
+                logoutContainer.style.transform = 'translateY(-30px)';
+                logoutContainer.style.opacity = '0';
+                
+                // Sayfa geçişini simüle et
+                setTimeout(() => {
+                    document.body.style.transition = 'opacity 0.4s ease';
+                    document.body.style.opacity = '0';
+                    setTimeout(() => {
+                        window.location.href = 'index.html';
+                    }, 400);
+                }, 500);
+            };
+            
+            // Global değişkene ekleyelim
+            window.redirectToHomePage = redirectToHomePage;
+        }
+
+        // Yükleme animasyonu tamamlandıktan sonra onay işareti
+        function animateCheckmark() {
+            const loader = document.querySelector('.circle-loader');
+            const checkmark = document.getElementById('checkmark');
+            
+            loader.style.animation = 'none';
+            loader.style.borderColor = 'rgba(79, 70, 229, 0.1)';
+            loader.style.borderLeftColor = 'rgba(79, 70, 229, 0.1)';
+            loader.style.borderTopColor = 'rgba(79, 70, 229, 0.1)';
+            
+            // Onay işaretini gösterirken hafif titreşim efekti ekle
+            checkmark.style.animation = 'checkmarkAppear 0.5s cubic-bezier(0.68, -0.55, 0.27, 1.55) forwards';
+            
+            // Onay işareti tamamlandıktan sonra hafif bir salınım ekle
+            setTimeout(() => {
+                checkmark.style.animation = 'none';
+                checkmark.style.transform = 'translate(-50%, -50%) scale(1)';
+                checkmark.style.opacity = '1';
+                
+                // Salınım animasyonu
+                let angle = 0;
+                const swing = setInterval(() => {
+                    angle += 0.1;
+                    const swingScale = 1 + Math.sin(angle) * 0.03; // %3 ölçek salınımı
+                    checkmark.style.transform = `translate(-50%, -50%) scale(${swingScale})`;
+                    
+                    if (angle > 6) {
+                        clearInterval(swing);
+                        checkmark.style.transform = 'translate(-50%, -50%) scale(1)';
+                    }
+                }, 20);
+            }, 500);
+        }
+
+        // Kullanıcı bilgilendirme mesajları
+        function updateStatusMessages() {
+            const messages = [
+                { text: "Oturumunuz güvenli bir şekilde kapatılıyor...", delay: 0 },
+                { text: "Yerel depolama temizleniyor...", delay: 800 },
+                { text: "Sunucu bağlantısı sonlandırılıyor...", delay: 1600 },
+                { text: "Çıkış işlemi tamamlandı!", delay: 2400 }
+            ];
+            
+            const statusText = document.querySelector('p');
+            let currentMessageIndex = 0;
+            
+            const messageInterval = setInterval(() => {
+                currentMessageIndex++;
+                
+                if (currentMessageIndex < messages.length) {
+                    // Mevcut mesajı kaybet, yenisini göster
+                    statusText.style.opacity = '0';
+                    statusText.style.transform = 'translateY(10px)';
+                    
+                    setTimeout(() => {
+                        statusText.textContent = messages[currentMessageIndex].text;
+                        statusText.style.opacity = '1';
+                        statusText.style.transform = 'translateY(0)';
+                    }, 300);
+                } else {
+                    clearInterval(messageInterval);
+                }
+            }, 800);
+        }
+
         document.addEventListener('DOMContentLoaded', function() {
             // Arka plan parçacıklarını oluştur
             createParticles();
+            
+            // Parçacık etkileşimini başlat
+            initializeParticleInteraction();
+            
+            // Sayfa geçişi ayarlarını başlat
+            initializePageTransition();
             
             // Oturum bilgilerini temizle
             localStorage.removeItem('authToken');
@@ -246,29 +375,36 @@
                 console.error('Çıkış işlemi hatası:', error);
             }
             
+            // Durum mesajlarını güncellemeye başla
+            updateStatusMessages();
+            
             // Animasyon tamamlandıktan sonra onay işareti göster
             setTimeout(function() {
-                const loader = document.querySelector('.circle-loader');
-                const checkmark = document.getElementById('checkmark');
-                
-                loader.style.animation = 'none';
-                loader.style.borderColor = 'rgba(79, 70, 229, 0.1)';
-                loader.style.borderLeftColor = 'rgba(79, 70, 229, 0.1)';
-                loader.style.borderTopColor = 'rgba(79, 70, 229, 0.1)';
-                
-                checkmark.style.animation = 'checkmarkAppear 0.5s cubic-bezier(0.68, -0.55, 0.27, 1.55) forwards';
+                animateCheckmark();
                 
                 // Kısa bir gecikme ile ana sayfaya yönlendir
                 setTimeout(function() {
-                    window.location.href = 'index.html';
+                    window.redirectToHomePage();
                 }, 1500);
-            }, 1800);
+            }, 2800);
             
             // Redirecting yazısını göster
             setTimeout(function() {
                 document.getElementById('redirecting').style.opacity = '1';
                 document.getElementById('redirecting').style.transform = 'translateY(0)';
-            }, 2000);
+            }, 3500);
+            
+            // Sayfa kapanmadan önce fareyle etkileşim ekle
+            document.body.addEventListener('click', function() {
+                window.redirectToHomePage();
+            });
+            
+            // ESC tuşu ile hemen çıkış
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape') {
+                    window.location.href = 'index.html';
+                }
+            });
         });
     </script>
 </body>
