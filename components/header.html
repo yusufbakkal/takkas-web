@@ -13,13 +13,13 @@
                 <i class="fas fa-bell"></i>
             </button>
             <div class="profile-dropdown">
-                <a href="#" class="profile-link">
-                <div class="avatar-circle" id="userAvatar">
+                <button class="profile-button">
+                    <div class="avatar-circle" id="userAvatar">
                         <span class="avatar-initials">G</span>
                     </div>
-                </a>
+                </button>
                 <div class="dropdown-menu">
-                    <div id="loggedInMenu">
+                    <div id="loggedInMenu" class="menu-content">
                         <div class="dropdown-header">
                             <div class="user-info">
                                 <div class="avatar-circle small">
@@ -43,7 +43,7 @@
                             </a>
                         </div>
                     </div>
-                    <div id="loggedOutMenu">
+                    <div id="loggedOutMenu" class="menu-content">
                         <a href="pages/signin.html" class="login-button">
                             Giriş Yap / Hesap Oluştur
                         </a>
@@ -67,11 +67,28 @@
         const userNameElement = document.querySelector('.user-name');
         const userEmailElement = document.querySelector('.user-email');
         const notificationBtn = document.querySelector('.notification-btn');
+        const profileButton = document.querySelector('.profile-button');
+        const dropdownMenu = document.querySelector('.dropdown-menu');
+
+        // Dropdown toggle işlevi
+        if (profileButton) {
+            profileButton.addEventListener('click', function(e) {
+                e.preventDefault();
+                dropdownMenu.classList.toggle('show');
+            });
+        }
+
+        // Sayfa herhangi bir yerine tıklandığında dropdown'ı kapat
+        document.addEventListener('click', function(e) {
+            if (!profileButton.contains(e.target) && !dropdownMenu.contains(e.target)) {
+                dropdownMenu.classList.remove('show');
+            }
+        });
 
         if (authToken && userName) {
             // Kullanıcı giriş yapmış
-            if (loggedInMenu) loggedInMenu.classList.add('active');
-            if (loggedOutMenu) loggedOutMenu.classList.remove('active');
+            loggedInMenu.style.display = 'block';
+            loggedOutMenu.style.display = 'none';
         
             // Kullanıcı adının baş harflerini al
             const initials = userName.split(' ')
@@ -81,7 +98,7 @@
                 .substring(0, 2);
         
             // Avatar'lara baş harfleri yerleştir
-            avatarInitials.textContent = initials;
+            if (avatarInitials) avatarInitials.textContent = initials;
             if (smallAvatarInitials) smallAvatarInitials.textContent = initials;
         
             // Kullanıcı bilgilerini göster
@@ -95,28 +112,24 @@
             ];
             const colorIndex = userName.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0) % colors.length;
             const backgroundColor = colors[colorIndex];
-            avatarCircle.style.backgroundColor = backgroundColor;
             
+            if (avatarCircle) avatarCircle.style.backgroundColor = backgroundColor;
             const smallAvatar = document.querySelector('.avatar-circle.small');
             if (smallAvatar) smallAvatar.style.backgroundColor = backgroundColor;
             
             // Bildirim butonunu göster
-            if (notificationBtn) {
-                notificationBtn.style.display = 'block';
-            }
+            if (notificationBtn) notificationBtn.style.display = 'block';
         } else {
             // Kullanıcı giriş yapmamış
-            if (loggedInMenu) loggedInMenu.classList.remove('active');
-            if (loggedOutMenu) loggedOutMenu.classList.add('active');
+            if (loggedInMenu) loggedInMenu.style.display = 'none';
+            if (loggedOutMenu) loggedOutMenu.style.display = 'block';
             
             // Varsayılan görünüm
-            avatarInitials.textContent = 'G';
-            avatarCircle.style.backgroundColor = '#ccc';
+            if (avatarInitials) avatarInitials.textContent = 'G';
+            if (avatarCircle) avatarCircle.style.backgroundColor = '#ccc';
             
-            // Bildirim butonunu gizle (opsiyonel)
-            if (notificationBtn) {
-                notificationBtn.style.display = 'none';
-            }
+            // Bildirim butonunu gizle
+            if (notificationBtn) notificationBtn.style.display = 'none';
         }
     });
 </script> 
@@ -133,7 +146,15 @@
     position: relative;
     display: inline-block;
     margin-right: 24px;
-    padding-bottom: 20px;
+}
+
+.profile-button {
+    background: none;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
 }
 
 .dropdown-menu {
@@ -147,36 +168,11 @@
     z-index: 1000;
     padding: 0;
     border: 1px solid #eef0f2;
-    opacity: 0;
-    visibility: hidden;
-    transition: all 0.2s ease;
-    transform: translateY(-10px);
+    display: none;
 }
 
-.profile-dropdown::after {
-    content: '';
-    position: absolute;
-    top: 100%;
-    left: -50px;
-    right: -50px;
-    height: 20px;
-    background: transparent;
-}
-
-.dropdown-menu::before {
-    content: '';
-    position: absolute;
-    top: -20px;
-    left: -50px;
-    right: -50px;
-    height: 20px;
-    background: transparent;
-}
-
-.profile-dropdown:hover .dropdown-menu {
-    opacity: 1;
-    visibility: visible;
-    transform: translateY(0);
+.dropdown-menu.show {
+    display: block;
 }
 
 .dropdown-header {
@@ -337,15 +333,5 @@
 .notification-btn:hover {
     background-color: #f8f9fa;
     color: #FF6B00;
-}
-
-#loggedInMenu,
-#loggedOutMenu {
-    display: none;
-}
-
-#loggedInMenu.active,
-#loggedOutMenu.active {
-    display: block;
 }
 </style> 
