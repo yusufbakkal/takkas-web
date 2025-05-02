@@ -60,98 +60,6 @@
                 padding: 1rem;
             }
         }
-        
-        /* Takas Modelleri için stiller */
-        .trade-models-section {
-            margin-top: 3rem;
-            background-color: #f8f9fa;
-            border-radius: 12px;
-            padding: 2rem;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-            border: 1px solid #e9ecef;
-        }
-        
-        .trade-models-title {
-            font-size: 1.75rem;
-            color: #333;
-            margin-bottom: 1.5rem;
-            padding-bottom: 0.5rem;
-            border-bottom: 2px solid #4F46E5;
-            display: inline-block;
-        }
-        
-        .trade-models-description {
-            font-size: 1.1rem;
-            color: #555;
-            margin-bottom: 1.5rem;
-        }
-        
-        .trade-models-list {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 1.5rem;
-        }
-        
-        .trade-model-card {
-            background-color: white;
-            border-radius: 10px;
-            padding: 1.5rem;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-            border: 1px solid #e9ecef;
-            transition: all 0.3s ease;
-        }
-        
-        .trade-model-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-            border-color: #4F46E5;
-        }
-        
-        .trade-model-brand {
-            font-size: 1.3rem;
-            font-weight: 600;
-            color: #333;
-            margin-bottom: 0.5rem;
-        }
-        
-        .trade-model-info {
-            display: flex;
-            flex-direction: column;
-            gap: 0.75rem;
-        }
-        
-        .trade-model-detail {
-            display: flex;
-            justify-content: space-between;
-            padding-bottom: 0.5rem;
-            border-bottom: 1px solid #eee;
-        }
-        
-        .trade-model-label {
-            font-weight: 500;
-            color: #555;
-        }
-        
-        .trade-model-value {
-            font-weight: 600;
-            color: #333;
-        }
-        
-        .trade-model-year-range {
-            margin-top: 1rem;
-            background-color: #f0f4f8;
-            padding: 0.75rem 1rem;
-            border-radius: 6px;
-            text-align: center;
-            font-weight: 600;
-            color: #4F46E5;
-        }
-        
-        @media (max-width: 768px) {
-            .trade-models-list {
-                grid-template-columns: 1fr;
-            }
-        }
     </style>
 </head>
 <body>
@@ -173,17 +81,6 @@
             <h2 class="similar-cars-title">Benzer Araçlar</h2>
             <div class="car-grid">
                 <!-- Benzer araçlar dinamik olarak buraya eklenecek -->
-            </div>
-        </section>
-        
-        <!-- Takas Seçenekleri Bölümü -->
-        <section class="trade-models-section" id="tradeModelsContainer" style="display: none;">
-            <h2 class="trade-models-title">Takas Seçenekleri</h2>
-            <div class="trade-models-info">
-                <p class="trade-models-description">Bu araç için sahibinin kabul ettiği takas seçenekleri:</p>
-                <div class="trade-models-list" id="tradeModelsList">
-                    <!-- Takas modelleri dinamik olarak buraya eklenecek -->
-                </div>
             </div>
         </section>
     </main>
@@ -349,32 +246,6 @@
                     } catch (addressError) {
                         console.error('Adres bilgileri alınırken hata oluştu:', addressError);
                     }
-                }
-                
-                // Takas modelleri bilgilerini al
-                try {
-                    const tradeModelsUrl = `https://takkas-api.onrender.com/api/trade-models?vehicle_listing_id=${carId}`;
-                    console.log('Takas modelleri için API isteği:', tradeModelsUrl);
-                    
-                    const tradeModelsResponse = await fetch(tradeModelsUrl);
-                    
-                    if (tradeModelsResponse.ok) {
-                        const tradeModelsData = await tradeModelsResponse.json();
-                        console.log('Takas modelleri API yanıtı:', tradeModelsData);
-                        
-                        // Takas verilerini araba verilerine ekle
-                        if (tradeModelsData.data && Array.isArray(tradeModelsData.data)) {
-                            data.trade_models = tradeModelsData.data;
-                        } else if (Array.isArray(tradeModelsData)) {
-                            data.trade_models = tradeModelsData;
-                        } else if (tradeModelsData.data && tradeModelsData.data.trade_models) {
-                            data.trade_models = tradeModelsData.data.trade_models;
-                        }
-                    } else {
-                        console.error('Takas modelleri bilgileri alınamadı:', tradeModelsResponse.status);
-                    }
-                } catch (tradeModelsError) {
-                    console.error('Takas modelleri bilgileri alınırken hata oluştu:', tradeModelsError);
                 }
                 
                 return data;
@@ -865,89 +736,6 @@
             `;
 
             document.getElementById('carDetail').innerHTML = carDetailHtml;
-
-            // Takas modellerini göster
-            if (car.trade_models && Array.isArray(car.trade_models) && car.trade_models.length > 0) {
-                const tradeModelsContainer = document.getElementById('tradeModelsContainer');
-                const tradeModelsList = document.getElementById('tradeModelsList');
-                
-                // Trade model verilerini hazırla
-                let tradeModelsHtml = '';
-                
-                car.trade_models.forEach(tradeModelData => {
-                    // Trade model veri yapısına göre işlem yap
-                    const tradeModels = tradeModelData.trade_models || [tradeModelData];
-                    
-                    tradeModels.forEach(model => {
-                        // API yanıtındaki farklı veri yapılarını ele alabilmek için koruma
-                        const brandName = model.brand || model.vehicle_details?.brand || 'Belirtilmemiş';
-                        const modelName = model.model || model.vehicle_details?.model || 'Belirtilmemiş';
-                        const versionName = model.version || model.vehicle_details?.version || '';
-                        
-                        // Yıl aralığı verisini al (birden fazla yapıda gelebilir)
-                        const yearRanges = model.year_range || [];
-                        let yearRangeText = '';
-                        
-                        if (yearRanges.length > 0) {
-                            // Yıl aralığı dizideki ilk eleman olarak geldi
-                            if (yearRanges[0].start_year !== undefined && yearRanges[0].end_year !== undefined) {
-                                yearRangeText = `${yearRanges[0].start_year} - ${yearRanges[0].end_year}`;
-                            } else if (yearRanges[0].startYear !== undefined && yearRanges[0].endYear !== undefined) {
-                                yearRangeText = `${yearRanges[0].startYear} - ${yearRanges[0].endYear}`;
-                            }
-                        } else if (model.year_range_start && model.year_range_end) {
-                            // Yıl aralığı doğrudan nesnede
-                            yearRangeText = `${model.year_range_start} - ${model.year_range_end}`;
-                        }
-                        
-                        // Debug
-                        console.log('Takas modeli:', {
-                            brand: brandName,
-                            model: modelName,
-                            version: versionName,
-                            yearRange: yearRangeText,
-                            originalData: model
-                        });
-                        
-                        tradeModelsHtml += `
-                            <div class="trade-model-card">
-                                <h3 class="trade-model-brand">${brandName}</h3>
-                                <div class="trade-model-info">
-                                    <div class="trade-model-detail">
-                                        <span class="trade-model-label">Model:</span>
-                                        <span class="trade-model-value">${modelName}</span>
-                                    </div>
-                                    ${versionName ? `
-                                    <div class="trade-model-detail">
-                                        <span class="trade-model-label">Versiyon:</span>
-                                        <span class="trade-model-value">${versionName}</span>
-                                    </div>
-                                    ` : ''}
-                                </div>
-                                ${yearRangeText ? `
-                                <div class="trade-model-year-range">
-                                    <span>${yearRangeText} Yıl Aralığı</span>
-                                </div>
-                                ` : ''}
-                            </div>
-                        `;
-                    });
-                });
-                
-                // Eğer takas modeli varsa ama HTML oluşturulmadıysa
-                if (!tradeModelsHtml) {
-                    tradeModelsHtml = `<p class="no-trade-models">Takas modeli verilerinde sorun var. Lütfen ilan sahibiyle iletişime geçin.</p>`;
-                }
-                
-                // Takas modelleri içeriğini güncelle
-                tradeModelsList.innerHTML = tradeModelsHtml;
-                
-                // Takas modelleri bölümünü göster
-                tradeModelsContainer.style.display = 'block';
-            }
-            
-            // Benzin tipi göster
-            // ... (benzin tipi gösterim kodu burada kalacak)
 
             // Message popup HTML'i
             const messagePopupHtml = `
