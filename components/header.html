@@ -12,45 +12,43 @@
             <button class="notification-btn" aria-label="Bildirimleri göster">
                 <i class="fas fa-bell"></i>
             </button>
-            
-            <!-- Oturum açık kullanıcılar için profil dropdown -->
-            <div id="userLoggedIn" class="profile-dropdown">
+            <div class="profile-dropdown">
                 <a href="#" class="profile-link">
-                    <div class="avatar-circle" id="userAvatar">
+                <div class="avatar-circle" id="userAvatar">
                         <span class="avatar-initials">G</span>
                     </div>
                 </a>
                 <div class="dropdown-menu">
-                    <div class="dropdown-header">
-                        <div class="user-info">
-                            <div class="avatar-circle small">
-                                <span class="avatar-initials"></span>
-                            </div>
-                            <div class="user-details">
-                                <span class="user-name"></span>
-                                <span class="user-email"></span>
+                    <div id="loggedInMenu" style="display: none;">
+                        <div class="dropdown-header">
+                            <div class="user-info">
+                                <div class="avatar-circle small">
+                                    <span class="avatar-initials"></span>
+                                </div>
+                                <div class="user-details">
+                                    <span class="user-name"></span>
+                                    <span class="user-email"></span>
+                                </div>
                             </div>
                         </div>
+                        <div class="dropdown-items">
+                            <a href="settings.html" class="dropdown-item">
+                                <i class="fas fa-cog"></i>
+                                <span>Ayarlar</span>
+                                <i class="fas fa-chevron-right"></i>
+                            </a>
+                            <a href="/logout.html" class="dropdown-item logout">
+                                <i class="fas fa-sign-out-alt"></i>
+                                <span>Çıkış Yap</span>
+                            </a>
+                        </div>
                     </div>
-                    <div class="dropdown-items">
-                        <a href="settings.html" class="dropdown-item">
-                            <i class="fas fa-cog"></i>
-                            <span>Ayarlar</span>
-                            <i class="fas fa-chevron-right"></i>
-                        </a>
-                        <a href="/logout.html" class="dropdown-item logout">
-                            <i class="fas fa-sign-out-alt"></i>
-                            <span>Çıkış Yap</span>
+                    <div id="loggedOutMenu" style="display: none;">
+                        <a href="pages/signin.html" class="login-button">
+                            Giriş Yap / Hesap Oluştur
                         </a>
                     </div>
                 </div>
-            </div>
-            
-            <!-- Oturum açmamış kullanıcılar için login butonu -->
-            <div id="userLoggedOut">
-                <a href="pages/signin.html" class="login-button">
-                    Giriş Yap / Hesap Oluştur
-                </a>
             </div>
         </div>
     </div>
@@ -61,42 +59,34 @@
         const authToken = localStorage.getItem('authToken');
         const userName = localStorage.getItem('userName');
         const userEmail = localStorage.getItem('userEmail');
-        
-        // Varsayılan olarak profil simgesini göster, kullanıcı giriş yapmamışsa login butonu göster
-        const userLoggedIn = document.getElementById('userLoggedIn');
-        const userLoggedOut = document.getElementById('userLoggedOut');
-        
-        // Varsayılan durumu ayarla
-        if (!authToken || !userName) {
-            userLoggedIn.style.display = 'none';
-            userLoggedOut.style.display = 'block';
-        } else {
+        const loggedInMenu = document.getElementById('loggedInMenu');
+        const loggedOutMenu = document.getElementById('loggedOutMenu');
+        const avatarCircle = document.querySelector('.avatar-circle');
+        const avatarInitials = document.querySelector('.avatar-initials');
+        const smallAvatarInitials = document.querySelector('.avatar-circle.small .avatar-initials');
+        const userNameElement = document.querySelector('.user-name');
+        const userEmailElement = document.querySelector('.user-email');
+        const notificationBtn = document.querySelector('.notification-btn');
+
+        if (authToken && userName) {
             // Kullanıcı giriş yapmış
-            userLoggedIn.style.display = 'inline-block';
-            userLoggedOut.style.display = 'none';
-            
-            // Kullanıcı detaylarını göster
-            const avatarInitials = document.querySelector('#userLoggedIn .avatar-initials');
-            const smallAvatarInitials = document.querySelector('#userLoggedIn .avatar-circle.small .avatar-initials');
-            const userNameElement = document.querySelector('#userLoggedIn .user-name');
-            const userEmailElement = document.querySelector('#userLoggedIn .user-email');
-            const avatarCircle = document.querySelector('#userLoggedIn .avatar-circle');
-            const smallAvatar = document.querySelector('#userLoggedIn .avatar-circle.small');
-            
+            loggedInMenu.style.display = 'block';
+            loggedOutMenu.style.display = 'none';
+        
             // Kullanıcı adının baş harflerini al
             const initials = userName.split(' ')
                 .map(name => name.charAt(0))
                 .join('')
                 .toUpperCase()
                 .substring(0, 2);
-            
+        
             // Avatar'lara baş harfleri yerleştir
-            if (avatarInitials) avatarInitials.textContent = initials;
-            if (smallAvatarInitials) smallAvatarInitials.textContent = initials;
-            
+            avatarInitials.textContent = initials;
+            smallAvatarInitials.textContent = initials;
+        
             // Kullanıcı bilgilerini göster
-            if (userNameElement) userNameElement.textContent = userName;
-            if (userEmailElement) userEmailElement.textContent = userEmail;
+            userNameElement.textContent = userName;
+            userEmailElement.textContent = userEmail;
             
             // Avatar rengini ayarla
             const colors = [
@@ -105,8 +95,26 @@
             ];
             const colorIndex = userName.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0) % colors.length;
             const backgroundColor = colors[colorIndex];
-            if (avatarCircle) avatarCircle.style.backgroundColor = backgroundColor;
-            if (smallAvatar) smallAvatar.style.backgroundColor = backgroundColor;
+            avatarCircle.style.backgroundColor = backgroundColor;
+            document.querySelector('.avatar-circle.small').style.backgroundColor = backgroundColor;
+            
+            // Bildirim butonunu göster
+            if (notificationBtn) {
+                notificationBtn.style.display = 'block';
+            }
+        } else {
+            // Kullanıcı giriş yapmamış
+            loggedInMenu.style.display = 'none';
+            loggedOutMenu.style.display = 'block';
+            
+            // Varsayılan görünüm
+            avatarInitials.textContent = 'G';
+            avatarCircle.style.backgroundColor = '#ccc';
+            
+            // Bildirim butonunu gizle (opsiyonel)
+            if (notificationBtn) {
+                notificationBtn.style.display = 'none';
+            }
         }
     });
 </script> 
@@ -117,15 +125,6 @@
     align-items: center;
     gap: 24px;
     margin-left: auto;
-}
-
-/* Varsayılan görünürlük ayarları */
-#userLoggedIn {
-    display: inline-block;
-}
-
-#userLoggedOut {
-    display: none;
 }
 
 .profile-dropdown {
@@ -296,12 +295,13 @@
 
 .login-button {
     display: block;
-    padding: 10px 24px;
+    padding: 14px 24px;
     background-color: #FF6B00;
     color: white;
     text-align: center;
     text-decoration: none;
     border-radius: 8px;
+    margin: 16px;
     font-weight: 600;
     font-size: 14px;
     transition: all 0.2s ease;
@@ -340,9 +340,5 @@
 .notification-btn:hover {
     background-color: #f8f9fa;
     color: #FF6B00;
-}
-
-#userLoggedOut .login-button {
-    margin: 0;
 }
 </style> 
