@@ -5,7 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Çıkış Yapılıyor - TAKKAS</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <!-- Zdog kütüphanesi -->
+    <script src="https://unpkg.com/zdog@1/dist/zdog.dist.min.js"></script>
     <style>
         :root {
             --primary: #FF6B00;
@@ -89,16 +90,18 @@
             color: var(--text-light);
         }
         
-        #canvas-container {
-            width: 100px;
-            height: 100px;
+        .zdog-canvas {
+            width: 120px;
+            height: 120px;
             margin-bottom: 2rem;
+            cursor: move;
         }
     </style>
 </head>
 <body>
     <div class="logout-container">
-        <div id="canvas-container"></div>
+        <!-- Zdog animasyonu için canvas -->
+        <canvas class="zdog-canvas" id="zdogCanvas" width="240" height="240"></canvas>
         
         <h1 class="logout-title">Çıkış Yapılıyor</h1>
         <p class="logout-message">Oturumunuz kapatılıyor, lütfen bekleyin...</p>
@@ -117,8 +120,8 @@
             const progressPercentage = document.getElementById('progressPercentage');
             let progress = 0;
             
-            // 3D animasyonu başlat
-            setupCanvas();
+            // Zdog trefoil animasyonu başlat
+            setupZdogAnimation();
             
             // Oturum bilgilerini temizle
             clearUserSession();
@@ -159,49 +162,86 @@
                 }
             }
             
-            function setupCanvas() {
-                const container = document.getElementById('canvas-container');
-                const width = container.clientWidth;
-                const height = container.clientHeight;
-                
-                // Sahne ayarla
-                const scene = new THREE.Scene();
-                const camera = new THREE.PerspectiveCamera(50, width / height, 0.1, 1000);
-                camera.position.z = 5;
-                
-                // Renderer ayarla
-                const renderer = new THREE.WebGLRenderer({ 
-                    antialias: true, 
-                    alpha: true
-                });
-                renderer.setSize(width, height);
-                renderer.setClearColor(0x000000, 0);
-                container.appendChild(renderer.domElement);
-                
-                // Basit bir torus (donut şekli) oluştur
-                const geometry = new THREE.TorusGeometry(1.5, 0.5, 16, 50);
-                const material = new THREE.MeshBasicMaterial({ 
-                    color: 0xFF6B00,
-                    wireframe: true,
-                    transparent: true,
-                    opacity: 0.8
+            function setupZdogAnimation() {
+                // Zdog Illustration oluştur
+                const illo = new Zdog.Illustration({
+                    element: '#zdogCanvas',
+                    dragRotate: true,
+                    zoom: 3,
+                    onDragStart: function() {
+                        // Sürükleme başladığında otomatik dönüşü devre dışı bırak
+                        this.dragRotate = true;
+                        isSpinning = false;
+                    },
+                    onResize: function(width, height) {
+                        this.zoom = Math.min(width, height) / 250;
+                    }
                 });
                 
-                const torus = new THREE.Mesh(geometry, material);
-                scene.add(torus);
+                // Renk ayarları
+                const colors = {
+                    orange: '#FF6B00',
+                    orangeLight: '#FF8A3D',
+                    orangeDark: '#E55A00',
+                };
                 
-                // Işık ekle
-                const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
-                scene.add(ambientLight);
+                // Trefoil düğüm parametreleri
+                const TAU = Math.PI * 2;
+                const loops = 4; // Kaç düğüm olacak
+                const segmentsPerLoop = 18; // Düğüm başına segment sayısı
+                const totalSegments = loops * segmentsPerLoop;
                 
-                // Animasyon
+                // Trefoil düğüm modeli oluştur
+                const trefoil = new Zdog.Shape({
+                    addTo: illo,
+                    path: [],
+                    closed: true,
+                    stroke: 10,
+                    color: colors.orange,
+                });
+                
+                // Trefoil düğüm için parametrik eğri oluştur
+                for (let i = 0; i < totalSegments; i++) {
+                    const t = i / totalSegments;
+                    const angle = t * TAU * loops;
+                    
+                    // Parametrik trefoil düğüm denklemi
+                    const r = 30;
+                    const x = r * (Math.sin(angle) + 2 * Math.sin(2 * angle));
+                    const y = r * (Math.cos(angle) - 2 * Math.cos(2 * angle));
+                    const z = r * -Math.sin(3 * angle);
+                    
+                    trefoil.path.push({ x, y, z });
+                }
+                
+                // Renk geçişi için yardımcı şekiller (küçük toplar) ekle
+                trefoil.path.forEach((point, i) => {
+                    // Her 3 noktada bir top ekle (performans için)
+                    if (i % 3 === 0) {
+                        const t = i / totalSegments;
+                        const hue = Math.floor(t * 30) + 20; // 20-50 arası (turuncu tonları)
+                        const lightness = 50 + Math.sin(t * TAU) * 10; // 40-60 arası
+                        
+                        new Zdog.Shape({
+                            addTo: illo,
+                            translate: point,
+                            stroke: 3,
+                            color: `hsl(${hue}, 100%, ${lightness}%)`,
+                        });
+                    }
+                });
+                
+                // Otomatik döndürme animasyonu
+                let isSpinning = true;
+                let rotateSpeed = 0.01;
+                
                 function animate() {
+                    if (isSpinning) {
+                        illo.rotate.y += rotateSpeed;
+                        illo.rotate.x += rotateSpeed * 0.5;
+                    }
+                    illo.updateRenderGraph();
                     requestAnimationFrame(animate);
-                    
-                    torus.rotation.x += 0.01;
-                    torus.rotation.y += 0.01;
-                    
-                    renderer.render(scene, camera);
                 }
                 
                 animate();
