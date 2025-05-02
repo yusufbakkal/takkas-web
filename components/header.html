@@ -12,43 +12,45 @@
             <button class="notification-btn" aria-label="Bildirimleri göster">
                 <i class="fas fa-bell"></i>
             </button>
-            <div class="profile-dropdown">
+            
+            <!-- Oturum açık kullanıcılar için profil dropdown -->
+            <div id="userLoggedIn" class="profile-dropdown" style="display: none;">
                 <a href="#" class="profile-link">
-                <div class="avatar-circle" id="userAvatar">
+                    <div class="avatar-circle" id="userAvatar">
                         <span class="avatar-initials">G</span>
                     </div>
                 </a>
                 <div class="dropdown-menu">
-                    <div id="loggedInMenu">
-                        <div class="dropdown-header">
-                            <div class="user-info">
-                                <div class="avatar-circle small">
-                                    <span class="avatar-initials"></span>
-                                </div>
-                                <div class="user-details">
-                                    <span class="user-name"></span>
-                                    <span class="user-email"></span>
-                                </div>
+                    <div class="dropdown-header">
+                        <div class="user-info">
+                            <div class="avatar-circle small">
+                                <span class="avatar-initials"></span>
+                            </div>
+                            <div class="user-details">
+                                <span class="user-name"></span>
+                                <span class="user-email"></span>
                             </div>
                         </div>
-                        <div class="dropdown-items">
-                            <a href="settings.html" class="dropdown-item">
-                                <i class="fas fa-cog"></i>
-                                <span>Ayarlar</span>
-                                <i class="fas fa-chevron-right"></i>
-                            </a>
-                            <a href="/logout.html" class="dropdown-item logout">
-                                <i class="fas fa-sign-out-alt"></i>
-                                <span>Çıkış Yap</span>
-                            </a>
-                        </div>
                     </div>
-                    <div id="loggedOutMenu">
-                        <a href="pages/signin.html" class="login-button">
-                            Giriş Yap / Hesap Oluştur
+                    <div class="dropdown-items">
+                        <a href="settings.html" class="dropdown-item">
+                            <i class="fas fa-cog"></i>
+                            <span>Ayarlar</span>
+                            <i class="fas fa-chevron-right"></i>
+                        </a>
+                        <a href="/logout.html" class="dropdown-item logout">
+                            <i class="fas fa-sign-out-alt"></i>
+                            <span>Çıkış Yap</span>
                         </a>
                     </div>
                 </div>
+            </div>
+            
+            <!-- Oturum açmamış kullanıcılar için login butonu -->
+            <div id="userLoggedOut" style="display: none;">
+                <a href="pages/signin.html" class="login-button">
+                    Giriş Yap / Hesap Oluştur
+                </a>
             </div>
         </div>
     </div>
@@ -59,30 +61,35 @@
         const authToken = localStorage.getItem('authToken');
         const userName = localStorage.getItem('userName');
         const userEmail = localStorage.getItem('userEmail');
-        const loggedInMenu = document.getElementById('loggedInMenu');
-        const loggedOutMenu = document.getElementById('loggedOutMenu');
-        const avatarCircle = document.querySelector('.avatar-circle');
-        const avatarInitials = document.querySelector('.avatar-initials');
-        const smallAvatarInitials = document.querySelector('.avatar-circle.small .avatar-initials');
-        const userNameElement = document.querySelector('.user-name');
-        const userEmailElement = document.querySelector('.user-email');
-
+        
+        // Oturum durumuna göre arayüz elementleri
+        const userLoggedIn = document.getElementById('userLoggedIn');
+        const userLoggedOut = document.getElementById('userLoggedOut');
+        
         if (authToken && userName) {
             // Kullanıcı giriş yapmış
-            if (loggedInMenu) loggedInMenu.style.display = 'block';
-            if (loggedOutMenu) loggedOutMenu.style.display = 'none';
-        
+            userLoggedIn.style.display = 'inline-block';
+            userLoggedOut.style.display = 'none';
+            
+            // Kullanıcı detaylarını göster
+            const avatarInitials = document.querySelector('#userLoggedIn .avatar-initials');
+            const smallAvatarInitials = document.querySelector('#userLoggedIn .avatar-circle.small .avatar-initials');
+            const userNameElement = document.querySelector('#userLoggedIn .user-name');
+            const userEmailElement = document.querySelector('#userLoggedIn .user-email');
+            const avatarCircle = document.querySelector('#userLoggedIn .avatar-circle');
+            const smallAvatar = document.querySelector('#userLoggedIn .avatar-circle.small');
+            
             // Kullanıcı adının baş harflerini al
             const initials = userName.split(' ')
                 .map(name => name.charAt(0))
                 .join('')
                 .toUpperCase()
                 .substring(0, 2);
-        
+            
             // Avatar'lara baş harfleri yerleştir
             if (avatarInitials) avatarInitials.textContent = initials;
             if (smallAvatarInitials) smallAvatarInitials.textContent = initials;
-        
+            
             // Kullanıcı bilgilerini göster
             if (userNameElement) userNameElement.textContent = userName;
             if (userEmailElement) userEmailElement.textContent = userEmail;
@@ -95,25 +102,11 @@
             const colorIndex = userName.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0) % colors.length;
             const backgroundColor = colors[colorIndex];
             if (avatarCircle) avatarCircle.style.backgroundColor = backgroundColor;
-            const smallAvatar = document.querySelector('.avatar-circle.small');
             if (smallAvatar) smallAvatar.style.backgroundColor = backgroundColor;
         } else {
             // Kullanıcı giriş yapmamış
-            if (loggedInMenu) loggedInMenu.style.display = 'none';
-            if (loggedOutMenu) loggedOutMenu.style.display = 'block';
-            
-            // Varsayılan görünüm
-            if (avatarInitials) avatarInitials.textContent = 'G';
-            if (avatarCircle) avatarCircle.style.backgroundColor = '#ccc';
-        }
-
-        // Logout butonuna özel işleyici ekle
-        const logoutButton = document.querySelector('.logout');
-        if (logoutButton) {
-            logoutButton.addEventListener('click', function(e) {
-                e.preventDefault();
-                window.location.href = '/logout.html';
-            });
+            userLoggedIn.style.display = 'none';
+            userLoggedOut.style.display = 'inline-block';
         }
     });
 </script> 
@@ -294,13 +287,12 @@
 
 .login-button {
     display: block;
-    padding: 14px 24px;
+    padding: 10px 24px;
     background-color: #FF6B00;
     color: white;
     text-align: center;
     text-decoration: none;
     border-radius: 8px;
-    margin: 16px;
     font-weight: 600;
     font-size: 14px;
     transition: all 0.2s ease;
@@ -339,5 +331,9 @@
 .notification-btn:hover {
     background-color: #f8f9fa;
     color: #FF6B00;
+}
+
+#userLoggedOut .login-button {
+    margin: 0;
 }
 </style> 
