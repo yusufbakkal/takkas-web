@@ -101,6 +101,42 @@
         </div>
     </div>
 
+    <!-- Message popup -->
+    <div id="messagePopup" class="message-popup">
+        <div class="message-popup-content">
+            <div class="message-popup-header">
+                <h3>Mesaj gönderin</h3>
+                <button class="close-popup">&times;</button>
+            </div>
+            <div class="message-warning">
+                <i class="fas fa-info-circle"></i>
+                <span>Güvenliğiniz için kaparo göndermeyin ya da benzeri hiçbir ön ödeme yapmayın.</span>
+            </div>
+            <div class="message-user-info">
+                <div class="message-user-avatar">
+                    <i class="fas fa-user"></i>
+                </div>
+                <div class="message-user-details">
+                    <div class="message-user-name">${fromWhere}</div>
+                    <div class="message-user-type">Platinum Üye</div>
+                </div>
+            </div>
+            <div class="message-quick-buttons">
+                <button type="button" class="quick-message-btn">Hala satılık mı?</button>
+                <button type="button" class="quick-message-btn">Son fiyat nedir?</button>
+                <button type="button" class="quick-message-btn">Hasar durumu nedir?</button>
+                <button type="button" class="quick-message-btn">Takas düşünür müsünüz?</button>
+            </div>
+            <form id="messageForm">
+                <div class="form-group">
+                    <textarea id="messageText" rows="4" placeholder="Mesaj yazın" required></textarea>
+                    <div class="character-count">En az 10 karakter kullanmalısın · 8000 karakter kaldı</div>
+                </div>
+                <button type="submit" class="send-message-button">Gönder</button>
+            </form>
+        </div>
+    </div>
+
     <!-- JavaScript -->
     <script>
         // Bileşenleri yükle
@@ -392,6 +428,9 @@
                                 </div>
                             </div>
                             <button class="contact-button">İlan Sahibini Ara</button>
+                            <a href="javascript:void(0);" class="message-link">
+                                <i class="fas fa-envelope"></i> Mesaj Gönder
+                            </a>
                         </div>
                     </div>
                 </div>
@@ -420,6 +459,126 @@
             `;
 
             document.getElementById('propertyDetail').innerHTML = propertyDetailHtml;
+
+            // Message popup HTML'i
+            const messagePopupHtml = `
+                <div id="messagePopup" class="message-popup">
+                    <div class="message-popup-content">
+                        <div class="message-popup-header">
+                            <h3>Mesaj gönderin</h3>
+                            <button class="close-popup">&times;</button>
+                        </div>
+                        <div class="message-warning">
+                            <i class="fas fa-info-circle"></i>
+                            <span>Güvenliğiniz için kaparo göndermeyin ya da benzeri hiçbir ön ödeme yapmayın.</span>
+                        </div>
+                        <div class="message-user-info">
+                            <div class="message-user-avatar">
+                                <i class="fas fa-user"></i>
+                            </div>
+                            <div class="message-user-details">
+                                <div class="message-user-name">${fromWhere}</div>
+                                <div class="message-user-type">Platinum Üye</div>
+                            </div>
+                        </div>
+                        <div class="message-quick-buttons">
+                            <button type="button" class="quick-message-btn">Hala satılık mı?</button>
+                            <button type="button" class="quick-message-btn">Son fiyat nedir?</button>
+                            <button type="button" class="quick-message-btn">Hasar durumu nedir?</button>
+                            <button type="button" class="quick-message-btn">Takas düşünür müsünüz?</button>
+                        </div>
+                        <form id="messageForm">
+                            <div class="form-group">
+                                <textarea id="messageText" rows="4" placeholder="Mesaj yazın" required></textarea>
+                                <div class="character-count">En az 10 karakter kullanmalısın · 8000 karakter kaldı</div>
+                            </div>
+                            <button type="submit" class="send-message-button">Gönder</button>
+                        </form>
+                    </div>
+                </div>
+            `;
+
+            // Message popup'ı body'e ekle
+            document.body.insertAdjacentHTML('beforeend', messagePopupHtml);
+
+            // Message popup için değişkenler ve fonksiyonlar
+            const messagePopup = document.getElementById('messagePopup');
+            const messageLink = document.querySelector('.message-link');
+            const closePopup = document.querySelector('.close-popup');
+            const messageForm = document.getElementById('messageForm');
+            const messageTextarea = document.getElementById('messageText');
+            const characterCount = document.querySelector('.character-count');
+            const quickButtons = document.querySelectorAll('.quick-message-btn');
+
+            // Karakter sayacı fonksiyonu
+            messageTextarea.addEventListener('input', function() {
+                const remaining = 8000 - this.value.length;
+                characterCount.textContent = `En az 10 karakter kullanmalısın · ${remaining} karakter kaldı`;
+                
+                // 10 karakterden az ise submit butonunu devre dışı bırak
+                const submitButton = document.querySelector('.send-message-button');
+                if (this.value.length < 10) {
+                    submitButton.disabled = true;
+                    submitButton.style.opacity = '0.5';
+                } else {
+                    submitButton.disabled = false;
+                    submitButton.style.opacity = '1';
+                }
+            });
+
+            // Hızlı mesaj butonları
+            quickButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    messageTextarea.value = this.textContent;
+                    messageTextarea.dispatchEvent(new Event('input'));
+                });
+            });
+
+            // Mesaj butonuna tıklandığında popup'ı göster
+            messageLink.addEventListener('click', () => {
+                messagePopup.style.display = 'flex';
+                document.body.style.overflow = 'hidden';
+            });
+
+            // Popup'ı kapatma işlemleri
+            closePopup.addEventListener('click', () => {
+                messagePopup.style.display = 'none';
+                document.body.style.overflow = 'auto';
+            });
+
+            // Popup dışına tıklandığında kapat
+            messagePopup.addEventListener('click', (e) => {
+                if (e.target === messagePopup) {
+                    messagePopup.style.display = 'none';
+                    document.body.style.overflow = 'auto';
+                }
+            });
+
+            // Form gönderildiğinde
+            messageForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                
+                // Form verilerini al
+                const message = document.getElementById('messageText').value;
+                
+                // API'ye gönderilecek verileri hazırla
+                const messageData = {
+                    message,
+                    property_id: property.id,
+                    user_id: property.user_id
+                };
+                
+                // Burada API entegrasyonu yapılabilir
+                console.log('Mesaj verileri:', messageData);
+                
+                // Başarılı mesaj
+                alert('Mesajınız başarıyla gönderildi!');
+                
+                // Formu temizle ve kapat
+                messageForm.reset();
+                messagePopup.style.display = 'none';
+                document.body.style.overflow = 'auto';
+            });
 
             // Görsel galerisi için değişkenler
             let currentImageIndex = 0;
