@@ -32,32 +32,6 @@
                             </div>
                         </div>
                         <div class="dropdown-items">
-                            <a href="siparislerim.html" class="dropdown-item">
-                                <i class="fas fa-box"></i>
-                                <span>Siparişlerim</span>
-                                <i class="fas fa-chevron-right"></i>
-                            </a>
-                            <a href="mesajlarim.html" class="dropdown-item">
-                                <i class="fas fa-envelope"></i>
-                                <span>Mesajlarım</span>
-                                <i class="fas fa-chevron-right"></i>
-                            </a>
-                            <a href="degerlendirmelerim.html" class="dropdown-item">
-                                <i class="fas fa-star"></i>
-                                <span>Değerlendirmelerim</span>
-                                <i class="fas fa-chevron-right"></i>
-                            </a>
-                            <a href="listelerim.html" class="dropdown-item">
-                                <i class="fas fa-heart"></i>
-                                <span>Listelerim</span>
-                                <i class="fas fa-chevron-right"></i>
-                            </a>
-                            <a href="hediye-ceklerim.html" class="dropdown-item">
-                                <i class="fas fa-gift"></i>
-                                <span>Hediye Çeklerim</span>
-                                <i class="fas fa-chevron-right"></i>
-                            </a>
-                            <div class="dropdown-divider"></div>
                             <a href="settings.html" class="dropdown-item">
                                 <i class="fas fa-cog"></i>
                                 <span>Ayarlar</span>
@@ -130,11 +104,11 @@
             loggedInMenu.style.display = 'block';
             loggedOutMenu.style.display = 'none';
         
-        // Kullanıcı adının baş harflerini al
-        const initials = userName.split(' ')
-            .map(name => name.charAt(0))
-            .join('')
-            .toUpperCase()
+            // Kullanıcı adının baş harflerini al
+            const initials = userName.split(' ')
+                .map(name => name.charAt(0))
+                .join('')
+                .toUpperCase()
                 .substring(0, 2);
         
             // Avatar'lara baş harfleri yerleştir
@@ -146,12 +120,12 @@
             userEmailElement.textContent = userEmail;
             
             // Avatar rengini ayarla
-        const colors = [
-            '#FF6370', '#4CAF50', '#2196F3', '#9C27B0', '#FF9800', 
-            '#795548', '#607D8B', '#3F51B5', '#009688', '#FFC107'
-        ];
-        const colorIndex = userName.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0) % colors.length;
-        const backgroundColor = colors[colorIndex];
+            const colors = [
+                '#FF6370', '#4CAF50', '#2196F3', '#9C27B0', '#FF9800', 
+                '#795548', '#607D8B', '#3F51B5', '#009688', '#FFC107'
+            ];
+            const colorIndex = userName.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0) % colors.length;
+            const backgroundColor = colors[colorIndex];
             avatarCircle.style.backgroundColor = backgroundColor;
             document.querySelector('.avatar-circle.small').style.backgroundColor = backgroundColor;
         } else {
@@ -187,7 +161,7 @@
     right: -24px;
     top: 45px;
     background-color: white;
-    min-width: 300px;
+    min-width: 250px;
     box-shadow: 0 4px 20px rgba(0,0,0,0.15);
     border-radius: 12px;
     z-index: 1000;
@@ -360,7 +334,6 @@
 }
 
 .logout {
-    border-top: 1px solid #eef0f2;
     color: #FF4444;
     margin-top: 8px;
 }
@@ -387,29 +360,6 @@
 
 .notification-btn:hover {
     background-color: #f8f9fa;
-    color: #FF6B00;
-}
-
-.dropdown-divider {
-    height: 1px;
-    background-color: #eef0f2;
-    margin: 8px 0;
-}
-
-.dropdown-item.settings {
-    color: #1a1d1f;
-}
-
-.dropdown-item.settings:hover {
-    background-color: #f8f9fa;
-    color: #FF6B00;
-}
-
-.dropdown-item.settings i {
-    color: #6f767e;
-}
-
-.dropdown-item.settings:hover i {
     color: #FF6B00;
 }
 </style> 
