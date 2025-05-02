@@ -37,7 +37,7 @@
                                 <span>Ayarlar</span>
                                 <i class="fas fa-chevron-right"></i>
                             </a>
-                            <a href="#" onclick="logout()" class="dropdown-item logout">
+                            <a href="/logout.html" class="dropdown-item logout">
                                 <i class="fas fa-sign-out-alt"></i>
                                 <span>Çıkış Yap</span>
                             </a>
@@ -67,37 +67,24 @@
         const userNameElement = document.querySelector('.user-name');
         const userEmailElement = document.querySelector('.user-email');
 
-        // Global scope'a logout fonksiyonunu ekle
-        window.logout = async function() {
-            try {
-                const token = localStorage.getItem('authToken');
-                if (!token) {
-                    alert('Oturum bulunamadı');
-                    return;
-                }
-
-                const response = await fetch('https://takkas-api.onrender.com/api/auth/logout', {
-                    method: 'POST',
-                    headers: {
-                        'Authorization': `Bearer ${token}`,
-                        'Content-Type': 'application/json'
-                    }
-                });
-
-                // LocalStorage'ı temizle
-                localStorage.clear();
+        // Logout butonuna özel işleyici ekle
+        const logoutButton = document.querySelector('.logout');
+        if (logoutButton) {
+            logoutButton.addEventListener('click', function(e) {
+                e.preventDefault();
                 
-                // Başarılı mesajı göster
+                // Çıkış yap işlemini gerçekleştir
+                localStorage.removeItem('authToken');
+                localStorage.removeItem('userName');
+                localStorage.removeItem('userEmail');
+                localStorage.removeItem('userId');
+                
                 alert('Başarıyla çıkış yapıldı');
                 
-                // Sayfayı yenile
-                window.location.reload();
-                
-            } catch (error) {
-                console.error('Çıkış hatası:', error);
-                alert('Çıkış yapılırken bir hata oluştu');
-            }
-        };
+                // Ana sayfaya yönlendir
+                window.location.href = '/index.html';
+            });
+        }
 
         if (authToken && userName) {
             // Kullanıcı giriş yapmış
