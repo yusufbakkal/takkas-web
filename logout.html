@@ -31,6 +31,11 @@
             overflow: hidden;
         }
         
+        .logout-container.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
         .logout-container::before {
             content: "";
             position: absolute;
@@ -53,6 +58,10 @@
             opacity: 0;
         }
         
+        h1.visible {
+            opacity: 1;
+        }
+        
         h1::after {
             content: "";
             position: absolute;
@@ -72,6 +81,10 @@
             line-height: 1.6;
             animation: fadeIn 1s ease 0.5s forwards;
             opacity: 0;
+        }
+        
+        p.visible {
+            opacity: 1;
         }
         
         .loader-container {
@@ -119,6 +132,61 @@
             animation: fadeUp 0.5s ease 2s forwards;
         }
         
+        /* İlerleme çubuğu stilleri */
+        .progress-container {
+            width: 100%;
+            height: 8px;
+            background-color: rgba(79, 70, 229, 0.1);
+            border-radius: 10px;
+            margin-top: 20px;
+            overflow: hidden;
+            opacity: 0;
+            transform: translateY(10px);
+            transition: all 0.3s ease;
+        }
+        
+        .progress-bar {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, #4F46E5, #8e85ff);
+            border-radius: 10px;
+            transition: width 0.1s linear;
+        }
+        
+        /* Konfeti efekti */
+        .confetti {
+            position: fixed;
+            width: 10px;
+            height: 10px;
+            background-color: #4F46E5;
+            border-radius: 2px;
+            animation: confetti-fall 3s ease-in-out forwards;
+            z-index: 1000;
+        }
+        
+        /* Dalgalanma Efekti Stilleri */
+        .ripple-container {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 0;
+            height: 0;
+            z-index: -1;
+        }
+        
+        .ripple {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 0px;
+            height: 0px;
+            border: 2px solid rgba(79, 70, 229, 0.15);
+            border-radius: 50%;
+            animation: ripple 4s ease-out infinite;
+        }
+        
         @keyframes spin {
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
@@ -143,6 +211,30 @@
             0% { transform: translate(-50%, -50%) scale(0); opacity: 0; }
             60% { transform: translate(-50%, -50%) scale(1.2); opacity: 1; }
             100% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+        }
+        
+        @keyframes confetti-fall {
+            0% { 
+                transform: translateY(-10px) rotate(0deg); 
+                opacity: 1; 
+            }
+            100% { 
+                transform: translateY(100vh) rotate(720deg); 
+                opacity: 0; 
+            }
+        }
+        
+        @keyframes ripple {
+            0% {
+                width: 0px;
+                height: 0px;
+                opacity: 0.8;
+            }
+            100% {
+                width: 900px;
+                height: 900px;
+                opacity: 0;
+            }
         }
         
         .particles {
@@ -183,6 +275,9 @@
         </div>
         <h1>Çıkış Yapılıyor</h1>
         <p>Oturumunuz güvenli bir şekilde kapatılıyor...</p>
+        <div id="progressBarContainer" class="progress-container">
+            <div id="progressBar" class="progress-bar"></div>
+        </div>
         <div class="redirecting" id="redirecting">Ana Sayfaya Yönlendiriliyorsunuz...</div>
     </div>
 
@@ -220,138 +315,138 @@
             }
         }
 
-        // Fare hareketi ile parçacıkları etkileşimli yap
-        function initializeParticleInteraction() {
-            const particles = document.querySelectorAll('.particle');
+        // Yaşıl hare efekti oluştur
+        function createRippleEffect() {
+            const rippleContainer = document.createElement('div');
+            rippleContainer.classList.add('ripple-container');
+            document.body.appendChild(rippleContainer);
             
-            document.addEventListener('mousemove', function(e) {
-                const mouseX = e.clientX;
-                const mouseY = e.clientY;
-                
-                particles.forEach(particle => {
-                    const particleRect = particle.getBoundingClientRect();
-                    const particleX = particleRect.left + particleRect.width / 2;
-                    const particleY = particleRect.top + particleRect.height / 2;
-                    
-                    const distanceX = mouseX - particleX;
-                    const distanceY = mouseY - particleY;
-                    const distance = Math.sqrt(distanceX * distanceX + distanceY * distanceY);
-                    
-                    if (distance < 150) {
-                        const angle = Math.atan2(distanceY, distanceX);
-                        const strength = (150 - distance) / 15;
-                        
-                        // Fare imlecinden kaçma efekti
-                        particle.style.transform = `translate(${-Math.cos(angle) * strength}px, ${-Math.sin(angle) * strength}px)`;
-                    } else {
-                        particle.style.transform = '';
-                    }
-                });
-            });
+            for (let i = 0; i < 3; i++) {
+                const ripple = document.createElement('div');
+                ripple.classList.add('ripple');
+                ripple.style.animationDelay = `${i * 1.5}s`;
+                rippleContainer.appendChild(ripple);
+            }
         }
-
-        // Sayfa geçişi animasyonu
-        function initializePageTransition() {
-            // Çıkış işlemi başladığında
-            const logoutContainer = document.querySelector('.logout-container');
-            logoutContainer.style.transform = 'translateY(0)';
-            logoutContainer.style.opacity = '1';
+        
+        // İlerleme barı animasyonu
+        function animateProgressBar() {
+            const progressBar = document.getElementById('progressBar');
+            if (!progressBar) return;
             
-            // Sayfa yönlendirmesi öncesi animasyon
-            const redirectToHomePage = () => {
-                // Fade out animasyonu
-                logoutContainer.style.transition = 'transform 0.5s ease, opacity 0.5s ease';
-                logoutContainer.style.transform = 'translateY(-30px)';
-                logoutContainer.style.opacity = '0';
-                
-                // Sayfa geçişini simüle et
-                setTimeout(() => {
-                    document.body.style.transition = 'opacity 0.4s ease';
-                    document.body.style.opacity = '0';
-                    setTimeout(() => {
-                        window.location.href = 'index.html';
-                    }, 400);
-                }, 500);
-            };
-            
-            // Global değişkene ekleyelim
-            window.redirectToHomePage = redirectToHomePage;
-        }
-
-        // Yükleme animasyonu tamamlandıktan sonra onay işareti
-        function animateCheckmark() {
-            const loader = document.querySelector('.circle-loader');
-            const checkmark = document.getElementById('checkmark');
-            
-            loader.style.animation = 'none';
-            loader.style.borderColor = 'rgba(79, 70, 229, 0.1)';
-            loader.style.borderLeftColor = 'rgba(79, 70, 229, 0.1)';
-            loader.style.borderTopColor = 'rgba(79, 70, 229, 0.1)';
-            
-            // Onay işaretini gösterirken hafif titreşim efekti ekle
-            checkmark.style.animation = 'checkmarkAppear 0.5s cubic-bezier(0.68, -0.55, 0.27, 1.55) forwards';
-            
-            // Onay işareti tamamlandıktan sonra hafif bir salınım ekle
-            setTimeout(() => {
-                checkmark.style.animation = 'none';
-                checkmark.style.transform = 'translate(-50%, -50%) scale(1)';
-                checkmark.style.opacity = '1';
-                
-                // Salınım animasyonu
-                let angle = 0;
-                const swing = setInterval(() => {
-                    angle += 0.1;
-                    const swingScale = 1 + Math.sin(angle) * 0.03; // %3 ölçek salınımı
-                    checkmark.style.transform = `translate(-50%, -50%) scale(${swingScale})`;
-                    
-                    if (angle > 6) {
-                        clearInterval(swing);
-                        checkmark.style.transform = 'translate(-50%, -50%) scale(1)';
-                    }
-                }, 20);
-            }, 500);
-        }
-
-        // Kullanıcı bilgilendirme mesajları
-        function updateStatusMessages() {
-            const messages = [
-                { text: "Oturumunuz güvenli bir şekilde kapatılıyor...", delay: 0 },
-                { text: "Yerel depolama temizleniyor...", delay: 800 },
-                { text: "Sunucu bağlantısı sonlandırılıyor...", delay: 1600 },
-                { text: "Çıkış işlemi tamamlandı!", delay: 2400 }
-            ];
-            
-            const statusText = document.querySelector('p');
-            let currentMessageIndex = 0;
-            
-            const messageInterval = setInterval(() => {
-                currentMessageIndex++;
-                
-                if (currentMessageIndex < messages.length) {
-                    // Mevcut mesajı kaybet, yenisini göster
-                    statusText.style.opacity = '0';
-                    statusText.style.transform = 'translateY(10px)';
-                    
-                    setTimeout(() => {
-                        statusText.textContent = messages[currentMessageIndex].text;
-                        statusText.style.opacity = '1';
-                        statusText.style.transform = 'translateY(0)';
-                    }, 300);
+            let width = 0;
+            const interval = setInterval(() => {
+                if (width >= 100) {
+                    clearInterval(interval);
                 } else {
-                    clearInterval(messageInterval);
+                    width += 1;
+                    progressBar.style.width = width + '%';
                 }
-            }, 800);
+            }, 30);
+        }
+        
+        // Animasyonları sekans halinde çalıştır
+        function runAnimationSequence() {
+            const container = document.querySelector('.logout-container');
+            const h1 = document.querySelector('h1');
+            const p = document.querySelector('p');
+            const redirectingText = document.getElementById('redirecting');
+            
+            // Daha yumuşak geçişler için GSAP benzeri zamanlama
+            setTimeout(() => container.classList.add('visible'), 100);
+            setTimeout(() => h1.classList.add('visible'), 600);
+            setTimeout(() => p.classList.add('visible'), 900);
+            
+            // Animasyon tamamlandıktan sonra onay işareti göster
+            setTimeout(() => {
+                const loader = document.querySelector('.circle-loader');
+                const checkmark = document.getElementById('checkmark');
+                
+                loader.style.animation = 'none';
+                loader.style.borderColor = 'rgba(79, 70, 229, 0.1)';
+                loader.style.borderLeftColor = 'rgba(79, 70, 229, 0.1)';
+                loader.style.borderTopColor = 'rgba(79, 70, 229, 0.1)';
+                
+                checkmark.style.animation = 'checkmarkAppear 0.5s cubic-bezier(0.68, -0.55, 0.27, 1.55) forwards';
+                playSuccessSound();
+                
+                // İlerleme çubuğunu göster
+                setTimeout(() => {
+                    document.getElementById('progressBarContainer').style.opacity = '1';
+                    document.getElementById('progressBarContainer').style.transform = 'translateY(0)';
+                    animateProgressBar();
+                }, 600);
+                
+                // Konfeti efekti göster
+                setTimeout(() => {
+                    showConfetti();
+                }, 300);
+                
+                // Kısa bir gecikme ile ana sayfaya yönlendir
+                setTimeout(() => {
+                    window.location.href = 'index.html';
+                }, 3500);
+            }, 1800);
+            
+            // Redirecting yazısını göster
+            setTimeout(() => {
+                redirectingText.style.opacity = '1';
+                redirectingText.style.transform = 'translateY(0)';
+            }, 2500);
+        }
+        
+        // Konfeti efektini göster
+        function showConfetti() {
+            const container = document.querySelector('.logout-container');
+            
+            for (let i = 0; i < 50; i++) {
+                const confetti = document.createElement('div');
+                confetti.classList.add('confetti');
+                
+                // Rastgele renk
+                const colors = ['#4F46E5', '#8e85ff', '#FF6B00', '#00CCBB', '#9333EA'];
+                const colorIndex = Math.floor(Math.random() * colors.length);
+                confetti.style.backgroundColor = colors[colorIndex];
+                
+                // Rastgele boyut
+                const size = Math.random() * 8 + 5;
+                confetti.style.width = `${size}px`;
+                confetti.style.height = `${size}px`;
+                
+                // Rastgele pozisyon
+                confetti.style.left = `${Math.random() * 100}%`;
+                confetti.style.top = `-10px`;
+                
+                // Rastgele animasyon
+                confetti.style.animationDuration = `${Math.random() * 3 + 2}s`;
+                confetti.style.animationDelay = `${Math.random() * 0.5}s`;
+                
+                // Rastgele dönüş
+                confetti.style.transform = `rotate(${Math.random() * 360}deg)`;
+                
+                document.body.appendChild(confetti);
+            }
+        }
+        
+        // Başarı sesi çal
+        function playSuccessSound() {
+            try {
+                const audio = new Audio('data:audio/mp3;base64,SUQzBAAAAAABEVRYWFgAAAAtAAADY29tbWVudABCaWdTb3VuZEJhbmsuY29tIC8gTGFTb25vdGhlcXVlLm9yZwBURU5DAAAAHQAAA1N3aXRjaCBQbHVzIMKpIE5DSCBTb2Z0d2FyZQBUSVQyAAAABgAAAzIyMzUAVFNTRQAAAA8AAANMYXZmNTcuODMuMTAwAAAAAAAAAAAAAAD/80DEAAAAA0gAAAAATEFNRTMuMTAwVVVVVVVVVVVVVUxBTUUzLjEwMFVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVf/zQsRbAAADSAAAAABVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVf/zQMSkAAADSAAAAABVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV');
+                audio.play();
+            } catch (err) {
+                console.log('Ses çalınamadı', err);
+            }
         }
 
         document.addEventListener('DOMContentLoaded', function() {
             // Arka plan parçacıklarını oluştur
             createParticles();
             
-            // Parçacık etkileşimini başlat
-            initializeParticleInteraction();
+            // Dalgalanma efektini ekle
+            createRippleEffect();
             
-            // Sayfa geçişi ayarlarını başlat
-            initializePageTransition();
+            // Animasyon sekansını başlat
+            runAnimationSequence();
             
             // Oturum bilgilerini temizle
             localStorage.removeItem('authToken');
@@ -374,37 +469,6 @@
             } catch (error) {
                 console.error('Çıkış işlemi hatası:', error);
             }
-            
-            // Durum mesajlarını güncellemeye başla
-            updateStatusMessages();
-            
-            // Animasyon tamamlandıktan sonra onay işareti göster
-            setTimeout(function() {
-                animateCheckmark();
-                
-                // Kısa bir gecikme ile ana sayfaya yönlendir
-                setTimeout(function() {
-                    window.redirectToHomePage();
-                }, 1500);
-            }, 2800);
-            
-            // Redirecting yazısını göster
-            setTimeout(function() {
-                document.getElementById('redirecting').style.opacity = '1';
-                document.getElementById('redirecting').style.transform = 'translateY(0)';
-            }, 3500);
-            
-            // Sayfa kapanmadan önce fareyle etkileşim ekle
-            document.body.addEventListener('click', function() {
-                window.redirectToHomePage();
-            });
-            
-            // ESC tuşu ile hemen çıkış
-            document.addEventListener('keydown', function(e) {
-                if (e.key === 'Escape') {
-                    window.location.href = 'index.html';
-                }
-            });
         });
     </script>
 </body>
