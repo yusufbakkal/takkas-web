@@ -531,6 +531,7 @@
             const listingId = urlParams.get('id') || 'ID-' + Math.floor(Math.random() * 1000000);
             const listingTitle = urlParams.get('title') || 'İlan başlığı bilgisi bulunamadı';
             const listingType = urlParams.get('type') || 'apartment';
+            const categoryType = urlParams.get('category') || 'estate'; // 'estate', 'vehicle', 'car' olabilir
             
             // Sayfaya bilgileri yerleştir
             document.getElementById('listingId').textContent = listingId;
@@ -541,19 +542,53 @@
                 day: 'numeric'
             });
             
+            // Kategori tipine göre başlık ve mesajları güncelle
+            const successTitle = document.querySelector('.success-title');
+            const successSubtitle = document.querySelector('.success-subtitle');
+            const estateCard = document.getElementById('estateCard');
+            const vehicleDetails = document.querySelector('.vehicle-details');
+            const noteContent = document.querySelector('.note-content p');
+            const btnPrimary = document.querySelector('.btn-primary');
+            
             // Emlak detaylarını göster
             const estateDetailsElement = document.getElementById('estateDetails');
             const estateIconElement = document.getElementById('estateIcon');
             
-            if (listingType === 'apartment') {
-                estateDetailsElement.textContent = 'Konut Tipi Emlak İlanı';
-                estateIconElement.className = 'fas fa-home';
-            } else if (listingType === 'land') {
-                estateDetailsElement.textContent = 'Arsa Tipi Emlak İlanı';
-                estateIconElement.className = 'fas fa-map-marker-alt';
+            if (categoryType === 'vehicle' || categoryType === 'car') {
+                // Araç ilanı için 
+                successTitle.textContent = "Araç İlanınız Başarıyla Oluşturuldu!";
+                successSubtitle.textContent = "Tebrikler! Araç ilanınız sistemimize kaydedildi ve incelendikten sonra yayına alınacak.";
+                vehicleDetails.querySelector('h4').textContent = "Araç Bilgileri";
+                noteContent.textContent = "Araç ilanınız 24 saat içinde incelenerek onaylanacaktır. Onaylandıktan sonra size bildirim gönderilecek ve ilanınız yayına alınacaktır.";
+                btnPrimary.innerHTML = '<i class="fas fa-list"></i> Araç İlanlarım';
+                btnPrimary.href = "my-car-listings.html";
+                
+                // Araç tipine göre ikon ve detayları ayarla
+                if (listingType === 'car') {
+                    estateDetailsElement.textContent = 'Otomobil İlanı';
+                    estateIconElement.className = 'fas fa-car';
+                } else if (listingType === 'motorcycle') {
+                    estateDetailsElement.textContent = 'Motosiklet İlanı';
+                    estateIconElement.className = 'fas fa-motorcycle';
+                } else if (listingType === 'commercial') {
+                    estateDetailsElement.textContent = 'Ticari Araç İlanı';
+                    estateIconElement.className = 'fas fa-truck';
+                } else {
+                    estateDetailsElement.textContent = 'Araç İlanı';
+                    estateIconElement.className = 'fas fa-car-side';
+                }
             } else {
-                estateDetailsElement.textContent = 'Emlak İlanı';
-                estateIconElement.className = 'fas fa-building';
+                // Emlak ilanı için 
+                if (listingType === 'apartment') {
+                    estateDetailsElement.textContent = 'Konut Tipi Emlak İlanı';
+                    estateIconElement.className = 'fas fa-home';
+                } else if (listingType === 'land') {
+                    estateDetailsElement.textContent = 'Arsa Tipi Emlak İlanı';
+                    estateIconElement.className = 'fas fa-map-marker-alt';
+                } else {
+                    estateDetailsElement.textContent = 'Emlak İlanı';
+                    estateIconElement.className = 'fas fa-building';
+                }
             }
             
             // Konfeti efekti
@@ -569,15 +604,27 @@
             });
             
             // Paylaşım butonlarını ayarla
-            setupShareButtons(listingId, listingTitle, listingType);
+            setupShareButtons(listingId, listingTitle, listingType, categoryType);
         });
         
         // Paylaşım butonlarını ayarla
-        function setupShareButtons(listingId, title, type) {
+        function setupShareButtons(listingId, title, type, categoryType) {
             // İlan tipine bağlı olarak doğru detay sayfasına yönlendir
-            const detailPage = type === 'land' ? 'property-detail.html' : 'property-detail.html';
+            let detailPage;
+            
+            if (categoryType === 'vehicle' || categoryType === 'car') {
+                detailPage = 'car-detail.html';
+            } else {
+                detailPage = type === 'land' ? 'property-detail.html' : 'property-detail.html';
+            }
+            
             const shareUrl = window.location.origin + `/${detailPage}?id=${listingId}`;
             const shareTitle = decodeURIComponent(title);
+            
+            // Paylaşım mesajını ilan türüne göre ayarla
+            const shareMessage = categoryType === 'vehicle' || categoryType === 'car' 
+                ? 'TAKKAS üzerinde yeni araç ilanım: ' 
+                : 'TAKKAS üzerinde yeni emlak ilanım: ';
             
             // Facebook
             document.getElementById('shareFacebook').addEventListener('click', function() {
@@ -586,17 +633,21 @@
             
             // Twitter
             document.getElementById('shareTwitter').addEventListener('click', function() {
-                window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent('TAKKAS üzerinde yeni emlak ilanım: ' + shareTitle)}&url=${encodeURIComponent(shareUrl)}`, '_blank');
+                window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(shareMessage + shareTitle)}&url=${encodeURIComponent(shareUrl)}`, '_blank');
             });
             
             // WhatsApp
             document.getElementById('shareWhatsapp').addEventListener('click', function() {
-                window.open(`https://wa.me/?text=${encodeURIComponent('TAKKAS üzerinde yeni emlak ilanım: ' + shareTitle + ' ' + shareUrl)}`, '_blank');
+                window.open(`https://wa.me/?text=${encodeURIComponent(shareMessage + shareTitle + ' ' + shareUrl)}`, '_blank');
             });
             
             // Email
             document.getElementById('shareEmail').addEventListener('click', function() {
-                window.location.href = `mailto:?subject=${encodeURIComponent('TAKKAS - Yeni Emlak İlanı: ' + shareTitle)}&body=${encodeURIComponent('Merhaba,\n\nTAKKAS platformunda yeni bir emlak ilanı oluşturdum. Aşağıdaki bağlantıdan inceleyebilirsin:\n\n' + shareUrl + '\n\nSaygılarımla.')}`;
+                const emailSubject = categoryType === 'vehicle' || categoryType === 'car'
+                    ? 'TAKKAS - Yeni Araç İlanı: '
+                    : 'TAKKAS - Yeni Emlak İlanı: ';
+                    
+                window.location.href = `mailto:?subject=${encodeURIComponent(emailSubject + shareTitle)}&body=${encodeURIComponent('Merhaba,\n\nTAKKAS platformunda yeni bir ilan oluşturdum. Aşağıdaki bağlantıdan inceleyebilirsin:\n\n' + shareUrl + '\n\nSaygılarımla.')}`;
             });
         }
         

@@ -636,7 +636,7 @@
                     
                     // Başarı sayfasına yönlendir ve ilan bilgilerini query parametreleri olarak ekle
                     setTimeout(() => {
-                        const redirectUrl = `listing-success.html?id=${result.id}&title=${encodeURIComponent(data.title)}&type=apartment`;
+                        const redirectUrl = `listing-success.html?id=${result.id}&title=${encodeURIComponent(data.title)}&type=apartment&category=estate`;
                         window.location.href = redirectUrl;
                     }, 1500);
                 } catch (error) {

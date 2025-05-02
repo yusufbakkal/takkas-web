@@ -4,152 +4,157 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Çıkış Yapılıyor - TAKKAS</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
-    <!-- Zdog kütüphanesi -->
-    <script src="https://unpkg.com/zdog@1/dist/zdog.dist.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
-            --primary: #FF6B00;
-            --background: #FAFAFA;
-            --surface: #FFFFFF;
-            --text: #202020;
-            --text-light: #707070;
-            --success: #4CAF50;
+            --primary: #4F46E5;
+            --primary-light: rgba(79, 70, 229, 0.1);
+            --text-dark: #333;
+            --text-muted: #666;
+            --background: #f8fafc;
+            --card: #fff;
+            --shadow: 0 8px 24px rgba(0,0,0,0.08);
+            --transition: all 0.3s ease;
         }
         
         * {
+            box-sizing: border-box;
             margin: 0;
             padding: 0;
-            box-sizing: border-box;
         }
         
         body {
-            font-family: 'Inter', sans-serif;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             height: 100vh;
             background: var(--background);
-            color: var(--text);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        
-        .logout-container {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            text-align: center;
-            padding: 2.5rem;
-            background: var(--surface);
-            border-radius: 12px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
-            max-width: 360px;
-        }
-        
-        .logout-title {
-            font-size: 1.6rem;
-            font-weight: 600;
-            margin-bottom: 0.5rem;
-            color: var(--text);
-        }
-        
-        .logout-message {
-            color: var(--text-light);
-            margin-bottom: 2rem;
-            font-weight: 300;
-            font-size: 0.9rem;
-        }
-        
-        .progress-container {
-            width: 100%;
-            margin-bottom: 3rem;
-            position: relative;
-        }
-        
-        .progress-bar {
-            width: 100%;
-            height: 4px;
-            background-color: #f0f0f0;
-            border-radius: 2px;
             overflow: hidden;
         }
         
-        .progress-fill {
+        .logout-container {
+            width: 360px;
+            padding: 2.5rem;
+            background: var(--card);
+            border-radius: 12px;
+            box-shadow: var(--shadow);
+            text-align: center;
+            transition: var(--transition);
+            position: relative;
+        }
+        
+        .icon-container {
+            position: relative;
+            width: 72px;
+            height: 72px;
+            margin: 0 auto 1.5rem;
+        }
+        
+        .circle-bg {
+            width: 100%;
             height: 100%;
-            width: 0%;
-            background-color: var(--primary);
-            border-radius: 2px;
-            transition: width 0.05s ease;
+            border-radius: 50%;
+            background: var(--primary-light);
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
         
-        .progress-percentage {
+        .icon {
+            font-size: 2rem;
+            color: var(--primary);
+            opacity: 0;
+        }
+        
+        .spinner {
             position: absolute;
-            top: 8px;
-            right: 0;
-            font-size: 0.75rem;
-            color: var(--text-light);
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: 3px solid var(--primary-light);
+            border-top-color: var(--primary);
+            border-radius: 50%;
         }
         
-        .zdog-canvas {
-            width: 120px;
-            height: 120px;
-            margin-bottom: 2rem;
-            cursor: move;
+        h1 {
+            color: var(--text-dark);
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            font-weight: 600;
+        }
+        
+        p {
+            color: var(--text-muted);
+            margin-bottom: 1.5rem;
+            line-height: 1.5;
+        }
+        
+        .redirect-label {
+            display: inline-block;
+            padding: 0.5rem 1rem;
+            background: var(--primary-light);
+            color: var(--primary);
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            opacity: 0;
         }
     </style>
 </head>
 <body>
-    <div class="logout-container">
-        <!-- Zdog animasyonu için canvas -->
-        <canvas class="zdog-canvas" id="zdogCanvas" width="240" height="240"></canvas>
-        
-        <h1 class="logout-title">Çıkış Yapılıyor</h1>
-        <p class="logout-message">Oturumunuz kapatılıyor, lütfen bekleyin...</p>
-        
-        <div class="progress-container">
-            <div class="progress-bar">
-                <div class="progress-fill" id="progressFill"></div>
+    <div class="logout-container" id="logoutContainer">
+        <div class="icon-container">
+            <div class="circle-bg">
+                <i class="fas fa-check icon" id="checkIcon"></i>
             </div>
-            <div class="progress-percentage" id="progressPercentage">0%</div>
+            <div class="spinner" id="spinner"></div>
         </div>
+        <h1>Çıkış Yapılıyor</h1>
+        <p>Oturumunuz güvenli bir şekilde kapatılıyor...</p>
+        <div class="redirect-label" id="redirectLabel">Ana Sayfaya Yönlendiriliyorsunuz</div>
     </div>
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            const progressFill = document.getElementById('progressFill');
-            const progressPercentage = document.getElementById('progressPercentage');
-            let progress = 0;
+            const spinner = document.getElementById('spinner');
+            const checkIcon = document.getElementById('checkIcon');
+            const redirectLabel = document.getElementById('redirectLabel');
+            const logoutContainer = document.getElementById('logoutContainer');
             
-            // Zdog trefoil animasyonu başlat
-            setupZdogAnimation();
+            // Sayfa açılış animasyonu
+            logoutContainer.style.opacity = '0';
+            logoutContainer.style.transform = 'translateY(20px)';
             
-            // Oturum bilgilerini temizle
-            clearUserSession();
-            
-            // İlerleme animasyonu
-            const interval = setInterval(() => {
-                progress += 1;
+            setTimeout(() => {
+                logoutContainer.style.opacity = '1';
+                logoutContainer.style.transform = 'translateY(0)';
                 
-                if (progress <= 100) {
-                    progressFill.style.width = `${progress}%`;
-                    progressPercentage.textContent = `${progress}%`;
+                // Spinner animasyonu
+                spinner.style.animation = 'spin 1s linear infinite';
+                
+                // Oturum bilgilerini temizle
+                clearUserSession();
+                
+                // Çıkış işlemi tamamlandı
+                setTimeout(() => {
+                    completeLogout();
                     
-                    if (progress >= 100) {
-                        clearInterval(interval);
-                        
-                        // İşlem tamamlandı, ana sayfaya yönlendir
-                        setTimeout(() => {
-                            window.location.href = 'index.html';
-                        }, 800);
-                    }
-                }
-            }, 35);
+                    // Ana sayfaya yönlendir
+                    setTimeout(() => {
+                        window.location.href = 'index.html';
+                    }, 1500);
+                }, 1800);
+            }, 300);
             
+            // Tüm oturum bilgilerini temizle
             function clearUserSession() {
                 const keysToRemove = ['authToken', 'userName', 'userEmail', 'userId', 'userRole'];
+                
                 keysToRemove.forEach(key => localStorage.removeItem(key));
                 
-                // API isteği
+                // API isteği ile çıkış yap (opsiyonel)
                 const token = localStorage.getItem('authToken');
                 if (token) {
                     fetch('https://takkas-api.onrender.com/api/auth/logout', {
@@ -162,89 +167,36 @@
                 }
             }
             
-            function setupZdogAnimation() {
-                // Zdog Illustration oluştur
-                const illo = new Zdog.Illustration({
-                    element: '#zdogCanvas',
-                    dragRotate: true,
-                    zoom: 3,
-                    onDragStart: function() {
-                        // Sürükleme başladığında otomatik dönüşü devre dışı bırak
-                        this.dragRotate = true;
-                        isSpinning = false;
-                    },
-                    onResize: function(width, height) {
-                        this.zoom = Math.min(width, height) / 250;
+            // Çıkış işlemi tamamlandı animasyonunu göster
+            function completeLogout() {
+                // Spinner animasyonunu durdur
+                spinner.style.animation = 'none';
+                spinner.style.opacity = '0';
+                
+                // Onay işaretini göster
+                checkIcon.style.opacity = '1';
+                checkIcon.style.transform = 'scale(1.2)';
+                
+                setTimeout(() => {
+                    checkIcon.style.transform = 'scale(1)';
+                }, 200);
+                
+                // Yönlendirme yazısını göster
+                setTimeout(() => {
+                    redirectLabel.style.opacity = '1';
+                }, 300);
+            }
+            
+            // Spin animasyonu tanımı
+            if (!document.querySelector('@keyframes spin')) {
+                const style = document.createElement('style');
+                style.textContent = `
+                    @keyframes spin {
+                        0% { transform: rotate(0deg); }
+                        100% { transform: rotate(360deg); }
                     }
-                });
-                
-                // Renk ayarları
-                const colors = {
-                    orange: '#FF6B00',
-                    orangeLight: '#FF8A3D',
-                    orangeDark: '#E55A00',
-                };
-                
-                // Trefoil düğüm parametreleri
-                const TAU = Math.PI * 2;
-                const loops = 4; // Kaç düğüm olacak
-                const segmentsPerLoop = 18; // Düğüm başına segment sayısı
-                const totalSegments = loops * segmentsPerLoop;
-                
-                // Trefoil düğüm modeli oluştur
-                const trefoil = new Zdog.Shape({
-                    addTo: illo,
-                    path: [],
-                    closed: true,
-                    stroke: 10,
-                    color: colors.orange,
-                });
-                
-                // Trefoil düğüm için parametrik eğri oluştur
-                for (let i = 0; i < totalSegments; i++) {
-                    const t = i / totalSegments;
-                    const angle = t * TAU * loops;
-                    
-                    // Parametrik trefoil düğüm denklemi
-                    const r = 30;
-                    const x = r * (Math.sin(angle) + 2 * Math.sin(2 * angle));
-                    const y = r * (Math.cos(angle) - 2 * Math.cos(2 * angle));
-                    const z = r * -Math.sin(3 * angle);
-                    
-                    trefoil.path.push({ x, y, z });
-                }
-                
-                // Renk geçişi için yardımcı şekiller (küçük toplar) ekle
-                trefoil.path.forEach((point, i) => {
-                    // Her 3 noktada bir top ekle (performans için)
-                    if (i % 3 === 0) {
-                        const t = i / totalSegments;
-                        const hue = Math.floor(t * 30) + 20; // 20-50 arası (turuncu tonları)
-                        const lightness = 50 + Math.sin(t * TAU) * 10; // 40-60 arası
-                        
-                        new Zdog.Shape({
-                            addTo: illo,
-                            translate: point,
-                            stroke: 3,
-                            color: `hsl(${hue}, 100%, ${lightness}%)`,
-                        });
-                    }
-                });
-                
-                // Otomatik döndürme animasyonu
-                let isSpinning = true;
-                let rotateSpeed = 0.01;
-                
-                function animate() {
-                    if (isSpinning) {
-                        illo.rotate.y += rotateSpeed;
-                        illo.rotate.x += rotateSpeed * 0.5;
-                    }
-                    illo.updateRenderGraph();
-                    requestAnimationFrame(animate);
-                }
-                
-                animate();
+                `;
+                document.head.appendChild(style);
             }
         });
     </script>

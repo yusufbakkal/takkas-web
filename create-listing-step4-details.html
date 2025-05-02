@@ -938,7 +938,7 @@
                     const encodedTitle = encodeURIComponent(data.title);
                     
                     // URL parametrelerini direkt olarak kullan
-                    window.location.href = `listing-success.html?id=${listingId}&title=${encodedTitle}&brand=${brandName}&model=${modelName}&version=${versionName}&year=${selectedYear}&color=${data.color}`;
+                    window.location.href = `listing-success.html?id=${listingId}&title=${encodedTitle}&brand=${brandName}&model=${modelName}&version=${versionName}&year=${selectedYear}&color=${data.color}&type=car&category=vehicle`;
                 }, 1500);
                 
             } catch (error) {
