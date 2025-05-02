@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Çıkış Yapılıyor - TAKKAS</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Pacifico&family=Dancing+Script:wght@700&display=swap" rel="stylesheet">
     <style>
         :root {
             --primary: #4F46E5;
@@ -184,6 +185,40 @@
             50% { transform: scale(1.05); }
             100% { transform: scale(1); }
         }
+        
+        .title-container {
+            margin-bottom: 1.5rem;
+            position: relative;
+            height: 60px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .title-text {
+            font-family: 'Dancing Script', cursive;
+            font-size: 2.5rem;
+            margin: 0;
+            position: relative;
+            color: transparent;
+            -webkit-text-stroke: 1px var(--primary);
+        }
+        
+        .title-text-fill {
+            position: absolute;
+            top: 0;
+            left: 0;
+            font-family: 'Dancing Script', cursive;
+            font-size: 2.5rem;
+            width: 0%;
+            white-space: nowrap;
+            overflow: hidden;
+            color: var(--primary);
+            background: var(--primary-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            transition: width 0.1s ease;
+        }
     </style>
 </head>
 <body>
@@ -194,7 +229,12 @@
                 <i class="fas fa-check-circle icon" id="checkIcon"></i>
             </div>
         </div>
-        <h1>Çıkış Yapılıyor</h1>
+        
+        <div class="title-container">
+            <h1 class="title-text">Çıkış Yapılıyor</h1>
+            <h1 class="title-text-fill" id="titleFill">Çıkış Yapılıyor</h1>
+        </div>
+        
         <p>Oturumunuz güvenli bir şekilde kapatılıyor...</p>
         
         <div class="progress-container">
@@ -226,6 +266,7 @@
             const checkIcon = document.getElementById('checkIcon');
             const redirectLabel = document.getElementById('redirectLabel');
             const logoutContainer = document.getElementById('logoutContainer');
+            const titleFill = document.getElementById('titleFill');
             
             const steps = Array.from(progressSteps.querySelectorAll('.step'));
             let currentProgress = 0;
@@ -264,6 +305,9 @@
                     // İlerleme çubuğunu güncelle
                     progressFill.style.width = `${currentProgress}%`;
                     progressPercentage.textContent = `${Math.floor(currentProgress)}%`;
+                    
+                    // Başlık dolum animasyonunu güncelle
+                    titleFill.style.width = `${currentProgress}%`;
                     
                     // İlerleme dairesini güncelle
                     progressCircle.style.background = `conic-gradient(var(--primary) ${currentProgress}%, transparent ${currentProgress}%)`;
@@ -321,6 +365,7 @@
                 checkIcon.classList.add('pulse');
                 redirectLabel.style.opacity = '1';
                 redirectLabel.style.transform = 'translateY(0)';
+                titleFill.style.width = '100%';
                 
                 // İlerleme metnini güncelle
                 document.querySelector('.progress-text span:first-child').textContent = 'İşlem başarıyla tamamlandı!';
