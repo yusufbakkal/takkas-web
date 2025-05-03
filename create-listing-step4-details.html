@@ -581,6 +581,94 @@
                     </div>
                 </div>
                 
+                <!-- Takas Seçeneği -->
+                <div id="tradeOptionSection" class="form-section">
+                    <h3 class="section-title">Takas Bilgileri</h3>
+                    
+                    <div class="form-group">
+                        <label>Takas istiyor musunuz?</label>
+                        <div class="radio-group" style="display: flex; gap: 2rem; margin-top: 1rem;">
+                            <div class="radio-item" style="display: flex; align-items: center;">
+                                <input type="radio" id="tradeYes" name="wants_trade" value="true">
+                                <label for="tradeYes" style="margin-left: 0.5rem; cursor: pointer;">Evet</label>
+                            </div>
+                            <div class="radio-item" style="display: flex; align-items: center;">
+                                <input type="radio" id="tradeNo" name="wants_trade" value="false" checked>
+                                <label for="tradeNo" style="margin-left: 0.5rem; cursor: pointer;">Hayır</label>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Takas Detayları - Evet seçildiğinde görünür olacak -->
+                    <div id="tradeDetailsSection" style="display: none;">
+                        <div class="form-group">
+                            <label for="tradeCategory">Kategori Seçimi</label>
+                            <select id="tradeCategory" name="trade_category" class="form-control">
+                                <option value="">Kategori Seçiniz</option>
+                                <!-- Kategoriler JavaScript ile doldurulacak -->
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="tradeSubCategory">Alt Kategori Seçimi</label>
+                            <select id="tradeSubCategory" name="trade_subcategory" class="form-control" disabled>
+                                <option value="">Alt Kategori Seçiniz</option>
+                                <!-- Alt kategoriler JavaScript ile doldurulacak -->
+                            </select>
+                        </div>
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="tradeYearStart">Başlangıç Yılı</label>
+                                <select id="tradeYearStart" name="trade_year_start" class="form-control">
+                                    <option value="">Yıl Seçiniz</option>
+                                    <!-- Yıllar JavaScript ile doldurulacak -->
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="tradeYearEnd">Bitiş Yılı</label>
+                                <select id="tradeYearEnd" name="trade_year_end" class="form-control">
+                                    <option value="">Yıl Seçiniz</option>
+                                    <!-- Yıllar JavaScript ile doldurulacak -->
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="tradeBrand">Marka</label>
+                            <select id="tradeBrand" name="trade_brand" class="form-control">
+                                <option value="">Marka Seçiniz</option>
+                                <!-- Markalar JavaScript ile doldurulacak -->
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="tradeModel">Model</label>
+                            <select id="tradeModel" name="trade_model" class="form-control" disabled>
+                                <option value="">Model Seçiniz</option>
+                                <!-- Modeller JavaScript ile doldurulacak -->
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="tradeVersion">Versiyon</label>
+                            <select id="tradeVersion" name="trade_version" class="form-control" disabled>
+                                <option value="">Versiyon Seçiniz</option>
+                                <!-- Versiyonlar JavaScript ile doldurulacak -->
+                            </select>
+                        </div>
+                        
+                        <button type="button" id="addTradeVehicleBtn" class="btn btn-secondary" style="margin-top: 1rem;">
+                            <i class="fas fa-plus"></i> Takas Aracı Ekle
+                        </button>
+                        
+                        <!-- Eklenen takas araçları listesi -->
+                        <div id="tradeVehiclesList" style="margin-top: 1.5rem;">
+                            <!-- Eklenen araçlar burada listelenecek -->
+                        </div>
+                    </div>
+                </div>
+                
                 <!-- Gizli alanlar: Model ID, Kategori ID, Kullanıcı ID ve Versiyon ID -->
                 <input type="hidden" id="modelId" name="model_id">
                 <input type="hidden" id="categoryId" name="category_id">
@@ -701,6 +789,9 @@
         // Sayfa yüklendiğinde illeri yükle
         document.addEventListener('DOMContentLoaded', function() {
             loadProvinces();
+            
+            // Takas seçeneği ile ilgili işlemler
+            setupTradeOptions();
         });
 
         // URL'den parametreleri al
@@ -722,6 +813,451 @@
             versionId
         });
 
+        // Takas seçeneği ile ilgili işlemler
+        function setupTradeOptions() {
+            const categoryId = urlParams.get('categoryId');
+            const tradeOptionSection = document.getElementById('tradeOptionSection');
+            const tradeYes = document.getElementById('tradeYes');
+            const tradeNo = document.getElementById('tradeNo');
+            const tradeDetailsSection = document.getElementById('tradeDetailsSection');
+            
+            // Emlak kategorisi kontrolü (ID: 20)
+            if (categoryId === '20') {
+                tradeOptionSection.style.display = 'none';
+            } else {
+                tradeOptionSection.style.display = 'block';
+                
+                // Radyo butonları için event listener'lar
+                tradeYes.addEventListener('change', function() {
+                    if (this.checked) {
+                        tradeDetailsSection.style.display = 'block';
+                        
+                        // Takas seçimi açıldığında ilgili verileri yükle
+                        Promise.all([
+                            loadTradeCategories(),
+                            loadYears(),
+                            loadTradeBrands()
+                        ]).then(() => {
+                            // Kategoriler yüklendikten sonra otomobil kategorisini otomatik seç
+                            setTimeout(() => {
+                                const tradeCategory = document.getElementById('tradeCategory');
+                                // Otomobil kategorisi genellikle 1 ID'ye sahip, değilse ilk kategoriyi seç
+                                const autoCategory = Array.from(tradeCategory.options).find(option => 
+                                    option.textContent === 'Otomobil' || option.value === '1');
+                                
+                                if (autoCategory) {
+                                    tradeCategory.value = autoCategory.value;
+                                    // Alt kategorileri yükle
+                                    loadTradeSubCategories(autoCategory.value);
+                                }
+                            }, 300);
+                        });
+                    }
+                });
+                
+                tradeNo.addEventListener('change', function() {
+                    if (this.checked) {
+                        tradeDetailsSection.style.display = 'none';
+                    }
+                });
+            }
+            
+            // Kategori değiştiğinde alt kategorileri yükle
+            document.getElementById('tradeCategory').addEventListener('change', function() {
+                const categoryId = this.value;
+                if (categoryId) {
+                    loadTradeSubCategories(categoryId);
+                } else {
+                    document.getElementById('tradeSubCategory').innerHTML = '<option value="">Alt Kategori Seçiniz</option>';
+                    document.getElementById('tradeSubCategory').disabled = true;
+                }
+            });
+            
+            // Marka değiştiğinde modelleri yükle
+            document.getElementById('tradeBrand').addEventListener('change', function() {
+                const brandOption = this.options[this.selectedIndex];
+                const brandName = brandOption.textContent;
+                
+                if (this.value) {
+                    loadTradeModels(brandName);
+                } else {
+                    document.getElementById('tradeModel').innerHTML = '<option value="">Model Seçiniz</option>';
+                    document.getElementById('tradeModel').disabled = true;
+                }
+            });
+            
+            // Model değiştiğinde versiyonları yükle
+            document.getElementById('tradeModel').addEventListener('change', function() {
+                const modelOption = this.options[this.selectedIndex];
+                
+                if (this.value && modelOption) {
+                    const modelName = modelOption.dataset.name || modelOption.textContent;
+                    const brandName = modelOption.dataset.brandName || document.getElementById('tradeBrand').options[document.getElementById('tradeBrand').selectedIndex].textContent;
+                    
+                    loadTradeVersions(modelName, brandName);
+                } else {
+                    document.getElementById('tradeVersion').innerHTML = '<option value="">Versiyon Seçiniz</option>';
+                    document.getElementById('tradeVersion').disabled = true;
+                }
+            });
+            
+            // Takas aracı ekle butonuna tıklandığında
+            document.getElementById('addTradeVehicleBtn').addEventListener('click', addTradeVehicle);
+        }
+        
+        // Takas kategorilerini yükle (Emlak kategorisi hariç)
+        async function loadTradeCategories() {
+            try {
+                // Tüm kategorileri yükle
+                const response = await fetch('car_categories.json');
+                const categories = await response.json();
+                
+                const tradeCategorySelect = document.getElementById('tradeCategory');
+                tradeCategorySelect.innerHTML = '<option value="">Kategori Seçiniz</option>';
+                
+                // Emlak kategorisi hariç göster (ID: 20)
+                categories.filter(category => category.parent_id === null && category.id !== 20).forEach(category => {
+                    const option = document.createElement('option');
+                    option.value = category.id;
+                    option.textContent = category.name;
+                    tradeCategorySelect.appendChild(option);
+                });
+            } catch (error) {
+                console.error('Kategoriler yüklenirken hata:', error);
+            }
+        }
+        
+        // Takas alt kategorilerini yükle
+        async function loadTradeSubCategories(categoryId) {
+            try {
+                // Tüm kategorileri yükle
+                const response = await fetch('car_categories.json');
+                const categories = await response.json();
+                
+                const tradeSubCategorySelect = document.getElementById('tradeSubCategory');
+                tradeSubCategorySelect.innerHTML = '<option value="">Alt Kategori Seçiniz</option>';
+                tradeSubCategorySelect.disabled = false;
+                
+                // Seçilen kategoriye ait alt kategorileri filtrele
+                categories.filter(category => category.parent_id === parseInt(categoryId)).forEach(subCategory => {
+                    const option = document.createElement('option');
+                    option.value = subCategory.id;
+                    option.textContent = subCategory.name;
+                    tradeSubCategorySelect.appendChild(option);
+                });
+            } catch (error) {
+                console.error('Alt kategoriler yüklenirken hata:', error);
+            }
+        }
+        
+        // Yılları yükle - şu anki yıldan 1950'ye kadar
+        function loadYears() {
+            const currentYear = new Date().getFullYear();
+            const startYear = 1950;
+            
+            const tradeYearStartSelect = document.getElementById('tradeYearStart');
+            const tradeYearEndSelect = document.getElementById('tradeYearEnd');
+            
+            tradeYearStartSelect.innerHTML = '<option value="">Yıl Seçiniz</option>';
+            tradeYearEndSelect.innerHTML = '<option value="">Yıl Seçiniz</option>';
+            
+            for (let year = currentYear; year >= startYear; year--) {
+                const optionStart = document.createElement('option');
+                optionStart.value = year;
+                optionStart.textContent = year;
+                tradeYearStartSelect.appendChild(optionStart);
+                
+                const optionEnd = document.createElement('option');
+                optionEnd.value = year;
+                optionEnd.textContent = year;
+                tradeYearEndSelect.appendChild(optionEnd);
+            }
+        }
+        
+        // Markaları yükle (AJAX ile API'den alınacak)
+        async function loadTradeBrands() {
+            try {
+                // Markalar için API endpointi
+                const response = await fetch('https://takkas-api.onrender.com/api/v1/vehicles/brands');
+                const data = await response.json();
+                
+                const tradeBrandSelect = document.getElementById('tradeBrand');
+                tradeBrandSelect.innerHTML = '<option value="">Marka Seçiniz</option>';
+                
+                // API'den gelen markaları listele
+                if (Array.isArray(data)) {
+                    // Markaları alfabetik sıraya göre sırala
+                    data.sort((a, b) => a.name.localeCompare(b.name));
+                    
+                    data.forEach(brand => {
+                        const option = document.createElement('option');
+                        option.value = brand.code || brand.name; // Marka kodu veya adı
+                        option.textContent = brand.name;
+                        tradeBrandSelect.appendChild(option);
+                    });
+                    
+                    // İlk markayı seç ve modellerini yükle
+                    if (data.length > 0) {
+                        // Önce tercih edilen markalar (örn: BMW, Mercedes, Audi gibi popüler markalar)
+                        const preferredBrands = ['BMW', 'Mercedes', 'Audi', 'Volkswagen', 'Toyota', 'Honda'];
+                        let selectedBrand = null;
+                        
+                        // Tercih edilen markalardan birini bul
+                        for (const brandName of preferredBrands) {
+                            const brandOption = Array.from(tradeBrandSelect.options).find(option => 
+                                option.textContent.includes(brandName));
+                            
+                            if (brandOption) {
+                                selectedBrand = brandOption;
+                                break;
+                            }
+                        }
+                        
+                        // Tercih edilen marka bulunamazsa ilk markayı seç
+                        if (!selectedBrand && tradeBrandSelect.options.length > 1) {
+                            selectedBrand = tradeBrandSelect.options[1]; // İlk gerçek marka (0 indeksi "Seçiniz" seçeneği)
+                        }
+                        
+                        // Bulduğumuz markayı seç ve modellerini yükle
+                        if (selectedBrand) {
+                            tradeBrandSelect.value = selectedBrand.value;
+                            loadTradeModels(selectedBrand.textContent);
+                        }
+                    }
+                } else {
+                    console.error('API markalar için beklenmeyen yanıt formatı:', data);
+                }
+            } catch (error) {
+                console.error('Markalar yüklenirken hata:', error);
+            }
+        }
+        
+        // Modelleri yükle
+        async function loadTradeModels(brandName) {
+            try {
+                // Direkt marka adı ile API URL'si oluşturuluyor
+                console.log(`Model API: https://takkas-api.onrender.com/api/v1/${encodeURIComponent(brandName)}`);
+                const response = await fetch(`https://takkas-api.onrender.com/api/v1/${encodeURIComponent(brandName)}`);
+                const rawData = await response.json();
+                
+                const tradeModelSelect = document.getElementById('tradeModel');
+                tradeModelSelect.innerHTML = '<option value="">Model Seçiniz</option>';
+                tradeModelSelect.disabled = false;
+                
+                // Brand isteğinden dönen model verileri yapısı
+                // Toyota için { "Corolla": {...}, "Camry": {...} } şeklinde olabilir
+                // Bu durumda Object.keys() ile model adlarını alıyoruz
+                
+                // Eğer dönen veri bir obje ise model adlarını çıkartalım
+                const models = [];
+                if (typeof rawData === 'object' && !Array.isArray(rawData)) {
+                    Object.keys(rawData).forEach(modelName => {
+                        models.push({
+                            name: modelName,
+                            id: rawData[modelName].model_id,
+                            model_id: rawData[modelName].model_id
+                        });
+                    });
+                }
+                // Eğer dönen veri bir dizi ise direkt kullanabilir
+                else if (Array.isArray(rawData)) {
+                    models.push(...rawData);
+                }
+                
+                // Modelleri alfabetik sıraya göre sırala
+                models.sort((a, b) => a.name.localeCompare(b.name));
+                
+                models.forEach(model => {
+                    const option = document.createElement('option');
+                    option.value = model.id || model.model_id || model.name;
+                    option.textContent = model.name;
+                    
+                    // Model detaylarını data-* attributeler olarak sakla
+                    option.dataset.name = model.name;
+                    option.dataset.modelId = model.id || model.model_id;
+                    option.dataset.brandName = brandName;
+                    
+                    tradeModelSelect.appendChild(option);
+                });
+                
+                // İlk modeli otomatik seç ve versiyonlarını yükle
+                if (models.length > 0) {
+                    tradeModelSelect.value = models[0].id || models[0].model_id || models[0].name;
+                    
+                    // İlk modelin verileri
+                    const selectedOption = tradeModelSelect.options[1]; // 0. indeks "Seçiniz" seçeneği
+                    const modelName = selectedOption.dataset.name;
+                    const modelBrandName = selectedOption.dataset.brandName;
+                    
+                    loadTradeVersions(modelName, modelBrandName);
+                }
+            } catch (error) {
+                console.error('Modeller yüklenirken hata:', error);
+            }
+        }
+        
+        // Versiyonları yükle
+        async function loadTradeVersions(modelName, brandName) {
+            try {
+                // Marka ve model adları ile API URL'si oluşturuluyor
+                const url = `https://takkas-api.onrender.com/api/v1/vehicles/brands/${encodeURIComponent(brandName)}/models/${encodeURIComponent(modelName)}`;
+                console.log(`Versiyon API: ${url}`);
+                
+                const response = await fetch(url);
+                const rawData = await response.json();
+                
+                const tradeVersionSelect = document.getElementById('tradeVersion');
+                tradeVersionSelect.innerHTML = '<option value="">Versiyon Seçiniz</option>';
+                tradeVersionSelect.disabled = false;
+                
+                // Versiyon verilerini çıkart
+                let versions = [];
+                if (rawData && rawData.versions && Array.isArray(rawData.versions)) {
+                    versions = rawData.versions;
+                } else if (Array.isArray(rawData)) {
+                    versions = rawData;
+                }
+                
+                // Versiyonları sırala
+                versions.sort((a, b) => a.name.localeCompare(b.name));
+                
+                versions.forEach(version => {
+                    const option = document.createElement('option');
+                    option.value = version.id;
+                    option.textContent = version.name;
+                    option.dataset.modelId = rawData.model_id || '';
+                    tradeVersionSelect.appendChild(option);
+                });
+                
+                // İlk versiyonu otomatik seç
+                if (versions.length > 0) {
+                    tradeVersionSelect.value = versions[0].id;
+                    
+                    // Yıl alanlarına da varsayılan değerler ata
+                    const currentYear = new Date().getFullYear();
+                    document.getElementById('tradeYearStart').value = currentYear - 5; // 5 yıl öncesi
+                    document.getElementById('tradeYearEnd').value = currentYear;
+                }
+            } catch (error) {
+                console.error('Versiyonlar yüklenirken hata:', error);
+            }
+        }
+        
+        // Takas araçlarını tutan dizi
+        const tradeVehicles = [];
+        
+        // Takas aracı ekle
+        function addTradeVehicle() {
+            const tradeCategory = document.getElementById('tradeCategory');
+            const tradeSubCategory = document.getElementById('tradeSubCategory');
+            const tradeYearStart = document.getElementById('tradeYearStart');
+            const tradeYearEnd = document.getElementById('tradeYearEnd');
+            const tradeBrand = document.getElementById('tradeBrand');
+            const tradeModel = document.getElementById('tradeModel');
+            const tradeVersion = document.getElementById('tradeVersion');
+            
+            // Form doğrulama
+            if (!tradeBrand.value || !tradeModel.value || !tradeVersion.value || 
+                !tradeYearStart.value || !tradeYearEnd.value) {
+                alert('Lütfen tüm alanları doldurunuz.');
+                return;
+            }
+            
+            // Yıl aralığı kontrolü
+            if (parseInt(tradeYearStart.value) > parseInt(tradeYearEnd.value)) {
+                alert('Başlangıç yılı bitiş yılından büyük olamaz.');
+                return;
+            }
+            
+            // Takas aracı nesnesini oluştur
+            const tradeVehicle = {
+                brand: tradeBrand.options[tradeBrand.selectedIndex].text,
+                model: tradeModel.options[tradeModel.selectedIndex].text,
+                version: tradeVersion.options[tradeVersion.selectedIndex].text,
+                brand_code: tradeBrand.value,
+                model_code: tradeModel.value,
+                version_code: tradeVersion.value,
+                year_range_start: parseInt(tradeYearStart.value),
+                year_range_end: parseInt(tradeYearEnd.value)
+            };
+            
+            // Kategori ve alt kategori bilgilerini de ekle
+            if (tradeCategory.value) {
+                tradeVehicle.category_id = parseInt(tradeCategory.value);
+                tradeVehicle.category_name = tradeCategory.options[tradeCategory.selectedIndex].text;
+            }
+            
+            if (tradeSubCategory.value) {
+                tradeVehicle.subcategory_id = parseInt(tradeSubCategory.value);
+                tradeVehicle.subcategory_name = tradeSubCategory.options[tradeSubCategory.selectedIndex].text;
+            }
+            
+            // Takas araçları dizisine ekle
+            tradeVehicles.push(tradeVehicle);
+            
+            // Aracı listede göster
+            renderTradeVehicles();
+            
+            // Formu temizle
+            tradeBrand.value = '';
+            tradeModel.innerHTML = '<option value="">Model Seçiniz</option>';
+            tradeModel.disabled = true;
+            tradeVersion.innerHTML = '<option value="">Versiyon Seçiniz</option>';
+            tradeVersion.disabled = true;
+            tradeYearStart.value = '';
+            tradeYearEnd.value = '';
+        }
+        
+        // Takas araçlarını listele
+        function renderTradeVehicles() {
+            const tradeVehiclesList = document.getElementById('tradeVehiclesList');
+            tradeVehiclesList.innerHTML = '';
+            
+            if (tradeVehicles.length === 0) {
+                tradeVehiclesList.innerHTML = '<p>Henüz takas aracı eklenmedi.</p>';
+                return;
+            }
+            
+            tradeVehicles.forEach((vehicle, index) => {
+                const vehicleCard = document.createElement('div');
+                vehicleCard.className = 'vehicle-card';
+                vehicleCard.style.border = '1px solid #E5E7EB';
+                vehicleCard.style.borderRadius = '8px';
+                vehicleCard.style.padding = '1rem';
+                vehicleCard.style.marginBottom = '1rem';
+                vehicleCard.style.backgroundColor = '#F9FAFB';
+                
+                let categoryText = '';
+                if (vehicle.category_name) {
+                    categoryText = vehicle.subcategory_name 
+                        ? `${vehicle.category_name} - ${vehicle.subcategory_name}` 
+                        : vehicle.category_name;
+                }
+                
+                vehicleCard.innerHTML = `
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <h4 style="margin: 0; font-weight: 600;">${vehicle.brand} ${vehicle.model} ${vehicle.version}</h4>
+                        <button type="button" class="remove-vehicle-btn" data-index="${index}" style="background: none; border: none; color: var(--danger-color); cursor: pointer;">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                    <p style="margin: 0.5rem 0 0 0; color: var(--text-secondary);">Yıl Aralığı: ${vehicle.year_range_start} - ${vehicle.year_range_end}</p>
+                    ${categoryText ? `<p style="margin: 0.25rem 0 0 0; color: var(--text-secondary);">Kategori: ${categoryText}</p>` : ''}
+                `;
+                
+                tradeVehiclesList.appendChild(vehicleCard);
+            });
+            
+            // Silme butonları için event listener
+            document.querySelectorAll('.remove-vehicle-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const index = parseInt(this.dataset.index);
+                    tradeVehicles.splice(index, 1);
+                    renderTradeVehicles();
+                });
+            });
+        }
+        
         // Bileşenleri yükle
         Promise.all([
             fetch('components/property-detail-header.html').then(response => response.text()),
@@ -903,6 +1439,27 @@
                     bluetooth: !!formData.get('bluetooth')
                 };
 
+                // Takas ile ilgili bilgileri ekle
+                data.wants_trade = document.getElementById('tradeYes').checked;
+                
+                // Takas istiyorsa ve araçlar eklediyse
+                if (data.wants_trade && tradeVehicles.length > 0) {
+                    // API beklenen formata göre trade_options'ı düzenle - v1 API yapısı
+                    data.trade_options = {
+                        vehicle_listing_id: data.id || 0, // API'den dönecek, ilk başta 0 olarak gönder
+                        trade_models: tradeVehicles.map(vehicle => ({
+                            brand: vehicle.brand,
+                            model: vehicle.model,
+                            version: vehicle.version,
+                            brand_code: vehicle.brand_code,
+                            model_code: vehicle.model_code,
+                            version_code: vehicle.version_code,
+                            year_range_start: vehicle.year_range_start,
+                            year_range_end: vehicle.year_range_end
+                        }))
+                    };
+                }
+
                 // Debug için veriyi konsola yazdır
                 console.log('API\'ye Gönderilecek Veri:', data);
                 
@@ -926,6 +1483,46 @@
                 
                 // API yanıtını konsola yazdır
                 console.log('API Yanıtı:', result);
+                
+                // İlan ID'sini al ve takas seçeneklerini güncelle
+                if (data.wants_trade && tradeVehicles.length > 0 && result.id) {
+                    // Takas seçeneklerini güncellemek için ikinci bir API isteği gönder
+                    try {
+                        const tradeData = {
+                            vehicle_listing_id: result.id,
+                            trade_models: tradeVehicles.map(vehicle => ({
+                                brand: vehicle.brand,
+                                model: vehicle.model,
+                                version: vehicle.version,
+                                brand_code: vehicle.brand_code,
+                                model_code: vehicle.model_code,
+                                version_code: vehicle.version_code,
+                                year_range_start: vehicle.year_range_start,
+                                year_range_end: vehicle.year_range_end
+                            }))
+                        };
+                        
+                        console.log('Takas Seçenekleri Gönderiliyor:', tradeData);
+                        
+                        // Takas seçeneklerini API'ye gönder
+                        const tradeResponse = await fetch('https://takkas-api.onrender.com/api/v1/vehicles/trade-options', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'Accept': 'application/json'
+                            },
+                            body: JSON.stringify(tradeData)
+                        });
+                        
+                        if (tradeResponse.ok) {
+                            console.log('Takas seçenekleri başarıyla kaydedildi.');
+                        } else {
+                            console.error('Takas seçenekleri kaydedilemedi:', await tradeResponse.text());
+                        }
+                    } catch (tradeError) {
+                        console.error('Takas seçenekleri gönderilirken hata:', tradeError);
+                    }
+                }
                 
                 // Başarı mesajı göster
                 alertBox.className = 'alert alert-success';
