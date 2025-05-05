@@ -374,12 +374,13 @@
     background: rgba(255, 87, 87, 0.9);
 }
 
-/* Çarpı işareti yerine Font Awesome ikonu kullanacağız, bu yüzden before içeriğini kaldırıyoruz */
-.dropzone .dz-preview .dz-remove::before {
-    content: '';
+/* Font Awesome icon stili */
+.dropzone .dz-preview .dz-remove i.fas.fa-times {
+    font-size: 1.5rem;
+    color: #fff;
 }
 
-.dropzone .dz-preview .dz-remove > * {
+.dropzone .dz-preview .dz-remove > *:not(.fas) {
     display: none;
 }
 

@@ -223,7 +223,7 @@ function initializeDropzone(listingId, listingType, authToken, uploadedPhotos) {
                             
                             // Font Awesome ikonu ekle
                             const icon = document.createElement('i');
-                            icon.className = 'fas fa-times dz-remove-icon';
+                            icon.className = 'fas fa-times';
                             removeButton.appendChild(icon);
                         }
                     }, 100);
