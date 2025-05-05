@@ -213,6 +213,20 @@ function initializeDropzone(listingId, listingType, authToken, uploadedPhotos) {
                     
                     // Dosyaları photosGrid'de görüntüle
                     updatePhotosGrid(dropzone.files);
+                    
+                    // Kaldır butonuna çarpı ikonu ekle (matches.html benzeri)
+                    setTimeout(() => {
+                        const removeButton = file.previewElement.querySelector('.dz-remove');
+                        if (removeButton) {
+                            // Mevcut içeriği temizle
+                            removeButton.innerHTML = '';
+                            
+                            // Font Awesome ikonu ekle
+                            const icon = document.createElement('i');
+                            icon.className = 'fas fa-times dz-remove-icon';
+                            removeButton.appendChild(icon);
+                        }
+                    }, 100);
                 });
                 
                 // Dosya kaldırıldığında

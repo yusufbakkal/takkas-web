@@ -150,6 +150,7 @@
 /* Dropzone özelleştirmeleri */
 .dropzone .dz-preview {
     margin: 15px;
+    position: relative;
 }
 
 .dropzone .dz-preview .dz-image {
@@ -339,4 +340,73 @@
         width: 100%;
         justify-content: center;
     }
+}
+
+/* Kaldır butonunu matches.html'deki reject butonuna benzer şekilde güncelle */
+.dropzone .dz-preview .dz-remove {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(0.9);
+    background: rgba(0, 0, 0, 0.65);
+    color: #fff;
+    border: none;
+    border-radius: 50%;
+    width: 48px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.6rem;
+    opacity: 0;
+    cursor: pointer;
+    z-index: 10;
+    transition: opacity 0.2s, transform 0.15s, background 0.2s;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+    outline: none;
+    padding: 0;
+}
+
+.dropzone .dz-preview:hover .dz-remove,
+.dropzone .dz-preview .dz-remove:focus {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+    background: rgba(255, 87, 87, 0.9);
+}
+
+/* Çarpı işareti yerine Font Awesome ikonu kullanacağız, bu yüzden before içeriğini kaldırıyoruz */
+.dropzone .dz-preview .dz-remove::before {
+    content: '';
+}
+
+.dropzone .dz-preview .dz-remove > * {
+    display: none;
+}
+
+/* Çarpı ikonu için özel sınıf - JavaScript ile eklenecek */
+.dz-remove-icon {
+    font-size: 1.5rem;
+    color: #fff;
+}
+
+/* Dropzone hover efektlerini engelle - buğulanmayı kaldır */
+.dropzone .dz-preview:hover .dz-image img {
+    transform: none !important;
+    -webkit-filter: none !important;
+    filter: none !important;
+    opacity: 1 !important;
+}
+
+.dropzone .dz-preview:hover .dz-details {
+    opacity: 0 !important;
+    background: transparent !important;
+}
+
+.dropzone .dz-preview .dz-image:hover {
+    z-index: 0 !important;
+}
+
+/* Hover efekti olarak sadece hafif bir gölge ekle */
+.dropzone .dz-preview:hover {
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
 } 
