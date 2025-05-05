@@ -47,9 +47,9 @@ document.addEventListener('DOMContentLoaded', function() {
             const vehiclesWithImages = await Promise.all(data.map(async vehicle => {
                 let carImages = await fetchCarImages(vehicle.id);
                 
-                // Eğer API'den fotoğraf yoksa, varsayılan fotoğraf eklemiyoruz
-                // Boş dizi döndürerek görselsiz olduğunu belirtiyoruz
-                if (!carImages || carImages.length === 0) {
+                // Eğer API'den fotoğraf yoksa, boş dizi olarak bırak
+                // Görseli olmayan araçlar için carImages = []
+                if (!carImages) {
                     carImages = [];
                 }
                 
@@ -66,10 +66,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 };
             }));
             
-            // Görseli olan araçları filtreliyoruz
-            const vehiclesWithValidImages = vehiclesWithImages.filter(vehicle => vehicle.hasImages);
-            
-            allCards = vehiclesWithValidImages;
+            // Artık filtreleme yapmıyoruz, tüm araçlar gösterilecek
+            allCards = vehiclesWithImages;
             
             // İlk kartı göster
             if (allCards.length > 0) {
@@ -93,27 +91,30 @@ document.addEventListener('DOMContentLoaded', function() {
         // Listeyi temizle
         matchesList.innerHTML = '';
         
-        // Görseli olan araçlar içinden rastgele 5 tanesini eşleşme olarak göster
+        // Tüm araçlar içinden rastgele 5 tanesini eşleşme olarak göster
         const matchCount = Math.min(vehicles.length, 5);
         const shuffled = [...vehicles].sort(() => 0.5 - Math.random());
         
         for (let i = 0; i < matchCount; i++) {
             const vehicle = shuffled[i];
-            // Sadece görseli olan araçları eşleşme listesinde göster
-            if (vehicle.images && vehicle.images.length > 0) {
-                const matchCard = document.createElement('div');
-                matchCard.className = 'match-card';
-                matchCard.innerHTML = `
-                    <div class="match-image">
-                        <img src="${vehicle.images[0]}" alt="${vehicle.title}">
-                    </div>
-                    <div class="match-info">
-                        <h3>${vehicle.title}</h3>
-                        <p>${vehicle.type}</p>
-                    </div>
-                `;
-                matchesList.appendChild(matchCard);
-            }
+            const matchCard = document.createElement('div');
+            matchCard.className = 'match-card';
+            
+            // Görseli yoksa boş bir görsel alanı göster
+            const imageHTML = vehicle.hasImages 
+                ? `<img src="${vehicle.images[0]}" alt="${vehicle.title}">`
+                : `<div class="no-image">Görsel Yok</div>`;
+                
+            matchCard.innerHTML = `
+                <div class="match-image">
+                    ${imageHTML}
+                </div>
+                <div class="match-info">
+                    <h3>${vehicle.title}</h3>
+                    <p>${vehicle.type}</p>
+                </div>
+            `;
+            matchesList.appendChild(matchCard);
         }
     }
 
@@ -144,26 +145,44 @@ document.addEventListener('DOMContentLoaded', function() {
     fetchVehicles();
 
     function renderCard(cardData) {
+        // Görseli olan araçlar için normal slider göster
+        // Görseli olmayan araçlar için "görsel yok" mesajı göster
+        let imagesHTML = '';
+        let indicatorsHTML = '';
+        
+        if (cardData.hasImages && cardData.images.length > 0) {
+            // Normal görsel slider'ı
+            imagesHTML = cardData.images.map(img => `
+                <img src="${img}" alt="${cardData.title}">
+            `).join('');
+            
+            indicatorsHTML = cardData.images.map((_, i) => `
+                <div class="indicator ${i === 0 ? 'active' : ''}"></div>
+            `).join('');
+        } else {
+            // Görsel yoksa, "görsel yok" mesajı
+            imagesHTML = `<div class="no-image-placeholder">Bu ilan için görsel bulunmamaktadır</div>`;
+            indicatorsHTML = '';
+        }
+        
         const cardHTML = `
             <div class="card">
                 <div class="card-image">
-                    <div class="image-slider">
+                    <div class="image-slider ${!cardData.hasImages ? 'no-images' : ''}">
                         <div class="slider-images">
-                            ${cardData.images.map(img => `
-                                <img src="${img}" alt="${cardData.title}">
-                            `).join('')}
+                            ${imagesHTML}
                         </div>
                         <div class="slider-indicators">
-                            ${cardData.images.map((_, i) => `
-                                <div class="indicator ${i === 0 ? 'active' : ''}"></div>
-                            `).join('')}
+                            ${indicatorsHTML}
                         </div>
+                        ${cardData.hasImages ? `
                         <button class="slider-nav prev">
                             <i class="fas fa-chevron-left"></i>
                         </button>
                         <button class="slider-nav next">
                             <i class="fas fa-chevron-right"></i>
                         </button>
+                        ` : ''}
                     </div>
                     <div class="card-gradient"></div>
                 </div>
@@ -195,7 +214,13 @@ document.addEventListener('DOMContentLoaded', function() {
         const card = cardStack.querySelector('.card');
         
         // Kart özelliklerini aktifleştir
-        initializeCardFeatures(card);
+        if (cardData.hasImages) {
+            initializeCardFeatures(card);
+        } else {
+            // Görseli olmayan kartlar için sadece butonları etkinleştir
+            initializeButtons(card);
+            initializeDragFeature(card);
+        }
     }
 
     function initializeCardFeatures(card) {
