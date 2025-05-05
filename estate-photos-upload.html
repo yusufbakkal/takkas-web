@@ -133,6 +133,11 @@
         window.addEventListener('load', function() {
             console.log('Sayfa tamamen yüklendi');
             
+            // Bileşenleri yükle
+            if (typeof loadComponents === 'function') {
+                loadComponents();
+            }
+            
             // Dropzone'un doğru yüklenip yüklenmediğini kontrol et
             if (typeof Dropzone !== 'undefined') {
                 console.log('Dropzone kütüphanesi yüklendi');
@@ -164,6 +169,23 @@
                 console.error('Dropzone kütüphanesi yüklenemedi!');
             }
         });
+    </script>
+
+    <!-- Bileşenleri yükler (Header ve Footer) -->
+    <script>
+        function loadComponents() {
+            fetch('components/property-detail-header.html')
+                .then(response => response.text())
+                .then(data => {
+                    document.getElementById('header-component').innerHTML = data;
+                });
+
+            fetch('components/footer.html')
+                .then(response => response.text())
+                .then(data => {
+                    document.getElementById('footer-component').innerHTML = data;
+                });
+        }
     </script>
 </body>
 </html>     

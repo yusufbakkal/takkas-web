@@ -109,7 +109,7 @@ function updatePageTitle(listingType) {
  * Bileşenleri yükler (Header ve Footer)
  */
 function loadComponents() {
-    fetch('components/header.html')
+    fetch('components/property-detail-header.html')
         .then(response => response.text())
         .then(data => {
             document.getElementById('header-component').innerHTML = data;
