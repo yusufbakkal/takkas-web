@@ -3,6 +3,36 @@ document.addEventListener('DOMContentLoaded', function() {
     let currentCardIndex = 0;
     let allCards = []; // API'den gelecek veriler için boş array
     
+    // Araç fotoğraflarını çeken fonksiyon
+    async function fetchCarImages(carId) {
+        try {
+            const imageUrl = `https://takkas-api.onrender.com/api/listing-photos/${carId}`;
+            console.log('Görsel API isteği gönderiliyor:', imageUrl);
+            
+            const response = await fetch(imageUrl);
+            console.log('Görsel API yanıt durumu:', response.status, response.statusText);
+            
+            if (!response.ok) {
+                console.warn(`${carId} ID'li araç için görseller bulunamadı. HTTP Durumu: ${response.status}`);
+                return null;
+            }
+            
+            const imagesData = await response.json();
+            console.log('Görsel API yanıtı:', imagesData);
+            
+            if (!imagesData || imagesData.length === 0) {
+                console.warn(`${carId} ID'li araç için görseller bulunamadı veya boş dizi döndü.`);
+                return null;
+            }
+            
+            // API'den gelen görselleri döndür
+            return imagesData.map(img => img.url);
+        } catch (error) {
+            console.error(`${carId} ID'li araç için görseller çekilirken hata:`, error);
+            return null;
+        }
+    }
+    
     // API'den araçları çek
     async function fetchVehicles() {
         try {
@@ -13,31 +43,78 @@ document.addEventListener('DOMContentLoaded', function() {
             const data = await response.json();
             console.log('API\'den gelen veriler:', data);
             
-            // API'den gelen verileri formatlayarak allCards'a aktar
-            allCards = data.map(vehicle => ({
-                id: vehicle.id,
-                title: vehicle.title || `${vehicle.brand} ${vehicle.model}`,
-                type: vehicle.case_type || 'Araç',
-                price: parseFloat(vehicle.price),
-                year: vehicle.production_year,
-                mileage: vehicle.kilometer,
-                fuel: vehicle.fuel_type,
-                images: [
-                    // Eğer araç görseli yoksa varsayılan görseller kullan
-                    vehicle.image_url || 'https://images.unsplash.com/photo-1617814076367-b759c7d7e738',
-                    'https://images.unsplash.com/photo-1580273916550-e323be2ae537',
-                    'https://images.unsplash.com/photo-1614162692292-7ac56d7f7f1e'
-                ]
+            // Araç verilerini işle ve her araç için fotoğrafları çek
+            const vehiclesWithImages = await Promise.all(data.map(async vehicle => {
+                let carImages = await fetchCarImages(vehicle.id);
+                
+                // Eğer API'den fotoğraf gelmezse varsayılan fotoğrafları kullan
+                if (!carImages || carImages.length === 0) {
+                    carImages = [
+                        'https://images.unsplash.com/photo-1617814076367-b759c7d7e738',
+                        'https://images.unsplash.com/photo-1580273916550-e323be2ae537',
+                        'https://images.unsplash.com/photo-1614162692292-7ac56d7f7f1e'
+                    ];
+                }
+                
+                return {
+                    id: vehicle.id,
+                    title: vehicle.title || `${vehicle.brand} ${vehicle.model}`,
+                    type: vehicle.case_type || 'Araç',
+                    price: parseFloat(vehicle.price),
+                    year: vehicle.production_year,
+                    mileage: vehicle.kilometer,
+                    fuel: vehicle.fuel_type,
+                    images: carImages
+                };
             }));
+            
+            allCards = vehiclesWithImages;
             
             // İlk kartı göster
             if (allCards.length > 0) {
                 renderCard(allCards[currentCardIndex]);
             }
+            
+            // Ayrıca eşleşmeler listesini de güncelle
+            updateMatchesList(allCards);
         } catch (error) {
             console.error('Araçlar yüklenirken hata:', error);
             // Hata durumunda örnek verilerle devam et
             loadSampleData();
+        }
+    }
+
+    // Eşleşmeler listesini güncelleme
+    function updateMatchesList(vehicles) {
+        const matchesList = document.querySelector('.matches-list');
+        if (!matchesList) return;
+        
+        // Listeyi temizle
+        matchesList.innerHTML = '';
+        
+        // Araçlardan rastgele 5 tanesini eşleşme olarak göster (ya da hepsini, eğer 5'ten azsa)
+        const matchCount = Math.min(vehicles.length, 5);
+        const shuffled = [...vehicles].sort(() => 0.5 - Math.random());
+        
+        for (let i = 0; i < matchCount; i++) {
+            const vehicle = shuffled[i];
+            // İlk görseli kullan, yoksa varsayılan görsel
+            const imageUrl = vehicle.images && vehicle.images.length > 0 
+                ? vehicle.images[0] 
+                : 'https://images.unsplash.com/photo-1618851142562-03c06812d9a4';
+                
+            const matchCard = document.createElement('div');
+            matchCard.className = 'match-card';
+            matchCard.innerHTML = `
+                <div class="match-image">
+                    <img src="${imageUrl}" alt="${vehicle.title}">
+                </div>
+                <div class="match-info">
+                    <h3>${vehicle.title}</h3>
+                    <p>${vehicle.type}</p>
+                </div>
+            `;
+            matchesList.appendChild(matchCard);
         }
     }
 
@@ -61,6 +138,7 @@ document.addEventListener('DOMContentLoaded', function() {
             // Diğer örnek kartlar buraya eklenebilir
         ];
     renderCard(allCards[currentCardIndex]);
+    updateMatchesList(allCards);
     }
 
     // Sayfa yüklendiğinde API'den verileri çek
