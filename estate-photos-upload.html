@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>İlan Fotoğrafları Ekle - TAKKAS</title>
+    
+    <!-- CSS Bağlantıları -->
+    <link rel="stylesheet" href="assets/css/base.css">
+    <link rel="stylesheet" href="assets/css/property-detail-header.css">
+    <link rel="stylesheet" href="assets/css/footer.css">
+    <link rel="stylesheet" href="assets/css/create-listing.css">
+    <link rel="stylesheet" href="assets/css/estate-photos-upload.css">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <!-- Dropzone.js CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/dropzone@5/dist/min/dropzone.min.css" type="text/css" />
+</head>
+<body>
+    <!-- Özel Header Bileşeni -->
+    <div id="header-component"></div>
+
+    <!-- Ana İçerik -->
+    <main class="create-listing-container">
+        <div class="create-listing-header">
+            <h1 id="pageTitle">İlan Fotoğrafları</h1>
+            <div class="steps-container">
+                <div class="step completed">
+                    <div class="step-number">1</div>
+                    <div class="step-text">Kategori Seç</div>
+                </div>
+                <div class="step-line completed"></div>
+                <div class="step completed">
+                    <div class="step-number">2</div>
+                    <div class="step-text">Alt Kategori</div>
+                </div>
+                <div class="step-line completed"></div>
+                <div class="step completed">
+                    <div class="step-number">3</div>
+                    <div class="step-text">İlan Detayları</div>
+                </div>
+                <div class="step-line completed"></div>
+                <div class="step active">
+                    <div class="step-number">4</div>
+                    <div class="step-text">Görsel Ekle</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="create-listing-content">
+            <h2 class="section-title" id="sectionTitle">İlan Fotoğrafları</h2>
+            
+            <div class="photo-upload-info">
+                <div class="info-icon">
+                    <i class="fas fa-info-circle"></i>
+                </div>
+                <div class="info-text">
+                    <p><strong>Fotoğraf Yükleme Kuralları:</strong></p>
+                    <ul>
+                        <li>En az 1 fotoğraf yüklemeniz gerekmektedir.</li>
+                        <li>En fazla 15 fotoğraf yükleyebilirsiniz.</li>
+                        <li>İlk yüklediğiniz fotoğraf ilanın kapak fotoğrafı olacaktır.</li>
+                        <li>Fotoğraflar .jpg, .jpeg veya .png formatında olmalıdır.</li>
+                        <li>Her bir fotoğraf en fazla 5MB boyutunda olabilir.</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="upload-container">
+                <div class="upload-area" id="photoUploadArea">
+                    <div class="dropzone" id="photoDropzone">
+                        <div class="dz-message">
+                            <div class="upload-icon">
+                                <i class="fas fa-cloud-upload-alt"></i>
+                            </div>
+                            <h3>Fotoğrafları buraya sürükleyin</h3>
+                            <p>veya</p>
+                            <button type="button" id="photoUploadBtn" class="upload-btn">
+                                <i class="fas fa-images"></i> Bilgisayardan Fotoğraf Seç
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="uploaded-photos" id="uploadedPhotos">
+                    <h3>Yüklenen Fotoğraflar</h3>
+                    <div class="photos-grid" id="photosGrid">
+                        <!-- Yüklenen fotoğraflar buraya dinamik olarak eklenecek -->
+                    </div>
+                </div>
+            </div>
+
+            <div class="photo-actions">
+                <button type="button" class="action-btn" id="backButton">
+                    <i class="fas fa-arrow-left"></i> Geri
+                </button>
+                <button type="button" class="action-btn primary" id="saveButton" disabled>
+                    <i class="fas fa-check"></i> İlanı Yayınla
+                </button>
+            </div>
+
+            <!-- Yükleme Durumu Modal -->
+            <div class="modal" id="uploadStatusModal">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h3>Fotoğraflar Yükleniyor</h3>
+                    </div>
+                    <div class="modal-body">
+                        <div class="progress-container">
+                            <div class="progress-bar" id="uploadProgressBar"></div>
+                        </div>
+                        <p id="uploadStatusText">Fotoğraflar yükleniyor... (<span id="uploadedCount">0</span>/<span id="totalCount">0</span>)</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer Bileşeni -->
+    <div class="full-width-footer-wrapper">
+        <div id="footer-component"></div>
+    </div>
+
+    <!-- Dropzone.js - Fotoğraf yükleme kütüphanesi -->
+    <script src="https://unpkg.com/dropzone@5/dist/min/dropzone.min.js"></script>
+    
+    <!-- JavaScript -->
+    <script src="assets/js/estate-photos-upload.js"></script>
+    
+    <!-- Debug Script -->
+    <script>
+        // Sayfa yüklendikten sonra çalışacak hata ayıklama kodları
+        window.addEventListener('load', function() {
+            console.log('Sayfa tamamen yüklendi');
+            
+            // Dropzone'un doğru yüklenip yüklenmediğini kontrol et
+            if (typeof Dropzone !== 'undefined') {
+                console.log('Dropzone kütüphanesi yüklendi');
+                
+                // Fotoğraf yükleme butonunun mevcut olup olmadığını kontrol et
+                const uploadBtn = document.getElementById('photoUploadBtn');
+                if (uploadBtn) {
+                    console.log('Fotoğraf yükleme butonu bulundu');
+                    uploadBtn.addEventListener('click', function() {
+                        console.log('Debug: Fotoğraf yükleme butonu tıklandı');
+                    });
+                } else {
+                    console.error('Fotoğraf yükleme butonu bulunamadı!');
+                }
+                
+                // Dropzone alanının doğru oluşturulup oluşturulmadığını kontrol et
+                const dropzoneElement = document.getElementById('photoDropzone');
+                if (dropzoneElement) {
+                    console.log('Dropzone alanı bulundu');
+                    if (dropzoneElement.dropzone) {
+                        console.log('Dropzone başarıyla başlatıldı');
+                    } else {
+                        console.warn('Dropzone alanı doğru başlatılmamış olabilir');
+                    }
+                } else {
+                    console.error('Dropzone alanı bulunamadı!');
+                }
+            } else {
+                console.error('Dropzone kütüphanesi yüklenemedi!');
+            }
+        });
+    </script>
+</body>
+</html>     

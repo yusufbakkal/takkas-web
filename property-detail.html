@@ -250,6 +250,28 @@
                     }
                 }
                 
+                // İlan fotoğraflarını al
+                try {
+                    const photosUrl = `https://takkas-api.onrender.com/api/estate-photos/estate/${propertyId}`;
+                    console.log('Fotoğraf bilgisi için API isteği:', photosUrl);
+                    
+                    const photosResponse = await fetch(photosUrl);
+                    
+                    if (photosResponse.ok) {
+                        const photosData = await photosResponse.json();
+                        console.log('Fotoğraf API yanıtı:', photosData);
+                        
+                        // Fotoğraf verilerini emlak verilerine ekle
+                        data.photos = photosData;
+                    } else {
+                        console.error('Fotoğraf bilgileri alınamadı:', photosResponse.status);
+                        data.photos = [];
+                    }
+                } catch (photosError) {
+                    console.error('Fotoğraf bilgileri alınırken hata oluştu:', photosError);
+                    data.photos = [];
+                }
+                
                 return data;
             } catch (error) {
                 console.error('İlan detayları çekilirken hata oluştu:', error);
@@ -294,33 +316,40 @@
                     // Örnek adres bilgileri
                     province_name: "İstanbul",
                     district_name: "Beşiktaş",
-                    neighborhood_name: "Levent"
+                    neighborhood_name: "Levent",
+                    // Boş fotoğraf dizisi
+                    photos: []
                 };
             }
         }
 
         // İlan detaylarını sayfaya ekle
         function renderPropertyDetails(property) {
-            // Varsayılan görseller
-            const defaultImages = [
-                'https://images.unsplash.com/photo-1580587771525-78b9dba3b914?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1074&q=80',
-                'https://images.unsplash.com/photo-1512917774080-9991f1c4c750?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1170&q=80',
-                'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1170&q=80',
-                'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1175&q=80',
-                'https://images.unsplash.com/photo-1600585154526-990dced4db3d?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=687&q=80'
-            ];
+            // Fotoğraf olup olmadığını kontrol et
+            const hasPhotos = property.photos && property.photos.length > 0;
+            
+            // Fotoğrafları düzenle ve is_primary olanı öne çıkar
+            let propertyImages = [];
+            if (hasPhotos) {
+                // primary olan görseli öne al
+                const primaryPhotoIndex = property.photos.findIndex(photo => photo.is_primary === true);
+                
+                if (primaryPhotoIndex !== -1) {
+                    // Primary olan görseli başa koy, diğerlerini sırala
+                    const primaryPhoto = property.photos[primaryPhotoIndex];
+                    const otherPhotos = property.photos.filter((_, index) => index !== primaryPhotoIndex);
+                    propertyImages = [primaryPhoto, ...otherPhotos].map(photo => photo.url);
+                } else {
+                    // Primary yoksa tüm görselleri al
+                    propertyImages = property.photos.map(photo => photo.url);
+                }
+            } else {
+                // Fotoğraf yoksa placeholder göster
+                propertyImages = ["https://via.placeholder.com/800x500/e0e0e0/333333?text=Fotoğraf+Bulunamadı"];
+            }
 
             // İlanın arsa mı konut mu olduğunu kontrol et
             const isLand = property.estate_type === 'arsa';
-
-            // Arsa tipi ilanlarda farklı resimler kullan
-            if (isLand) {
-                defaultImages[0] = 'https://images.unsplash.com/photo-1500382017468-9049fed747ef?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1074&q=80';
-                defaultImages[1] = 'https://images.unsplash.com/photo-1628624747186-a941c476b7ef?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1170&q=80';
-                defaultImages[2] = 'https://images.unsplash.com/photo-1560518883-ce09059eeffa?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1073&q=80';
-                defaultImages[3] = 'https://images.unsplash.com/photo-1592595896616-c37162298647?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1170&q=80';
-                defaultImages[4] = 'https://images.unsplash.com/photo-1600566752355-35792bedcfea?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=687&q=80';
-            }
 
             // Tarih formatını düzenle
             const createdDate = new Date(property.created_at);
@@ -409,21 +438,25 @@
                 <div class="property-main-content">
                     <div class="property-gallery">
                         <div class="main-image">
-                            <img src="${defaultImages[0]}" alt="${property.title}" id="mainImage">
+                            <img src="${propertyImages[0]}" alt="${property.title}" id="mainImage">
+                            ${propertyImages.length > 1 ? `
                             <button class="gallery-nav prev-btn" id="prevImage" aria-label="Önceki görsel">
                                 <i class="fas fa-chevron-left"></i>
                             </button>
                             <button class="gallery-nav next-btn" id="nextImage" aria-label="Sonraki görsel">
                                 <i class="fas fa-chevron-right"></i>
                             </button>
+                            ` : ''}
                         </div>
+                        ${propertyImages.length > 1 ? `
                         <div class="thumbnail-container">
-                            ${defaultImages.map((img, index) => `
+                            ${propertyImages.map((img, index) => `
                                 <div class="thumbnail ${index === 0 ? 'active' : ''}" data-index="${index}">
                                     <img src="${img}" alt="Görsel ${index + 1}">
                                 </div>
                             `).join('')}
                         </div>
+                        ` : ''}
                     </div>
 
                     <div class="property-info-sidebar">
@@ -602,9 +635,14 @@
                 document.body.style.overflow = 'auto';
             });
 
+            // Eğer fotoğraf yoksa galeri işlemlerini yapma
+            if (!hasPhotos || propertyImages.length <= 1) {
+                return;
+            }
+            
             // Görsel galerisi için değişkenler
             let currentImageIndex = 0;
-            const images = defaultImages;
+            const images = propertyImages;
             const mainImage = document.getElementById('mainImage');
             const thumbnails = document.querySelectorAll('.thumbnail');
             const prevBtn = document.getElementById('prevImage');
@@ -967,8 +1005,35 @@
                 // En fazla 4 benzer ilan göster
                 const similarProperties = estateData.slice(0, 4);
                 
+                // Benzer ilanların fotoğraflarını çek
+                const propertiesWithPhotos = await Promise.all(
+                    similarProperties.map(async (property) => {
+                        try {
+                            const photosUrl = `https://takkas-api.onrender.com/api/estate-photos/estate/${property.id}`;
+                            const photosResponse = await fetch(photosUrl);
+                            
+                            if (photosResponse.ok) {
+                                const photosData = await photosResponse.json();
+                                if (photosData && photosData.length > 0) {
+                                    // Öncelikle primary olan fotoğrafı bul
+                                    const primaryPhoto = photosData.find(photo => photo.is_primary === true);
+                                    if (primaryPhoto) {
+                                        property.photo_url = primaryPhoto.url;
+                                    } else {
+                                        property.photo_url = photosData[0].url;
+                                    }
+                                }
+                            }
+                            return property;
+                        } catch (error) {
+                            console.error(`${property.id} ID'li ilanın fotoğrafları çekilirken hata oluştu:`, error);
+                            return property;
+                        }
+                    })
+                );
+                
                 // Benzer ilanları sayfaya ekle
-                renderSimilarProperties(similarProperties);
+                renderSimilarProperties(propertiesWithPhotos);
             } catch (error) {
                 console.error('Benzer ilanlar yüklenirken hata oluştu:', error);
                 
@@ -990,17 +1055,10 @@
         function renderSimilarProperties(properties) {
             const similarPropertiesGrid = document.getElementById('similarPropertiesGrid');
             
-            // Varsayılan görseller
-            const defaultImages = [
-                'https://images.unsplash.com/photo-1580587771525-78b9dba3b914?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1074&q=80',
-                'https://images.unsplash.com/photo-1512917774080-9991f1c4c750?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1170&q=80',
-                'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1170&q=80',
-                'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1175&q=80'
-            ];
-            
             // Benzer ilanlar HTML'ini oluştur
-            const similarPropertiesHtml = properties.map((property, index) => {
-                const image = property.image_url || property.image || defaultImages[index % defaultImages.length];
+            const similarPropertiesHtml = properties.map((property) => {
+                // Fotoğraf yoksa placeholder göster
+                const image = property.photo_url || "https://via.placeholder.com/400x250/e0e0e0/333333?text=Fotoğraf+Bulunamadı";
                 const price = typeof property.price === 'number' ? property.price.toLocaleString() : property.price;
                 
                 return `

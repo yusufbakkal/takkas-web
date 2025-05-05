@@ -1,273 +1,656 @@
 <!DOCTYPE html>
-<html lang="tr" class="light-theme">
+<html lang="tr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mesajlar</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="style.css">
+    <title>Mesajlar | Takkas</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#4F46E5',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .chat-container {
+            height: calc(100vh - 64px);
+        }
+        .message-list {
+            height: calc(100% - 70px);
+            overflow-y: auto;
+        }
+        .conversation-area {
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+        .messages-container {
+            flex-grow: 1;
+            overflow-y: auto;
+            padding: 1rem;
+        }
+        .input-area {
+            padding: 1rem;
+            border-top: 1px solid #e5e7eb;
+        }
+        .chat-bubble {
+            max-width: 75%;
+            padding: 0.75rem 1rem;
+            border-radius: 1rem;
+            margin-bottom: 0.5rem;
+        }
+        .sent {
+            background-color: #EEF2FF;
+            color: #333;
+            margin-left: auto;
+            border-top-right-radius: 0;
+            border: 1px solid #E0E7FF;
+        }
+        .received {
+            background-color: #F9FAFB;
+            border-top-left-radius: 0;
+            border: 1px solid #E5E7EB;
+        }
+        .message-time {
+            font-size: 0.75rem;
+            margin-top: 0.25rem;
+        }
+        .sent .message-time {
+            color: #6B7280;
+        }
+        .received .message-time {
+            color: #9ca3af;
+        }
+        /* Emoji desteği için font-family ayarı */
+        .chat-bubble p {
+            font-family: 'Segoe UI Emoji', 'Segoe UI Symbol', 'Apple Color Emoji', 'Noto Color Emoji', sans-serif;
+        }
+    </style>
 </head>
-<body>
-    <div class="chat-container">
-        <!-- Sol panel - Mesaj listesi -->
-        <div class="sidebar">
-            <div class="sidebar-header">
-                <div class="header-left">
-                    <a href="index.html" class="back-button">
-                        <i class="fas fa-arrow-left"></i>
-                    </a>
-                    <h2>Messages</h2>
-                </div>
-                <div class="header-actions">
-                    <button class="theme-toggle-btn" id="themeToggleBtn">
-                        <i class="fas fa-sun"></i>
-                    </button>
-                    <button class="new-message-btn" id="newMessageBtn">
-                        <i class="fas fa-edit"></i>
-                    </button>
-                </div>
+<body class="bg-gray-50">
+    <div class="chat-container flex">
+        <!-- Sol sidebar - Konuşmalar listesi -->
+        <div class="w-1/4 bg-white border-r">
+            <div class="p-4 border-b flex justify-between items-center">
+                <h1 class="text-xl font-semibold text-gray-800">Mesajlar</h1>
+                <button class="text-primary hover:bg-indigo-50 p-2 rounded-full">
+                    <i class="fas fa-edit text-lg"></i>
+                </button>
             </div>
-            <div class="search-container">
-                <i class="fas fa-search search-icon"></i>
-                <input type="text" id="searchInput" placeholder="Search...">
-            </div>
-            <div class="pinned-section">
-                <p class="section-title"><i class="fas fa-thumbtack"></i> PINNED</p>
-                <div class="contact-list" id="pinnedContacts">
-                    <div class="contact-item active">
-                        <div class="contact-avatar">
-                            <img src="https://randomuser.me/api/portraits/men/32.jpg" alt="Kişi">
-                            <div class="online-indicator"></div>
-                        </div>
-                        <div class="contact-info">
-                            <div class="contact-header">
-                                <span class="contact-name">Killan James</span>
-                                <span class="contact-time">4:30 PM</span>
-                            </div>
-                            <div class="contact-message typing-indicator">Typing...</div>
-                        </div>
-                        <div class="unread-badge">2</div>
+            <div class="p-3 border-b">
+                <div class="relative">
+                    <input type="text" placeholder="Arama..." class="w-full pl-10 pr-4 py-2 bg-gray-50 rounded-full focus:outline-none border border-gray-200 focus:border-indigo-300 focus:ring-1 focus:ring-indigo-300">
+                    <div class="absolute left-3 top-2.5 text-gray-500">
+                        <i class="fas fa-search"></i>
                     </div>
                 </div>
             </div>
-            <div class="all-messages-section">
-                <p class="section-title"><i class="far fa-envelope"></i> All Message</p>
-                <div class="contact-list" id="allContacts">
-                    <div class="contact-item">
-                        <div class="contact-avatar">
-                            <img src="https://randomuser.me/api/portraits/men/32.jpg" alt="Kişi">
-                            <div class="online-indicator"></div>
-                        </div>
-                        <div class="contact-info">
-                            <div class="contact-header">
-                                <span class="contact-name">Desian Tam</span>
-                                <span class="contact-time">9:36 AM</span>
-                            </div>
-                            <div class="contact-message">Hello! Everyone</div>
-                        </div>
-                        <div class="read-indicator">
-                            <i class="fas fa-check-double" style="color: #4caf50;"></i>
-                        </div>
-                    </div>
-                    <div class="contact-item">
-                        <div class="contact-avatar">
-                            <img src="https://randomuser.me/api/portraits/men/41.jpg" alt="Kişi">
-                        </div>
-                        <div class="contact-info">
-                            <div class="contact-header">
-                                <span class="contact-name">Ahmed Medi</span>
-                                <span class="contact-time">1:15 AM</span>
-                            </div>
-                            <div class="contact-message">Wow really Cool 🔥</div>
-                        </div>
-                    </div>
-                    <div class="contact-item">
-                        <div class="contact-avatar">
-                            <img src="https://randomuser.me/api/portraits/women/44.jpg" alt="Kişi">
-                        </div>
-                        <div class="contact-info">
-                            <div class="contact-header">
-                                <span class="contact-name">Claudia Maudi</span>
-                                <span class="contact-time">4:30 PM</span>
-                            </div>
-                            <div class="contact-message">Nice</div>
-                        </div>
-                    </div>
-                    <div class="contact-item">
-                        <div class="contact-avatar">
-                            <img src="https://randomuser.me/api/portraits/women/66.jpg" alt="Kişi">
-                            <div class="online-indicator"></div>
-                        </div>
-                        <div class="contact-info">
-                            <div class="contact-header">
-                                <span class="contact-name">Novita</span>
-                                <span class="contact-time">4:30 PM</span>
-                            </div>
-                            <div class="contact-message">yah, nice design</div>
-                        </div>
-                        <div class="unread-badge">2</div>
-                    </div>
-                    <div class="contact-item">
-                        <div class="contact-avatar">
-                            <img src="https://randomuser.me/api/portraits/men/67.jpg" alt="Kişi">
-                        </div>
-                        <div class="contact-info">
-                            <div class="contact-header">
-                                <span class="contact-name">Milie Nose</span>
-                                <span class="contact-time">8:20 PM</span>
-                            </div>
-                            <div class="contact-message">Awesome 🔥</div>
-                        </div>
-                        <div class="unread-badge">1</div>
-                    </div>
-                    <div class="contact-item">
-                        <div class="contact-avatar">
-                            <img src="https://randomuser.me/api/portraits/men/79.jpg" alt="Kişi">
-                        </div>
-                        <div class="contact-info">
-                            <div class="contact-header">
-                                <span class="contact-name">Ikhsan SD</span>
-                                <span class="contact-time">yesterday</span>
-                            </div>
-                            <div class="contact-message">
-                                <i class="fas fa-microphone-alt"></i> Voice message
-                            </div>
-                        </div>
-                    </div>
-                    <div class="contact-item">
-                        <div class="contact-avatar">
-                            <img src="https://randomuser.me/api/portraits/men/22.jpg" alt="Kişi">
-                            <div class="online-indicator"></div>
-                        </div>
-                        <div class="contact-info">
-                            <div class="contact-header">
-                                <span class="contact-name">Aditya</span>
-                                <span class="contact-time">yesterday</span>
-                            </div>
-                            <div class="contact-message">publish now</div>
-                        </div>
-                        <div class="read-indicator">
-                            <i class="fas fa-check-double" style="color: #4caf50;"></i>
-                        </div>
+            <div class="overflow-y-auto message-list">
+                <div class="py-2 px-4 flex items-center hover:bg-gray-50 cursor-pointer">
+                    <i class="far fa-comment-dots text-gray-500 mr-3"></i>
+                    <span class="text-gray-600">Tüm mesajlar</span>
+                </div>
+                
+                <!-- Konuşma listesi -->
+                <div id="conversations-list" class="mt-2">
+                    <!-- Konuşmalar JavaScript ile doldurulacak -->
+                    <div class="flex justify-center py-6">
+                        <div class="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-primary"></div>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- Sağ panel - Mesaj detayları -->
-        <div class="chat-area">
-            <div class="chat-header" id="chatHeader">
-                <div class="chat-header-left">
-                    <a href="index.html" class="back-button">
-                        <i class="fas fa-arrow-left"></i>
-                    </a>
-                    <div class="chat-avatar">
-                        <img src="https://randomuser.me/api/portraits/men/32.jpg" alt="Killan James">
-                    </div>
-                    <div class="chat-user-info">
-                        <h3>Killan James</h3>
-                        <p>Active Now</p>
-                    </div>
+        <!-- Sağ taraf - Konuşma alanı (başlangıçta boş, bir konuşma seçildiğinde doldurulacak) -->
+        <div class="w-3/4 bg-white" id="conversation-container">
+            <!-- Başlangıç durumu: Mesaj seçilmediğinde gösterilecek -->
+            <div class="h-full flex flex-col items-center justify-center text-gray-500" id="no-conversation-selected">
+                <div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mb-4 border border-gray-200">
+                    <i class="fas fa-comment-dots text-gray-400 text-2xl"></i>
                 </div>
-                <div class="chat-actions">
-                    <button class="chat-action-btn">
-                        <i class="fas fa-video"></i>
-                    </button>
-                    <button class="chat-action-btn">
-                        <i class="fas fa-phone-alt"></i>
-                    </button>
-                    <button class="chat-action-btn">
-                        <i class="fas fa-ellipsis-v"></i>
-                    </button>
-                </div>
+                <p>Mesajlaşmaya başlamak için bir konuşma seçin</p>
             </div>
-            <div class="messages-container" id="messagesContainer">
-                <div class="message-row">
-                    <div class="message-avatar">
-                        <img src="https://randomuser.me/api/portraits/men/32.jpg" alt="Killan">
-                    </div>
-                    <div class="message received">
-                        Hi, I hope you are doing well, yesterday you have gave a pen This very nice. I am very happy for this,yesterday you have gave a pen This very nice
-                    </div>
-                </div>
-                
-                <div class="message sent">
-                    Yes I'm well. Thank you, i am very happy for this,yesterday you have gave a pen This very nice
-                    <div class="message-info">
-                        4:30 PM
-                    </div>
-                </div>
-                
-                <div class="message-row">
-                    <div class="message-avatar">
-                        <img src="https://randomuser.me/api/portraits/men/32.jpg" alt="Killan">
-                    </div>
-                    <div class="message received">
-                        Hi, I hope you are doing well, yesterday you have gave a pen This very nice 😊
-                    </div>
-                </div>
-                
-                <div class="message-row">
-                    <div class="message-avatar">
-                        <img src="https://randomuser.me/api/portraits/men/32.jpg" alt="Killan">
-                    </div>
-                    <div class="message received">
-                        i am very happy for this,yesterday you have gave a pen This very nice
-                    </div>
-                </div>
-                
-                <div class="message sent">
-                    Yes I'm well. Thank you, i am very happy for this,yesterday you have gave a pen This very nice
-                    <div class="message-info">
-                        4:30 PM
-                    </div>
-                </div>
 
-                <div class="message-row">
-                    <div class="message-avatar">
-                        <img src="https://randomuser.me/api/portraits/men/32.jpg" alt="Killan">
+            <!-- Konuşma seçildiğinde gösterilecek -->
+            <div class="h-full hidden" id="conversation-view">
+                <!-- Başlık -->
+                <div class="p-4 border-b flex items-center bg-white">
+                    <div class="w-10 h-10 bg-indigo-100 text-indigo-700 rounded-full mr-3 flex-shrink-0" id="contact-avatar">
+                        <span class="w-full h-full flex items-center justify-center font-bold" id="contact-initial"></span>
                     </div>
-                    <div class="message received">
-                        <div class="voice-message">
-                            <div class="voice-message-play">
-                                <i class="fas fa-play"></i>
-                            </div>
-                            <div class="voice-message-visualizer">
-                                <img src="https://i.imgur.com/9UD2gTS.png" height="24" alt="voice wave">
-                            </div>
-                            <span class="voice-message-time">1:25</span>
+                    <div class="flex-grow">
+                        <h2 class="font-semibold text-gray-800" id="contact-name"></h2>
+                    </div>
+                    <div class="relative">
+                        <button class="text-gray-500 hover:text-gray-700 hover:bg-gray-100 p-2 rounded-full" id="menu-button">
+                            <i class="fas fa-ellipsis-v"></i>
+                        </button>
+                        <div class="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-10 hidden" id="dropdown-menu">
+                            <button class="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50" id="delete-conversation-btn">
+                                <i class="fas fa-trash mr-2"></i>Konuşmayı Sil
+                            </button>
                         </div>
                     </div>
                 </div>
-            </div>
-            <div class="message-input-container">
-                <button class="attachment-btn">
-                    <i class="fas fa-paperclip"></i>
-                </button>
-                <input type="text" id="messageInput" placeholder="Type Something...">
-                <button class="send-btn" id="sendMessageBtn">
-                    <i class="fas fa-paper-plane"></i>
-                </button>
+
+                <!-- Mesajlar alanı -->
+                <div class="messages-container bg-gray-50" id="messages-container">
+                    <!-- Mesajlar JavaScript ile doldurulacak -->
+                </div>
+
+                <!-- Mesaj gönderme alanı -->
+                <div class="input-area flex items-center bg-white">
+                    <button class="p-2 text-gray-500 hover:text-primary hover:bg-gray-100 rounded-full">
+                        <i class="fas fa-paperclip"></i>
+                    </button>
+                    <input 
+                        type="text" 
+                        id="message-input"
+                        placeholder="Mesajınızı yazın..." 
+                        class="flex-grow mx-2 p-2 border border-gray-200 rounded-full focus:outline-none focus:ring-2 focus:ring-indigo-300 focus:border-indigo-300 bg-gray-50"
+                    >
+                    <button id="send-button" class="p-2 text-white bg-primary rounded-full hover:bg-indigo-600 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
+                        <i class="fas fa-paper-plane"></i>
+                    </button>
+                </div>
             </div>
         </div>
     </div>
 
-    <script src="script.js"></script>
     <script>
-        // Tema değiştirme fonksiyonu
-        const themeToggleBtn = document.getElementById('themeToggleBtn');
-        const themeIcon = themeToggleBtn.querySelector('i');
+        let selectedUserId = null;
+        let conversationsData = [];
+        let currentMessages = [];
 
-        themeToggleBtn.addEventListener('click', function() {
-            document.documentElement.classList.toggle('light-theme');
+        document.addEventListener('DOMContentLoaded', () => {
+            // Token kontrolü
+            const token = localStorage.getItem('authToken');
             
-            // İkonu güncelle
-            if (document.documentElement.classList.contains('light-theme')) {
-                themeIcon.classList.remove('fa-moon');
-                themeIcon.classList.add('fa-sun');
-            } else {
-                themeIcon.classList.remove('fa-sun');
-                themeIcon.classList.add('fa-moon');
+            if (!token) {
+                // Token yoksa login sayfasına yönlendir
+                window.location.href = '/pages/signin.html';
+                return;
+            }
+
+            // Son mesajları getir
+            fetchLastMessages(token);
+
+            // Kısa aralıklarla son mesajları kontrol et (2 saniye)
+            window.messagesInterval = setInterval(() => {
+                fetchLastMessages(token);
+            }, 2000);
+
+            // Mesaj gönderme işlemi
+            const sendButton = document.getElementById('send-button');
+            if (sendButton) {
+                sendButton.addEventListener('click', handleSendMessage);
+            }
+
+            const messageInput = document.getElementById('message-input');
+            if (messageInput) {
+                messageInput.addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') {
+                        handleSendMessage();
+                    }
+                });
+            }
+
+            // 3 nokta menüsü işlevselliği
+            const menuButton = document.getElementById('menu-button');
+            const dropdownMenu = document.getElementById('dropdown-menu');
+            
+            if (menuButton && dropdownMenu) {
+                menuButton.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    dropdownMenu.classList.toggle('hidden');
+                });
+                
+                // Sayfanın başka bir yerine tıklandığında menüyü kapat
+                document.addEventListener('click', () => {
+                    if (!dropdownMenu.classList.contains('hidden')) {
+                        dropdownMenu.classList.add('hidden');
+                    }
+                });
+            }
+            
+            // Konuşma silme işlevselliği
+            const deleteButton = document.getElementById('delete-conversation-btn');
+            if (deleteButton) {
+                deleteButton.addEventListener('click', () => {
+                    if (selectedUserId) {
+                        deleteConversation(selectedUserId);
+                    }
+                });
+            }
+        });
+
+        async function fetchLastMessages(token) {
+            try {
+                const response = await fetch('https://takkas-api.onrender.com/api/messages/last-messages', {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (!response.ok) {
+                    throw new Error('Mesajlar yüklenirken bir hata oluştu');
+                }
+
+                const messages = await response.json();
+                
+                // Yeni mesaj olup olmadığını kontrol et
+                if (conversationsData.length > 0) {
+                    // Son mesajın ID'si öncekinden farklıysa yeni mesaj gelmiş demektir
+                    const latestMessage = messages[0];
+                    const previousLatestMessage = conversationsData[0];
+                    
+                    if (latestMessage && previousLatestMessage && 
+                        latestMessage.id !== previousLatestMessage.id &&
+                        !selectedUserId) {
+                        // Seçili bir konuşma yoksa ve yeni mesaj gelmişse bildirim göster
+                        showNewMessageNotification(latestMessage);
+                    }
+                }
+                
+                conversationsData = messages;
+                renderConversations(messages);
+            } catch (err) {
+                showError(err.message);
+            }
+        }
+
+        function renderConversations(conversations) {
+            const conversationsList = document.getElementById('conversations-list');
+            
+            if (conversations.length === 0) {
+                conversationsList.innerHTML = `
+                    <div class="px-4 py-3 text-center text-gray-500">
+                        Henüz mesajınız bulunmuyor.
+                    </div>
+                `;
+                return;
+            }
+
+            const conversationsHTML = conversations.map(conversation => {
+                // İlk harfi almak için
+                const initial = conversation.other_user_name.charAt(0).toUpperCase();
+                
+                // Mesaj içeriğini kısaltma ve emoji desteği
+                const shortContent = conversation.content.length > 30 
+                    ? conversation.content.substring(0, 30) + '...' 
+                    : conversation.content;
+
+                // Tarih formatını ayarlama
+                const date = new Date(conversation.created_at);
+                const today = new Date();
+                
+                let timeStr;
+                if (date.toDateString() === today.toDateString()) {
+                    // Bugün içinse sadece saat
+                    timeStr = date.toLocaleTimeString('tr-TR', {
+                        hour: '2-digit', 
+                        minute: '2-digit'
+                    });
+                } else {
+                    // Farklı bir gün için tarih
+                    timeStr = date.toLocaleDateString('tr-TR', {
+                        day: '2-digit', 
+                        month: '2-digit'
+                    });
+                }
+
+                return `
+                    <div class="px-4 py-3 border-b flex items-center hover:bg-gray-50 cursor-pointer ${
+                        !conversation.is_read ? 'bg-indigo-50' : ''
+                    }" onclick="selectConversation(${conversation.other_user_id})">
+                        <div class="w-10 h-10 bg-indigo-100 text-indigo-700 rounded-full flex items-center justify-center mr-3 flex-shrink-0">
+                            ${initial}
+                        </div>
+                        <div class="flex-grow min-w-0">
+                            <div class="flex justify-between items-center">
+                                <h3 class="font-semibold truncate text-gray-800">${conversation.other_user_name}</h3>
+                                <span class="text-xs text-gray-500 whitespace-nowrap ml-2">${timeStr}</span>
+                            </div>
+                            <p class="text-sm text-gray-600 truncate">${shortContent}</p>
+                        </div>
+                        ${!conversation.is_read ? '<div class="w-2 h-2 bg-indigo-500 rounded-full ml-2 flex-shrink-0"></div>' : ''}
+                    </div>
+                `;
+            }).join('');
+            
+            conversationsList.innerHTML = conversationsHTML;
+        }
+
+        // Konuşma seçme işlemi
+        function selectConversation(userId) {
+            selectedUserId = userId;
+            
+            // Görünüm değişikliği
+            document.getElementById('no-conversation-selected').classList.add('hidden');
+            document.getElementById('conversation-view').classList.remove('hidden');
+            
+            // Seçilen kullanıcının bilgilerini gösterme
+            const selectedConversation = conversationsData.find(c => c.other_user_id === userId);
+            if (selectedConversation) {
+                document.getElementById('contact-name').textContent = selectedConversation.other_user_name;
+                document.getElementById('contact-initial').textContent = selectedConversation.other_user_name.charAt(0).toUpperCase();
+            }
+            
+            // Mesajları yükleme
+            fetchConversation(userId);
+            
+            // Konuşmanın okunduğunu bildir
+            markConversationAsRead(userId);
+            
+            // Konuşma mesajlarını düzenli aralıklarla güncelle (1.5 saniye)
+            if (window.conversationInterval) {
+                clearInterval(window.conversationInterval);
+            }
+            
+            window.conversationInterval = setInterval(() => {
+                if (selectedUserId) {
+                    fetchConversation(selectedUserId);
+                }
+            }, 1500);
+        }
+
+        async function fetchConversation(userId) {
+            const token = localStorage.getItem('authToken');
+            if (!token) return;
+            
+            try {
+                const response = await fetch(`https://takkas-api.onrender.com/api/messages/conversation/${userId}`, {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (!response.ok) {
+                    throw new Error('Mesajlar yüklenirken bir hata oluştu');
+                }
+
+                const data = await response.json();
+                if (JSON.stringify(currentMessages) !== JSON.stringify(data)) {
+                    currentMessages = data || [];
+                    renderMessages(currentMessages);
+                    scrollToBottom();
+                }
+            } catch (err) {
+                showError(err.message);
+            }
+        }
+
+        function renderMessages(messages) {
+            const messagesContainer = document.getElementById('messages-container');
+            
+            if (messages.length === 0) {
+                messagesContainer.innerHTML = `
+                    <div class="flex items-center justify-center h-full">
+                        <div class="text-center text-gray-500">
+                            <p>Henüz mesaj bulunmuyor.</p>
+                            <p class="text-sm mt-2">Sohbete başlamak için aşağıdan mesaj gönderebilirsiniz.</p>
+                        </div>
+                    </div>
+                `;
+                return;
+            }
+
+            const messagesHTML = messages.map(message => {
+                // is_sender alanını kullan
+                const isSentByMe = message.is_sender;
+                const date = new Date(message.created_at);
+                const timeStr = date.toLocaleTimeString('tr-TR', {
+                    hour: '2-digit',
+                    minute: '2-digit'
+                });
+
+                return `
+                    <div class="flex ${isSentByMe ? 'justify-end' : 'justify-start'}">
+                        <div class="chat-bubble ${isSentByMe ? 'sent' : 'received'}">
+                            <p>${message.content}</p>
+                            <div class="message-time text-right">${timeStr}</div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+            
+            messagesContainer.innerHTML = messagesHTML;
+        }
+
+        async function handleSendMessage() {
+            if (!selectedUserId) return;
+            
+            const messageInput = document.getElementById('message-input');
+            const content = messageInput.value.trim();
+            
+            if (!content) return;
+            
+            const token = localStorage.getItem('authToken');
+            if (!token) {
+                window.location.href = '/pages/signin.html';
+                return;
+            }
+
+            try {
+                const response = await fetch('https://takkas-api.onrender.com/api/messages/send', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        receiverId: selectedUserId,
+                        content: content
+                    })
+                });
+
+                if (!response.ok) {
+                    throw new Error('Mesaj gönderilirken bir hata oluştu');
+                }
+
+                // Başarıyla gönderilen mesajın bilgilerini al
+                const sentMessage = await response.json();
+                console.log('Mesaj gönderildi:', sentMessage);
+
+                // Mesaj başarıyla gönderildikten sonra formu sıfırla
+                messageInput.value = '';
+                
+                // Görünümü hızlıca güncellemek için yeni mesajı ekle
+                // Not: is_sender true olarak ayarlanır çünkü kullanıcı tarafından gönderildi
+                if (Array.isArray(currentMessages)) {
+                    const newMessage = {
+                        ...sentMessage,
+                        is_sender: true
+                    };
+                    currentMessages.push(newMessage);
+                    renderMessages(currentMessages);
+                    scrollToBottom();
+                }
+                
+                // Ardından tüm mesajları güncellemek için isteği yap
+                fetchConversation(selectedUserId);
+                
+                // Son mesajlar listesini güncelle
+                fetchLastMessages(token);
+            } catch (err) {
+                showError(err.message);
+            }
+        }
+
+        function scrollToBottom() {
+            const messagesContainer = document.getElementById('messages-container');
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
+
+        function showError(errorMessage) {
+            const messagesContainer = document.getElementById('messages-container');
+            if (messagesContainer) {
+                messagesContainer.innerHTML = `
+                    <div class="bg-red-50 border border-red-200 text-red-700 p-4 rounded m-4">
+                        <strong class="font-bold">Hata!</strong>
+                        <span class="block sm:inline ml-1">${errorMessage}</span>
+                    </div>
+                `;
+            }
+        }
+
+        // Konuşma silme fonksiyonu
+        async function deleteConversation(userId) {
+            if (!confirm('Bu konuşmayı silmek istediğinize emin misiniz?')) {
+                return;
+            }
+            
+            const token = localStorage.getItem('authToken');
+            if (!token) return;
+            
+            try {
+                const response = await fetch(`https://takkas-api.onrender.com/api/messages/conversation/${userId}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (!response.ok) {
+                    throw new Error('Konuşma silinirken bir hata oluştu');
+                }
+
+                // Silme işlemi başarılı olduysa ana görünüme dön
+                document.getElementById('conversation-view').classList.add('hidden');
+                document.getElementById('no-conversation-selected').classList.remove('hidden');
+                selectedUserId = null;
+                
+                // Son mesajlar listesini güncelle
+                fetchLastMessages(token);
+                
+                // Bildirim göster
+                showNotification('Konuşma başarıyla silindi');
+            } catch (err) {
+                showError(err.message);
+            }
+        }
+
+        // Bildirimi gösterme
+        function showNotification(message, type = 'success') {
+            const bgColor = type === 'success' ? 'bg-green-500' : 'bg-indigo-600';
+            
+            const notificationElement = document.createElement('div');
+            notificationElement.className = `fixed bottom-4 right-4 ${bgColor} text-white px-4 py-2 rounded-lg shadow-lg z-50 transition-opacity duration-500`;
+            notificationElement.textContent = message;
+            
+            document.body.appendChild(notificationElement);
+            
+            // 3 saniye sonra bildirimi kaldır
+            setTimeout(() => {
+                notificationElement.classList.add('opacity-0');
+                setTimeout(() => {
+                    if (notificationElement.parentElement) {
+                        notificationElement.parentElement.removeChild(notificationElement);
+                    }
+                }, 500);
+            }, 3000);
+        }
+
+        // Konuşmayı okundu olarak işaretle
+        async function markConversationAsRead(userId) {
+            const token = localStorage.getItem('authToken');
+            if (!token) return;
+            
+            try {
+                const response = await fetch(`https://takkas-api.onrender.com/api/messages/mark-read/${userId}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (!response.ok) {
+                    console.error('Mesajlar okundu olarak işaretlenirken hata oluştu');
+                }
+                
+                // Son mesajlar listesini güncelle
+                fetchLastMessages(token);
+            } catch (err) {
+                console.error('Okundu işaretleme hatası:', err);
+            }
+        }
+
+        // Yeni mesaj bildirimi göster
+        function showNewMessageNotification(message) {
+            const senderName = message.other_user_name || 'Kullanıcı';
+            const messageContent = message.content.length > 30 
+                ? message.content.substring(0, 30) + '...' 
+                : message.content;
+            
+            const notificationElement = document.createElement('div');
+            notificationElement.className = 'fixed top-4 right-4 bg-indigo-600 text-white p-4 rounded-lg shadow-lg z-50 flex items-start cursor-pointer transition-opacity duration-500';
+            notificationElement.innerHTML = `
+                <div class="mr-3 w-10 h-10 bg-indigo-500 rounded-full flex items-center justify-center flex-shrink-0">
+                    ${senderName.charAt(0).toUpperCase()}
+                </div>
+                <div class="flex-grow">
+                    <p class="font-semibold">${senderName}</p>
+                    <p class="text-sm">${messageContent}</p>
+                </div>
+                <button class="ml-3 text-white hover:text-indigo-200">
+                    <i class="fas fa-times"></i>
+                </button>
+            `;
+            
+            // Bildirimi tıklayınca konuşmayı aç
+            notificationElement.addEventListener('click', function(e) {
+                // Kapatma düğmesine tıklanmadıysa
+                if (e.target.tagName !== 'BUTTON' && e.target.tagName !== 'I') {
+                    selectConversation(message.other_user_id);
+                    this.remove();
+                }
+            });
+            
+            // Kapatma düğmesine tıklayınca bildirimi kapat
+            const closeButton = notificationElement.querySelector('button');
+            closeButton.addEventListener('click', function(e) {
+                e.stopPropagation();
+                notificationElement.classList.add('opacity-0');
+                setTimeout(() => {
+                    if (notificationElement.parentElement) {
+                        notificationElement.parentElement.removeChild(notificationElement);
+                    }
+                }, 500);
+            });
+            
+            document.body.appendChild(notificationElement);
+            
+            // 5 saniye sonra bildirimi kaldır
+            setTimeout(() => {
+                notificationElement.classList.add('opacity-0');
+                setTimeout(() => {
+                    if (notificationElement.parentElement) {
+                        notificationElement.parentElement.removeChild(notificationElement);
+                    }
+                }, 500);
+            }, 5000);
+        }
+
+        // Sayfa kapatıldığında interval'i temizle
+        window.addEventListener('beforeunload', () => {
+            if (window.messagesInterval) {
+                clearInterval(window.messagesInterval);
+            }
+            if (window.conversationInterval) {
+                clearInterval(window.conversationInterval);
             }
         });
     </script>

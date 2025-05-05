@@ -182,6 +182,12 @@
                 // API'den ilan detaylarını çek
                 const carDetails = await fetchCarDetails(carId);
                 
+                // Görsel verilerini çek
+                let carImages = await fetchCarImages(carId);
+                
+                // Görsel verilerini ilan detaylarına ekle
+                carDetails.images = carImages;
+                
                 // İlan detaylarını sayfaya ekle
                 renderCarDetails(carDetails);
                 
@@ -197,6 +203,41 @@
                 `;
             } finally {
                 spinner.classList.remove('active');
+            }
+        }
+
+        // API'den araç görsellerini çek
+        async function fetchCarImages(carId) {
+            try {
+                const imageUrl = `https://takkas-api.onrender.com/api/listing-photos/${carId}`;
+                console.log('Görsel API isteği gönderiliyor:', imageUrl);
+                
+                const response = await fetch(imageUrl);
+                console.log('Görsel API yanıt durumu:', response.status, response.statusText);
+                
+                if (!response.ok) {
+                    console.warn(`${carId} ID'li araç için görseller bulunamadı. HTTP Durumu: ${response.status}`);
+                    return null;
+                }
+                
+                const imagesData = await response.json();
+                console.log('Görsel API yanıtı:', imagesData);
+                
+                if (!imagesData || imagesData.length === 0) {
+                    console.warn(`${carId} ID'li araç için görseller bulunamadı veya boş dizi döndü.`);
+                    return null;
+                }
+                
+                // Sıralama için görsel verilerini düzenle
+                // Önce is_primary=true olanları en başa getir, sonra order_index'e göre sırala
+                return imagesData.sort((a, b) => {
+                    if (a.is_primary && !b.is_primary) return -1;
+                    if (!a.is_primary && b.is_primary) return 1;
+                    return (a.order_index || 0) - (b.order_index || 0);
+                }).map(img => img.url);
+            } catch (error) {
+                console.error(`${carId} ID'li araç için görseller çekilirken hata:`, error);
+                return null;
             }
         }
 
@@ -524,14 +565,16 @@
 
         // İlan detaylarını sayfaya ekle
         function renderCarDetails(car) {
-            // Varsayılan görseller
-            const defaultImages = [
-                'https://images.unsplash.com/photo-1494976388531-d1058494cdd8?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1170&q=80',
-                'https://images.unsplash.com/photo-1583121274602-3e2820c69888?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1170&q=80',
-                'https://images.unsplash.com/photo-1605559424843-9e4c228bf1c2?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1164&q=80',
-                'https://images.unsplash.com/photo-1552519507-da3b142c6e3d?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1170&q=80',
-                'https://images.unsplash.com/photo-1542362567-b07e54358753?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1170&q=80'
-            ];
+            // "Fotoğraf Bulunamadı" görseli
+            const noImagePlaceholder = `https://via.placeholder.com/800x500/e0e0e0/333333?text=${encodeURIComponent('Fotoğraf Bulunamadı')}`;
+            
+            // API'den gelen görsel verilerini kullan, yoksa fotoğraf bulunamadı görseli kullan
+            let carImages = [];
+            if (car.images && car.images.length > 0) {
+                carImages = car.images;
+            } else {
+                carImages = [noImagePlaceholder];
+            }
 
             // Tarih formatını düzenle
             const createdDate = new Date(car.created_at);
@@ -560,7 +603,7 @@
                 <div class="property-main-content">
                     <div class="property-gallery">
                         <div class="main-image">
-                            <img src="${defaultImages[0]}" alt="${car.title}" id="mainImage">
+                            <img src="${carImages[0]}" alt="${car.title}" id="mainImage">
                             <button class="gallery-nav prev-btn" id="prevImage" aria-label="Önceki görsel">
                                 <i class="fas fa-chevron-left"></i>
                             </button>
@@ -569,7 +612,7 @@
                             </button>
                         </div>
                         <div class="thumbnail-container">
-                            ${defaultImages.map((img, index) => `
+                            ${carImages.map((img, index) => `
                                 <div class="thumbnail ${index === 0 ? 'active' : ''}" data-index="${index}">
                                     <img src="${img}" alt="Görsel ${index + 1}">
                                 </div>
@@ -859,7 +902,7 @@
 
             // Görsel galerisi için değişkenler
             let currentImageIndex = 0;
-            const images = defaultImages;
+            const images = carImages;
             const mainImage = document.getElementById('mainImage');
             const thumbnails = document.querySelectorAll('.thumbnail');
             const prevBtn = document.getElementById('prevImage');
@@ -1093,9 +1136,9 @@
             const name = car.name || car.title || 'Bilinmeyen Araç';
             const type = car.type || 'Bilinmeyen Tip';
             
-            // Görsel için varsayılan bir placeholder kullan, API'den görsel gelmezse
-            const defaultImage = `https://via.placeholder.com/400x250/e0e0e0/333333?text=${encodeURIComponent(name)}`;
-            const image = car.image || defaultImage;
+            // Görsel için "Fotoğraf Bulunamadı" görseli kullan, API'den görsel gelmezse
+            const noImagePlaceholder = `https://via.placeholder.com/400x250/e0e0e0/333333?text=${encodeURIComponent('Fotoğraf Bulunamadı')}`;
+            const image = car.image || noImagePlaceholder;
             
             const transmission = car.transmission || car.gear_type || 'Bilinmeyen';
             const price = car.price || 0;
@@ -1115,7 +1158,7 @@
                                 </div>
                                 <p class="car-type">${brand} ${model}</p>
                             </header>
-                            <img src="${image}" alt="${name}" class="car-image" onerror="this.onerror=null; this.src='${defaultImage}';">
+                            <img src="${image}" alt="${name}" class="car-image" onerror="this.onerror=null; this.src='${noImagePlaceholder}';">
                             <footer class="car-details">
                                 <div class="car-specs">
                                     <div class="spec-item">
@@ -1152,32 +1195,49 @@
                 const vehicleData = Array.isArray(data) ? data : (data.results || data.data || []);
                 console.log('İşlenecek araç verileri:', vehicleData);
                 
-                // API'den dönen veriyi işleyin
-                const cars = vehicleData.map(car => {
+                // Araç verilerini işleme ve her araç için görsel çekme
+                const carsPromises = vehicleData.map(async car => {
                     // Araç adını belirle
                     const name = car.title || car.name || car.model || 'Bilinmeyen Araç';
                     
-                    // Varsayılan görseller
-                    const defaultImages = [
-                        'https://images.unsplash.com/photo-1583121274602-3e2820c69888?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1170&q=80',
-                        'https://images.unsplash.com/photo-1605559424843-9e4c228bf1c2?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1164&q=80',
-                        'https://images.unsplash.com/photo-1552519507-da3b142c6e3d?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1170&q=80',
-                        'https://images.unsplash.com/photo-1542362567-b07e54358753?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1170&q=80',
-                        'https://images.unsplash.com/photo-1550355291-bbee04a92027?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1236&q=80',
-                        'https://images.unsplash.com/photo-1494976388531-d1058494cdd8?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1170&q=80',
-                        'https://images.unsplash.com/photo-1553440569-bcc63803a83d?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1125&q=80',
-                        'https://images.unsplash.com/photo-1549317661-bd32c8ce0db2?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1170&q=80'
-                    ];
-                    
-                    // Rastgele bir görsel seç
-                    const randomImage = defaultImages[Math.floor(Math.random() * defaultImages.length)];
+                    // Ilan ID'si varsa fotoğrafları çekmeyi dene
+                    let carImage = null;
+                    if (car.id) {
+                        try {
+                            const photoUrl = `https://takkas-api.onrender.com/api/listing-photos/${car.id}`;
+                            console.log(`Benzer araçlar: ${car.id} ID'li araç için fotoğraf isteği gönderiliyor:`, photoUrl);
+                            
+                            const photoResponse = await fetch(photoUrl);
+                            if (photoResponse.ok) {
+                                const photos = await photoResponse.json();
+                                console.log(`Benzer araçlar: ${car.id} ID'li araç için fotoğraf yanıtı:`, photos);
+                                
+                                // İlk fotoğrafı veya ana fotoğrafı (is_primary=true) kullan
+                                if (photos && photos.length > 0) {
+                                    // Önce is_primary=true olan fotoğrafı ara
+                                    const primaryPhoto = photos.find(photo => photo.is_primary === true);
+                                    if (primaryPhoto) {
+                                        carImage = primaryPhoto.url;
+                                    } else {
+                                        // Ana fotoğraf yoksa ilk fotoğrafı kullan
+                                        carImage = photos[0].url;
+                                    }
+                                    console.log(`Benzer araçlar: ${car.id} ID'li araç için fotoğraf bulundu:`, carImage);
+                                }
+                            } else {
+                                console.log(`Benzer araçlar: ${car.id} ID'li araç için fotoğraf bulunamadı, HTTP durumu:`, photoResponse.status);
+                            }
+                        } catch (photoError) {
+                            console.error(`Benzer araçlar: ${car.id} ID'li araç için fotoğraf çekilirken hata:`, photoError);
+                        }
+                    }
                     
                     return {
                         id: car.id,
                         name: name,
                         title: car.title,
                         type: car.case_type || car.type || car.category || car.vehicleType || car.category_name || 'Bilinmeyen Tip',
-                        image: car.image_url || car.image || randomImage,
+                        image: carImage || car.image_url || car.image || null,
                         passengers: car.passengers || car.capacity || 4,
                         transmission: car.gear_type || car.transmission || car.gearbox || 'Otomatik',
                         price: car.price || car.amount || 100000,
@@ -1187,6 +1247,9 @@
                         kilometer: car.kilometer || 0
                     };
                 });
+                
+                // Tüm Promise'ları çözümle
+                const cars = await Promise.all(carsPromises);
                 
                 console.log('İşlenmiş araçlar:', cars);
                 return cars;
@@ -1200,7 +1263,7 @@
                         name: "2023 Model Lüks Sedan",
                         title: "2023 Model Lüks Sedan",
                         type: "Sedan",
-                        image: 'https://images.unsplash.com/photo-1583121274602-3e2820c69888?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1170&q=80',
+                        image: null, // Görsel yok, createCarCard "Fotoğraf Bulunamadı" görseli kullanacak
                         passengers: 5,
                         transmission: "Otomatik",
                         price: 1850000,
@@ -1214,7 +1277,7 @@
                         name: "2023 Model Lüks Sedan",
                         title: "2023 Model Lüks Sedan",
                         type: "Sedan",
-                        image: 'https://images.unsplash.com/photo-1605559424843-9e4c228bf1c2?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1164&q=80',
+                        image: null, // Görsel yok, createCarCard "Fotoğraf Bulunamadı" görseli kullanacak
                         passengers: 5,
                         transmission: "Otomatik",
                         price: 1850000,
@@ -1228,7 +1291,7 @@
                         name: "semihten ucuz Araba",
                         title: "semihten ucuz Araba",
                         type: "Sedan",
-                        image: 'https://images.unsplash.com/photo-1552519507-da3b142c6e3d?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1170&q=80',
+                        image: null, // Görsel yok, createCarCard "Fotoğraf Bulunamadı" görseli kullanacak
                         passengers: 5,
                         transmission: "Otomatik",
                         price: 1500000,
@@ -1242,7 +1305,7 @@
                         name: "2020 Model BMW",
                         title: "2020 Model BMW",
                         type: "Sedan",
-                        image: 'https://images.unsplash.com/photo-1542362567-b07e54358753?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1170&q=80',
+                        image: null, // Görsel yok, createCarCard "Fotoğraf Bulunamadı" görseli kullanacak
                         passengers: 5,
                         transmission: "Manuel",
                         price: 500000,
@@ -1256,7 +1319,7 @@
                         name: "test data",
                         title: "test data",
                         type: "Sedan",
-                        image: 'https://images.unsplash.com/photo-1550355291-bbee04a92027?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1236&q=80',
+                        image: null, // Görsel yok, createCarCard "Fotoğraf Bulunamadı" görseli kullanacak
                         passengers: 5,
                         transmission: "Manuel",
                         price: 100000,
