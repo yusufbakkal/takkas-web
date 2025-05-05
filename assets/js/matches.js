@@ -47,13 +47,10 @@ document.addEventListener('DOMContentLoaded', function() {
             const vehiclesWithImages = await Promise.all(data.map(async vehicle => {
                 let carImages = await fetchCarImages(vehicle.id);
                 
-                // Eğer API'den fotoğraf gelmezse varsayılan fotoğrafları kullan
+                // Eğer API'den fotoğraf yoksa, varsayılan fotoğraf eklemiyoruz
+                // Boş dizi döndürerek görselsiz olduğunu belirtiyoruz
                 if (!carImages || carImages.length === 0) {
-                    carImages = [
-                        'https://images.unsplash.com/photo-1617814076367-b759c7d7e738',
-                        'https://images.unsplash.com/photo-1580273916550-e323be2ae537',
-                        'https://images.unsplash.com/photo-1614162692292-7ac56d7f7f1e'
-                    ];
+                    carImages = [];
                 }
                 
                 return {
@@ -64,11 +61,15 @@ document.addEventListener('DOMContentLoaded', function() {
                     year: vehicle.production_year,
                     mileage: vehicle.kilometer,
                     fuel: vehicle.fuel_type,
-                    images: carImages
+                    images: carImages,
+                    hasImages: (carImages && carImages.length > 0)
                 };
             }));
             
-            allCards = vehiclesWithImages;
+            // Görseli olan araçları filtreliyoruz
+            const vehiclesWithValidImages = vehiclesWithImages.filter(vehicle => vehicle.hasImages);
+            
+            allCards = vehiclesWithValidImages;
             
             // İlk kartı göster
             if (allCards.length > 0) {
@@ -92,29 +93,27 @@ document.addEventListener('DOMContentLoaded', function() {
         // Listeyi temizle
         matchesList.innerHTML = '';
         
-        // Araçlardan rastgele 5 tanesini eşleşme olarak göster (ya da hepsini, eğer 5'ten azsa)
+        // Görseli olan araçlar içinden rastgele 5 tanesini eşleşme olarak göster
         const matchCount = Math.min(vehicles.length, 5);
         const shuffled = [...vehicles].sort(() => 0.5 - Math.random());
         
         for (let i = 0; i < matchCount; i++) {
             const vehicle = shuffled[i];
-            // İlk görseli kullan, yoksa varsayılan görsel
-            const imageUrl = vehicle.images && vehicle.images.length > 0 
-                ? vehicle.images[0] 
-                : 'https://images.unsplash.com/photo-1618851142562-03c06812d9a4';
-                
-            const matchCard = document.createElement('div');
-            matchCard.className = 'match-card';
-            matchCard.innerHTML = `
-                <div class="match-image">
-                    <img src="${imageUrl}" alt="${vehicle.title}">
-                </div>
-                <div class="match-info">
-                    <h3>${vehicle.title}</h3>
-                    <p>${vehicle.type}</p>
-                </div>
-            `;
-            matchesList.appendChild(matchCard);
+            // Sadece görseli olan araçları eşleşme listesinde göster
+            if (vehicle.images && vehicle.images.length > 0) {
+                const matchCard = document.createElement('div');
+                matchCard.className = 'match-card';
+                matchCard.innerHTML = `
+                    <div class="match-image">
+                        <img src="${vehicle.images[0]}" alt="${vehicle.title}">
+                    </div>
+                    <div class="match-info">
+                        <h3>${vehicle.title}</h3>
+                        <p>${vehicle.type}</p>
+                    </div>
+                `;
+                matchesList.appendChild(matchCard);
+            }
         }
     }
 
