@@ -342,26 +342,25 @@
     }
 }
 
-/* Kaldır butonunu matches.html'deki reject butonuna benzer şekilde güncelle */
+/* Kaldır butonunu görseldeki gibi tam ortaya konumlandır */
 .dropzone .dz-preview .dz-remove {
     position: absolute;
     top: 50%;
     left: 50%;
-    transform: translate(-50%, -50%) scale(0.9);
-    background: rgba(0, 0, 0, 0.65);
+    transform: translate(-50%, -50%) scale(1); /* scale başlangıçta 1 olsun */
+    background: rgba(244, 67, 54, 0.9); /* Kırmızı arka plan */
     color: #fff;
     border: none;
     border-radius: 50%;
-    width: 48px;
-    height: 48px;
+    width: 40px; /* Daha iyi oranlama için boyutu küçülttüm */
+    height: 40px;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 1.6rem;
     opacity: 0;
     cursor: pointer;
-    z-index: 10;
-    transition: opacity 0.2s, transform 0.15s, background 0.2s;
+    z-index: 20; /* Daha yüksek z-index */
+    transition: opacity 0.2s, transform 0.15s;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
     outline: none;
     padding: 0;
@@ -370,14 +369,19 @@
 .dropzone .dz-preview:hover .dz-remove,
 .dropzone .dz-preview .dz-remove:focus {
     opacity: 1;
-    transform: translate(-50%, -50%) scale(1);
-    background: rgba(255, 87, 87, 0.9);
+    transform: translate(-50%, -50%) scale(1.05); /* Hafif büyüme efekti */
+    background: rgba(244, 67, 54, 0.95); /* Hover durumunda daha belirgin kırmızı */
 }
 
 /* Font Awesome icon stili */
 .dropzone .dz-preview .dz-remove i.fas.fa-times {
-    font-size: 1.5rem;
-    color: #fff;
+    font-size: 1.2rem; /* Biraz daha küçük */
+    color: #fff; /* Beyaz X */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
 }
 
 .dropzone .dz-preview .dz-remove > *:not(.fas) {
