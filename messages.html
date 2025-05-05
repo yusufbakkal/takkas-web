@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="tr">
+<html lang="tr" class="light-theme">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -12,10 +12,20 @@
         <!-- Sol panel - Mesaj listesi -->
         <div class="sidebar">
             <div class="sidebar-header">
-                <h2>Messages</h2>
-                <button class="new-message-btn" id="newMessageBtn">
-                    <i class="fas fa-edit"></i>
-                </button>
+                <div class="header-left">
+                    <a href="index.html" class="back-button">
+                        <i class="fas fa-arrow-left"></i>
+                    </a>
+                    <h2>Messages</h2>
+                </div>
+                <div class="header-actions">
+                    <button class="theme-toggle-btn" id="themeToggleBtn">
+                        <i class="fas fa-sun"></i>
+                    </button>
+                    <button class="new-message-btn" id="newMessageBtn">
+                        <i class="fas fa-edit"></i>
+                    </button>
+                </div>
             </div>
             <div class="search-container">
                 <i class="fas fa-search search-icon"></i>
@@ -24,13 +34,122 @@
             <div class="pinned-section">
                 <p class="section-title"><i class="fas fa-thumbtack"></i> PINNED</p>
                 <div class="contact-list" id="pinnedContacts">
-                    <!-- Sabitlenmiş kişiler burada listelenecek -->
+                    <div class="contact-item active">
+                        <div class="contact-avatar">
+                            <img src="https://randomuser.me/api/portraits/men/32.jpg" alt="Kişi">
+                            <div class="online-indicator"></div>
+                        </div>
+                        <div class="contact-info">
+                            <div class="contact-header">
+                                <span class="contact-name">Killan James</span>
+                                <span class="contact-time">4:30 PM</span>
+                            </div>
+                            <div class="contact-message typing-indicator">Typing...</div>
+                        </div>
+                        <div class="unread-badge">2</div>
+                    </div>
                 </div>
             </div>
             <div class="all-messages-section">
                 <p class="section-title"><i class="far fa-envelope"></i> All Message</p>
                 <div class="contact-list" id="allContacts">
-                    <!-- Tüm kişiler burada listelenecek -->
+                    <div class="contact-item">
+                        <div class="contact-avatar">
+                            <img src="https://randomuser.me/api/portraits/men/32.jpg" alt="Kişi">
+                            <div class="online-indicator"></div>
+                        </div>
+                        <div class="contact-info">
+                            <div class="contact-header">
+                                <span class="contact-name">Desian Tam</span>
+                                <span class="contact-time">9:36 AM</span>
+                            </div>
+                            <div class="contact-message">Hello! Everyone</div>
+                        </div>
+                        <div class="read-indicator">
+                            <i class="fas fa-check-double" style="color: #4caf50;"></i>
+                        </div>
+                    </div>
+                    <div class="contact-item">
+                        <div class="contact-avatar">
+                            <img src="https://randomuser.me/api/portraits/men/41.jpg" alt="Kişi">
+                        </div>
+                        <div class="contact-info">
+                            <div class="contact-header">
+                                <span class="contact-name">Ahmed Medi</span>
+                                <span class="contact-time">1:15 AM</span>
+                            </div>
+                            <div class="contact-message">Wow really Cool 🔥</div>
+                        </div>
+                    </div>
+                    <div class="contact-item">
+                        <div class="contact-avatar">
+                            <img src="https://randomuser.me/api/portraits/women/44.jpg" alt="Kişi">
+                        </div>
+                        <div class="contact-info">
+                            <div class="contact-header">
+                                <span class="contact-name">Claudia Maudi</span>
+                                <span class="contact-time">4:30 PM</span>
+                            </div>
+                            <div class="contact-message">Nice</div>
+                        </div>
+                    </div>
+                    <div class="contact-item">
+                        <div class="contact-avatar">
+                            <img src="https://randomuser.me/api/portraits/women/66.jpg" alt="Kişi">
+                            <div class="online-indicator"></div>
+                        </div>
+                        <div class="contact-info">
+                            <div class="contact-header">
+                                <span class="contact-name">Novita</span>
+                                <span class="contact-time">4:30 PM</span>
+                            </div>
+                            <div class="contact-message">yah, nice design</div>
+                        </div>
+                        <div class="unread-badge">2</div>
+                    </div>
+                    <div class="contact-item">
+                        <div class="contact-avatar">
+                            <img src="https://randomuser.me/api/portraits/men/67.jpg" alt="Kişi">
+                        </div>
+                        <div class="contact-info">
+                            <div class="contact-header">
+                                <span class="contact-name">Milie Nose</span>
+                                <span class="contact-time">8:20 PM</span>
+                            </div>
+                            <div class="contact-message">Awesome 🔥</div>
+                        </div>
+                        <div class="unread-badge">1</div>
+                    </div>
+                    <div class="contact-item">
+                        <div class="contact-avatar">
+                            <img src="https://randomuser.me/api/portraits/men/79.jpg" alt="Kişi">
+                        </div>
+                        <div class="contact-info">
+                            <div class="contact-header">
+                                <span class="contact-name">Ikhsan SD</span>
+                                <span class="contact-time">yesterday</span>
+                            </div>
+                            <div class="contact-message">
+                                <i class="fas fa-microphone-alt"></i> Voice message
+                            </div>
+                        </div>
+                    </div>
+                    <div class="contact-item">
+                        <div class="contact-avatar">
+                            <img src="https://randomuser.me/api/portraits/men/22.jpg" alt="Kişi">
+                            <div class="online-indicator"></div>
+                        </div>
+                        <div class="contact-info">
+                            <div class="contact-header">
+                                <span class="contact-name">Aditya</span>
+                                <span class="contact-time">yesterday</span>
+                            </div>
+                            <div class="contact-message">publish now</div>
+                        </div>
+                        <div class="read-indicator">
+                            <i class="fas fa-check-double" style="color: #4caf50;"></i>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -38,10 +157,88 @@
         <!-- Sağ panel - Mesaj detayları -->
         <div class="chat-area">
             <div class="chat-header" id="chatHeader">
-                <!-- Aktif sohbet başlığı buraya gelecek -->
+                <div class="chat-header-left">
+                    <a href="index.html" class="back-button">
+                        <i class="fas fa-arrow-left"></i>
+                    </a>
+                    <div class="chat-avatar">
+                        <img src="https://randomuser.me/api/portraits/men/32.jpg" alt="Killan James">
+                    </div>
+                    <div class="chat-user-info">
+                        <h3>Killan James</h3>
+                        <p>Active Now</p>
+                    </div>
+                </div>
+                <div class="chat-actions">
+                    <button class="chat-action-btn">
+                        <i class="fas fa-video"></i>
+                    </button>
+                    <button class="chat-action-btn">
+                        <i class="fas fa-phone-alt"></i>
+                    </button>
+                    <button class="chat-action-btn">
+                        <i class="fas fa-ellipsis-v"></i>
+                    </button>
+                </div>
             </div>
             <div class="messages-container" id="messagesContainer">
-                <!-- Mesajlar burada görünecek -->
+                <div class="message-row">
+                    <div class="message-avatar">
+                        <img src="https://randomuser.me/api/portraits/men/32.jpg" alt="Killan">
+                    </div>
+                    <div class="message received">
+                        Hi, I hope you are doing well, yesterday you have gave a pen This very nice. I am very happy for this,yesterday you have gave a pen This very nice
+                    </div>
+                </div>
+                
+                <div class="message sent">
+                    Yes I'm well. Thank you, i am very happy for this,yesterday you have gave a pen This very nice
+                    <div class="message-info">
+                        4:30 PM
+                    </div>
+                </div>
+                
+                <div class="message-row">
+                    <div class="message-avatar">
+                        <img src="https://randomuser.me/api/portraits/men/32.jpg" alt="Killan">
+                    </div>
+                    <div class="message received">
+                        Hi, I hope you are doing well, yesterday you have gave a pen This very nice 😊
+                    </div>
+                </div>
+                
+                <div class="message-row">
+                    <div class="message-avatar">
+                        <img src="https://randomuser.me/api/portraits/men/32.jpg" alt="Killan">
+                    </div>
+                    <div class="message received">
+                        i am very happy for this,yesterday you have gave a pen This very nice
+                    </div>
+                </div>
+                
+                <div class="message sent">
+                    Yes I'm well. Thank you, i am very happy for this,yesterday you have gave a pen This very nice
+                    <div class="message-info">
+                        4:30 PM
+                    </div>
+                </div>
+
+                <div class="message-row">
+                    <div class="message-avatar">
+                        <img src="https://randomuser.me/api/portraits/men/32.jpg" alt="Killan">
+                    </div>
+                    <div class="message received">
+                        <div class="voice-message">
+                            <div class="voice-message-play">
+                                <i class="fas fa-play"></i>
+                            </div>
+                            <div class="voice-message-visualizer">
+                                <img src="https://i.imgur.com/9UD2gTS.png" height="24" alt="voice wave">
+                            </div>
+                            <span class="voice-message-time">1:25</span>
+                        </div>
+                    </div>
+                </div>
             </div>
             <div class="message-input-container">
                 <button class="attachment-btn">
@@ -56,5 +253,23 @@
     </div>
 
     <script src="script.js"></script>
+    <script>
+        // Tema değiştirme fonksiyonu
+        const themeToggleBtn = document.getElementById('themeToggleBtn');
+        const themeIcon = themeToggleBtn.querySelector('i');
+
+        themeToggleBtn.addEventListener('click', function() {
+            document.documentElement.classList.toggle('light-theme');
+            
+            // İkonu güncelle
+            if (document.documentElement.classList.contains('light-theme')) {
+                themeIcon.classList.remove('fa-moon');
+                themeIcon.classList.add('fa-sun');
+            } else {
+                themeIcon.classList.remove('fa-sun');
+                themeIcon.classList.add('fa-moon');
+            }
+        });
+    </script>
 </body>
 </html> 
