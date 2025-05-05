@@ -1526,16 +1526,15 @@
                 
                 // Başarı mesajı göster
                 alertBox.className = 'alert alert-success';
-                alertBox.innerHTML = '<i class="fas fa-check-circle"></i> İlanınız başarıyla oluşturuldu. Yönlendiriliyorsunuz...';
+                alertBox.innerHTML = '<i class="fas fa-check-circle"></i> İlanınız başarıyla oluşturuldu. Fotoğraf yükleme sayfasına yönlendiriliyorsunuz...';
                 alertBox.style.display = 'block';
                 
-                // Başarı sayfasına yönlendir
+                // Fotoğraf yükleme sayfasına yönlendir
                 setTimeout(() => {
                     const listingId = result.id || 'ID-' + Math.floor(Math.random() * 1000000);
-                    const encodedTitle = encodeURIComponent(data.title);
                     
-                    // URL parametrelerini direkt olarak kullan
-                    window.location.href = `listing-success.html?id=${listingId}&title=${encodedTitle}&brand=${brandName}&model=${modelName}&version=${versionName}&year=${selectedYear}&color=${data.color}&type=car&category=vehicle`;
+                    // Fotoğraf yükleme sayfasına yönlendir
+                    window.location.href = `estate-photos-upload.html?id=${listingId}&type=vehicle`;
                 }, 1500);
                 
             } catch (error) {
