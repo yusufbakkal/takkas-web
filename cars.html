@@ -416,8 +416,7 @@
         async function toggleFavorite(advertId, button) {
             const authToken = localStorage.getItem('authToken');
             if (!authToken) {
-                alert('Favorilere eklemek için giriş yapmalısınız');
-                window.location.href = 'pages/signin.html';
+                showNotification('Favorilere eklemek için giriş yapmanız gerekiyor', 'info');
                 return;
             }
 
@@ -434,6 +433,7 @@
                         }
                     });
                     if (!response.ok) throw new Error('Favoriden kaldırılırken hata oluştu');
+                    showNotification('Favorilerden çıkarıldı', 'success');
                 } else {
                     // Favoriye ekle
                     const response = await fetch(`https://takkas-api.onrender.com/api/favorite-vehicles/${advertId}`, {
@@ -443,13 +443,111 @@
                         }
                     });
                     if (!response.ok) throw new Error('Favoriye eklenirken hata oluştu');
+                    showNotification('Favorilere eklendi', 'success');
                 }
                 // İşlem sonrası ikonu güncelle
                 await updateFavoriteIcon(advertId, button);
             } catch (error) {
-                alert(error.message);
+                showNotification(error.message, 'error');
             }
         }
+
+        // Bildirim gösterme fonksiyonu
+        function showNotification(message, type = 'info') {
+            const notification = document.createElement('div');
+            notification.className = `notification ${type}`;
+            notification.innerHTML = `
+                <div class="notification-content">
+                    <i class="fas ${type === 'success' ? 'fa-check-circle' : type === 'error' ? 'fa-exclamation-circle' : 'fa-info-circle'}"></i>
+                    <span>${message}</span>
+                </div>
+            `;
+            
+            document.body.appendChild(notification);
+            
+            // 3 saniye sonra bildirimi kaldır
+            setTimeout(() => {
+                notification.classList.add('fade-out');
+                setTimeout(() => notification.remove(), 300);
+            }, 3000);
+        }
+
+        // Bildirim stilleri
+        const style = document.createElement('style');
+        style.textContent = `
+            .notification {
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                padding: 15px 25px;
+                border-radius: 8px;
+                background: white;
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+                z-index: 1000;
+                animation: slideIn 0.3s ease-out;
+            }
+            
+            .notification.success {
+                border-left: 4px solid #4CAF50;
+            }
+            
+            .notification.error {
+                border-left: 4px solid #f44336;
+            }
+            
+            .notification.info {
+                border-left: 4px solid #2196F3;
+            }
+            
+            .notification-content {
+                display: flex;
+                align-items: center;
+                gap: 10px;
+            }
+            
+            .notification i {
+                font-size: 20px;
+            }
+            
+            .notification.success i {
+                color: #4CAF50;
+            }
+            
+            .notification.error i {
+                color: #f44336;
+            }
+            
+            .notification.info i {
+                color: #2196F3;
+            }
+            
+            .notification.fade-out {
+                animation: fadeOut 0.3s ease-out forwards;
+            }
+            
+            @keyframes slideIn {
+                from {
+                    transform: translateX(100%);
+                    opacity: 0;
+                }
+                to {
+                    transform: translateX(0);
+                    opacity: 1;
+                }
+            }
+            
+            @keyframes fadeOut {
+                from {
+                    transform: translateX(0);
+                    opacity: 1;
+                }
+                to {
+                    transform: translateX(100%);
+                    opacity: 0;
+                }
+            }
+        `;
+        document.head.appendChild(style);
     </script>
 </body>
 </html> 

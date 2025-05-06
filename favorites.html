@@ -256,6 +256,15 @@
 
     <!-- JavaScript -->
     <script>
+        // Authentication check
+        const authToken = localStorage.getItem('authToken');
+        if (!authToken) {
+            showNotification('Giriş yapmanız gerekiyor. Giriş sayfasına yönlendiriliyorsunuz...', 'info');
+            setTimeout(() => {
+                window.location.href = 'pages/signin.html';
+            }, 1000); // 2 saniye sonra yönlendir
+        }
+
         // Bileşenleri yükle
         Promise.all([
             fetch('components/property-detail-header.html').then(response => response.text()),

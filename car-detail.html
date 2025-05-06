@@ -1149,7 +1149,7 @@
                             <header class="car-header">
                                 <div class="car-title-row">
                                     <h2 class="car-name">${name}</h2>
-                                    <button class="car-favorite" aria-label="Favorilere ekle" onclick="event.stopPropagation(); event.preventDefault();">
+                                    <button class="car-favorite" aria-label="Favorilere ekle" onclick="event.stopPropagation(); event.preventDefault(); toggleFavorite(${car.id}, this);">
                                         <i class="far fa-heart"></i>
                                     </button>
                                 </div>
@@ -1366,8 +1366,7 @@
         async function toggleFavorite(advertId, button) {
             const authToken = localStorage.getItem('authToken');
             if (!authToken) {
-                showNotification('Favorilere eklemek için giriş yapmalısınız', 'error');
-                window.location.href = 'pages/signin.html';
+                showNotification('Favorilere eklemek için giriş yapmanız gerekiyor', 'info');
                 return;
             }
 
