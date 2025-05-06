@@ -1,0 +1,64 @@
+.chat-container {
+    height: calc(100vh - 64px);
+}
+
+.message-list {
+    height: calc(100% - 70px);
+    overflow-y: auto;
+}
+
+.conversation-area {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.messages-container {
+    flex-grow: 1;
+    overflow-y: auto;
+    padding: 1rem;
+}
+
+.input-area {
+    padding: 1rem;
+    border-top: 1px solid #e5e7eb;
+}
+
+.chat-bubble {
+    max-width: 75%;
+    padding: 0.75rem 1rem;
+    border-radius: 1rem;
+    margin-bottom: 0.5rem;
+}
+
+.sent {
+    background-color: #EEF2FF;
+    color: #333;
+    margin-left: auto;
+    border-top-right-radius: 0;
+    border: 1px solid #E0E7FF;
+}
+
+.received {
+    background-color: #F9FAFB;
+    border-top-left-radius: 0;
+    border: 1px solid #E5E7EB;
+}
+
+.message-time {
+    font-size: 0.75rem;
+    margin-top: 0.25rem;
+}
+
+.sent .message-time {
+    color: #6B7280;
+}
+
+.received .message-time {
+    color: #9ca3af;
+}
+
+/* Emoji desteği için font-family ayarı */
+.chat-bubble p {
+    font-family: 'Segoe UI Emoji', 'Segoe UI Symbol', 'Apple Color Emoji', 'Noto Color Emoji', sans-serif;
+} 
