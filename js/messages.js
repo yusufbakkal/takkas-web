@@ -2,37 +2,181 @@ let selectedUserId = null;
 let conversationsData = [];
 let currentMessages = [];
 
+function setInitialLayout() {
+    const conversationsListPanel = document.getElementById('conversations-list-panel');
+    const conversationContainer = document.getElementById('conversation-container');
+    const noConversationSelected = document.getElementById('no-conversation-selected');
+    const conversationView = document.getElementById('conversation-view');
+
+    if (window.innerWidth < 640) { // Mobil
+        conversationsListPanel.classList.remove('hidden');
+        conversationsListPanel.classList.add('flex');
+        conversationContainer.classList.add('hidden');
+        conversationContainer.classList.remove('flex');
+    } else { // Masaüstü
+        conversationsListPanel.classList.remove('hidden');
+        conversationsListPanel.classList.add('flex');
+        conversationContainer.classList.remove('hidden');
+        conversationContainer.classList.add('flex');
+        
+        // Eğer bir konuşma seçili değilse no-conversation-selected göster
+        if (!selectedUserId) {
+            noConversationSelected.classList.remove('hidden');
+            noConversationSelected.classList.add('flex');
+            conversationView.classList.add('hidden');
+            conversationView.classList.remove('flex');
+        } else {
+            // Eğer bir konuşma seçiliyse (sayfa yenilenmesi durumu vb. nadir durumlar için)
+            noConversationSelected.classList.add('hidden');
+            noConversationSelected.classList.remove('flex');
+            conversationView.classList.remove('hidden');
+            conversationView.classList.add('flex');
+        }
+    }
+}
+
 document.addEventListener('DOMContentLoaded', () => {
-    // Token kontrolü
     const token = localStorage.getItem('authToken');
-    
     if (!token) {
-        // Token yoksa login sayfasına yönlendir
         window.location.href = '/pages/signin.html';
         return;
     }
 
-    // Son mesajları getir
+    setInitialLayout(); // Başlangıç düzenini ayarla
+    window.addEventListener('resize', setInitialLayout); // Ekran boyutu değiştiğinde düzeni güncelle
+
     fetchLastMessages(token);
+    window.messagesInterval = setInterval(() => fetchLastMessages(token), 2000);
 
-    // Kısa aralıklarla son mesajları kontrol et (2 saniye)
-    window.messagesInterval = setInterval(() => {
-        fetchLastMessages(token);
-    }, 2000);
-
-    // Mesaj gönderme işlemi
     const sendButton = document.getElementById('send-button');
-    if (sendButton) {
-        sendButton.addEventListener('click', handleSendMessage);
-    }
+    if (sendButton) sendButton.addEventListener('click', handleSendMessage);
 
     const messageInput = document.getElementById('message-input');
-    if (messageInput) {
-        messageInput.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') {
-                handleSendMessage();
+    if (messageInput) messageInput.addEventListener('keypress', (e) => e.key === 'Enter' && handleSendMessage());
+
+    const mobileBackButton = document.getElementById('mobile-back-to-list');
+    if (mobileBackButton) {
+        mobileBackButton.addEventListener('click', () => {
+            document.getElementById('conversation-container').classList.add('hidden');
+            document.getElementById('conversation-container').classList.remove('flex');
+            document.getElementById('conversations-list-panel').classList.remove('hidden');
+            document.getElementById('conversations-list-panel').classList.add('flex');
+            selectedUserId = null;
+            if (window.conversationInterval) clearInterval(window.conversationInterval);
+            // Mobil listeye dönünce, no-conversation-selected'ı masaüstü için tekrar ayarlamaya gerek yok, çünkü container gizli.
+        });
+    }
+
+    // Ses kaydı işlemleri
+    const audioContainer = document.getElementById('audio-message-container');
+    const cancelAudioBtn = document.getElementById('cancel-audio-btn');
+    const sendAudioBtn = document.getElementById('send-audio-btn');
+    
+    // Long-press (uzun basma) özelliği için send butonuna
+    if (sendButton) {
+        let pressTimer;
+        let isRecording = false;
+        
+        sendButton.addEventListener('mousedown', (e) => {
+            pressTimer = setTimeout(() => {
+                // Uzun basma algılandı, ses kaydını başlat
+                startRecording();
+            }, 500);
+        });
+        
+        sendButton.addEventListener('mouseup', () => {
+            clearTimeout(pressTimer);
+            
+            // Eğer kayıttaysa, mouseup olayı kaydı durdurmaz
+            // Bu şekilde sadece kayıt başlatılmış ama iptal düğmesiyle durdurulmamışsa normal tıklama işlenir
+            if (!isRecording) {
+                // Normal tıklama, mesaj gönder
+                // (handleSendMessage fonksiyonu zaten event listener olarak eklenmiş)
             }
         });
+        
+        sendButton.addEventListener('mouseleave', () => {
+            clearTimeout(pressTimer);
+        });
+        
+        // Ses kaydını iptal et
+        if (cancelAudioBtn) {
+            cancelAudioBtn.addEventListener('click', () => {
+                stopRecording(true);
+            });
+        }
+        
+        // Ses kaydını gönder
+        if (sendAudioBtn) {
+            sendAudioBtn.addEventListener('click', () => {
+                stopRecording(false);
+                // Normalde burada kaydedilen sesi göndermek için API çağrısı yapılmalı
+                // Simüle etmek için manuel olarak bir ses mesajı ekliyoruz
+                simulateSendAudioMessage();
+            });
+        }
+        
+        // Ses kaydı başlatma fonksiyonu
+        function startRecording() {
+            isRecording = true;
+            
+            if (audioContainer) {
+                audioContainer.classList.remove('hidden');
+                
+                // Kayıt süresini sayan bir sayaç başlat
+                let seconds = 0;
+                let minutes = 0;
+                window.audioTimer = setInterval(() => {
+                    seconds++;
+                    if (seconds >= 60) {
+                        minutes++;
+                        seconds = 0;
+                    }
+                    
+                    document.getElementById('audio-time').textContent = `${minutes}:${seconds < 10 ? '0' + seconds : seconds}`;
+                }, 1000);
+            }
+        }
+        
+        // Ses kaydı durdurma fonksiyonu
+        function stopRecording(isCancelled) {
+            isRecording = false;
+            
+            if (audioContainer) {
+                audioContainer.classList.add('hidden');
+                
+                // Sayacı durdur
+                if (window.audioTimer) {
+                    clearInterval(window.audioTimer);
+                }
+                
+                // Süreyi sıfırla
+                document.getElementById('audio-time').textContent = '0:00';
+            }
+        }
+        
+        // Ses mesajı gönderimi simülasyonu
+        function simulateSendAudioMessage() {
+            if (!selectedUserId) return;
+            
+            const token = localStorage.getItem('authToken');
+            if (!token) return;
+            
+            // Gerçek bir API çağrısı yerine, mevcut mesajlara bir ses mesajı ekleriz
+            const fakeAudioMessage = {
+                content: 'audio:message', // Burada gerçek ses dosyasının URL'si olurdu
+                created_at: new Date().toISOString(),
+                is_sender: true,
+                message_id: Math.floor(Math.random() * 10000),
+                receiver_id: selectedUserId,
+                sender_id: null // Kendi ID'miz, API'dan alınırdı
+            };
+            
+            // Mesajları güncelle
+            currentMessages.push(fakeAudioMessage);
+            renderMessages(currentMessages);
+            scrollToBottom();
+        }
     }
 
     // 3 nokta menüsü işlevselliği
@@ -113,49 +257,62 @@ function renderConversations(conversations) {
         return;
     }
 
-    const conversationsHTML = conversations.map(conversation => {
-        // İlk harfi almak için
+    const conversationsHTML = conversations.map((conversation, index) => {
         const initial = conversation.other_user_name.charAt(0).toUpperCase();
         
-        // Mesaj içeriğini kısaltma ve emoji desteği
-        const shortContent = conversation.content.length > 30 
-            ? conversation.content.substring(0, 30) + '...' 
-            : conversation.content;
+        let shortContent = '';
+        if (conversation.content) {
+            if (conversation.content.startsWith('audio:')) {
+                shortContent = '<i class="fas fa-microphone text-xs mr-1"></i> Ses Kaydı';
+            } else {
+                shortContent = conversation.content.length > 30 
+                    ? conversation.content.substring(0, 30) + '...' 
+                    : conversation.content;
+            }
+        }
 
-        // Tarih formatını ayarlama
         const date = new Date(conversation.created_at);
         const today = new Date();
         
         let timeStr;
         if (date.toDateString() === today.toDateString()) {
-            // Bugün içinse sadece saat
             timeStr = date.toLocaleTimeString('tr-TR', {
                 hour: '2-digit', 
                 minute: '2-digit'
             });
         } else {
-            // Farklı bir gün için tarih
             timeStr = date.toLocaleDateString('tr-TR', {
                 day: '2-digit', 
                 month: '2-digit'
             });
         }
+        
+        const isSelected = selectedUserId === conversation.other_user_id;
 
         return `
-            <div class="px-4 py-3 border-b flex items-center hover:bg-gray-50 cursor-pointer ${
+            <div class="px-4 py-3 border-b flex items-center cursor-pointer ${
                 !conversation.is_read ? 'bg-indigo-50' : ''
+            } ${
+                isSelected ? 'bg-indigo-100' : ''
             }" onclick="selectConversation(${conversation.other_user_id})">
-                <div class="w-10 h-10 bg-indigo-100 text-indigo-700 rounded-full flex items-center justify-center mr-3 flex-shrink-0">
-                    ${initial}
+                <div class="relative">
+                    <div class="w-12 h-12 bg-indigo-100 text-indigo-700 rounded-full flex items-center justify-center mr-3 flex-shrink-0">
+                        ${initial}
+                    </div>
+                    ${conversation.is_active ? '<span class="absolute bottom-0 right-3 w-3 h-3 bg-green-500 rounded-full border-2 border-white"></span>' : ''} 
                 </div>
                 <div class="flex-grow min-w-0">
                     <div class="flex justify-between items-center">
                         <h3 class="font-semibold truncate text-gray-800">${conversation.other_user_name}</h3>
-                        <span class="text-xs text-gray-500 whitespace-nowrap ml-2">${timeStr}</span>
+                        <div class="flex items-center">
+                            <span class="text-xs text-gray-500 whitespace-nowrap ml-2">${timeStr}</span>
+                        </div>
                     </div>
-                    <p class="text-sm text-gray-600 truncate">${shortContent}</p>
+                    <div class="flex items-center justify-between">
+                        <p class="text-sm text-gray-600 truncate">${shortContent}</p>
+                        ${!conversation.is_read ? '<div class="w-2 h-2 bg-indigo-500 rounded-full ml-2 flex-shrink-0"></div>' : ''}
+                    </div>
                 </div>
-                ${!conversation.is_read ? '<div class="w-2 h-2 bg-indigo-500 rounded-full ml-2 flex-shrink-0"></div>' : ''}
             </div>
         `;
     }).join('');
@@ -166,34 +323,42 @@ function renderConversations(conversations) {
 // Konuşma seçme işlemi
 function selectConversation(userId) {
     selectedUserId = userId;
-    
-    // Görünüm değişikliği
-    document.getElementById('no-conversation-selected').classList.add('hidden');
-    document.getElementById('conversation-view').classList.remove('hidden');
-    
-    // Seçilen kullanıcının bilgilerini gösterme
-    const selectedConversation = conversationsData.find(c => c.other_user_id === userId);
-    if (selectedConversation) {
-        document.getElementById('contact-name').textContent = selectedConversation.other_user_name;
-        document.getElementById('contact-initial').textContent = selectedConversation.other_user_name.charAt(0).toUpperCase();
+
+    const conversationsListPanel = document.getElementById('conversations-list-panel');
+    const conversationContainer = document.getElementById('conversation-container');
+    const noConversationSelected = document.getElementById('no-conversation-selected');
+    const conversationView = document.getElementById('conversation-view');
+
+    // Her zaman noConversationSelected'ı gizle, conversationView'i göster
+    noConversationSelected.classList.add('hidden');
+    noConversationSelected.classList.remove('flex');
+    conversationView.classList.remove('hidden');
+    conversationView.classList.add('flex');
+
+    if (window.innerWidth < 640) { // sm breakpoint
+        conversationsListPanel.classList.add('hidden');
+        conversationsListPanel.classList.remove('flex');
+        conversationContainer.classList.remove('hidden');
+        conversationContainer.classList.add('flex');
+    } else {
+        // Masaüstünde, conversationContainer zaten görünür olmalı (setInitialLayout sayesinde)
+        // Sadece içindeki view'lerin doğru olduğundan emin oluyoruz (yukarıda yapıldı)
+        conversationsListPanel.classList.remove('hidden'); // Sol panelin görünür olduğundan emin ol
+        conversationsListPanel.classList.add('flex');
+        conversationContainer.classList.remove('hidden'); // Sağ panelin görünür olduğundan emin ol
+        conversationContainer.classList.add('flex');
+    }
+
+    const selectedConvData = conversationsData.find(c => c.other_user_id === userId);
+    if (selectedConvData) {
+        document.getElementById('contact-name').textContent = selectedConvData.other_user_name;
     }
     
-    // Mesajları yükleme
     fetchConversation(userId);
-    
-    // Konuşmanın okunduğunu bildir
     markConversationAsRead(userId);
     
-    // Konuşma mesajlarını düzenli aralıklarla güncelle (1.5 saniye)
-    if (window.conversationInterval) {
-        clearInterval(window.conversationInterval);
-    }
-    
-    window.conversationInterval = setInterval(() => {
-        if (selectedUserId) {
-            fetchConversation(selectedUserId);
-        }
-    }, 1500);
+    if (window.conversationInterval) clearInterval(window.conversationInterval);
+    window.conversationInterval = setInterval(() => selectedUserId && fetchConversation(selectedUserId), 1500);
 }
 
 async function fetchConversation(userId) {
@@ -239,26 +404,82 @@ function renderMessages(messages) {
         return;
     }
 
-    const messagesHTML = messages.map(message => {
-        // is_sender alanını kullan
-        const isSentByMe = message.is_sender;
-        const date = new Date(message.created_at);
-        const timeStr = date.toLocaleTimeString('tr-TR', {
+    const messagesHTML = [];
+    let currentDate = '';
+
+    messages.forEach((message, index) => {
+        // Tarih kontrolü yapıp gerekirse tarih ayırıcısı ekle
+        const messageDate = new Date(message.created_at);
+        const formattedDate = messageDate.toLocaleDateString('tr-TR', {
+            day: '2-digit',
+            month: '2-digit',
+            year: 'numeric'
+        });
+
+        if (formattedDate !== currentDate) {
+            currentDate = formattedDate;
+            messagesHTML.push(`
+                <div class="message-date-divider">
+                    <span>${formattedDate}</span>
+                </div>
+            `);
+        }
+
+        // Mesaj saati
+        const timeStr = messageDate.toLocaleTimeString('tr-TR', {
             hour: '2-digit',
             minute: '2-digit'
         });
 
-        return `
-            <div class="flex ${isSentByMe ? 'justify-end' : 'justify-start'}">
-                <div class="chat-bubble ${isSentByMe ? 'sent' : 'received'}">
-                    <p>${message.content}</p>
-                    <div class="message-time text-right">${timeStr}</div>
+        // is_sender alanını kullan
+        const isSentByMe = message.is_sender;
+        const bubbleClass = isSentByMe ? 'sent' : 'received';
+        const alignClass = isSentByMe ? 'items-end' : 'items-start';
+
+        // Ses kaydı mı, normal mesaj mı kontrol et
+        if (message.content && message.content.startsWith('audio:')) {
+            // Ses kaydı mesajı
+            messagesHTML.push(`
+                <div class="flex flex-col ${alignClass} mb-3">
+                    <div class="audio-message ${bubbleClass}">
+                        <div class="audio-play-button">
+                            <i class="fas fa-play"></i>
+                        </div>
+                        <div class="audio-waveform">
+                            <div class="w-1 h-3 mx-0.5"></div>
+                            <div class="w-1 h-4 mx-0.5"></div>
+                            <div class="w-1 h-6 mx-0.5"></div>
+                            <div class="w-1 h-5 mx-0.5"></div>
+                            <div class="w-1 h-3 mx-0.5"></div>
+                            <div class="w-1 h-4 mx-0.5"></div>
+                            <div class="w-1 h-7 mx-0.5"></div>
+                            <div class="w-1 h-5 mx-0.5"></div>
+                            <div class="w-1 h-3 mx-0.5"></div>
+                            <div class="w-1 h-2 mx-0.5"></div>
+                        </div>
+                        <span class="audio-time">1:25</span>
+                    </div>
+                    <div class="message-status text-xs">
+                        ${timeStr} ${isSentByMe ? '<i class="fas fa-check-double"></i>' : ''}
+                    </div>
                 </div>
-            </div>
-        `;
-    }).join('');
-    
-    messagesContainer.innerHTML = messagesHTML;
+            `);
+        } else {
+            // Normal metin mesajı
+            messagesHTML.push(`
+                <div class="flex flex-col ${alignClass} mb-3">
+                    <div class="chat-bubble ${bubbleClass}">
+                        <p>${message.content}</p>
+                    </div>
+                    <div class="message-status text-xs">
+                        ${timeStr} ${isSentByMe ? '<i class="fas fa-check-double"></i>' : ''}
+                    </div>
+                </div>
+            `);
+        }
+    });
+
+    messagesContainer.innerHTML = messagesHTML.join('');
 }
 
 async function handleSendMessage() {

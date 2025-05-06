@@ -14,97 +14,137 @@
                 extend: {
                     colors: {
                         primary: '#4F46E5',
+                        secondary: '#7770FF', // Mor renk tonları için
+                        messageBg: '#F1F0FF', // Mesaj arkaplan rengi
                     }
                 }
             }
         }
     </script>
 </head>
-<body class="bg-gray-50">
-    <div class="chat-container flex">
-        <!-- Sol sidebar - Konuşmalar listesi -->
-        <div class="w-1/4 bg-white border-r">
-            <div class="p-4 border-b flex justify-between items-center">
-                <h1 class="text-xl font-semibold text-gray-800">Mesajlar</h1>
-                <button class="text-primary hover:bg-indigo-50 p-2 rounded-full">
-                    <i class="fas fa-edit text-lg"></i>
-                </button>
-            </div>
-            <div class="p-3 border-b">
-                <div class="relative">
-                    <input type="text" placeholder="Arama..." class="w-full pl-10 pr-4 py-2 bg-gray-50 rounded-full focus:outline-none border border-gray-200 focus:border-indigo-300 focus:ring-1 focus:ring-indigo-300">
-                    <div class="absolute left-3 top-2.5 text-gray-500">
-                        <i class="fas fa-search"></i>
-                    </div>
-                </div>
-            </div>
-            <div class="overflow-y-auto message-list">
-                <div class="py-2 px-4 flex items-center hover:bg-gray-50 cursor-pointer">
-                    <i class="far fa-comment-dots text-gray-500 mr-3"></i>
-                    <span class="text-gray-600">Tüm mesajlar</span>
-                </div>
-                
-                <!-- Konuşma listesi -->
-                <div id="conversations-list" class="mt-2">
-                    <!-- Konuşmalar JavaScript ile doldurulacak -->
-                    <div class="flex justify-center py-6">
-                        <div class="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-primary"></div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Sağ taraf - Konuşma alanı (başlangıçta boş, bir konuşma seçildiğinde doldurulacak) -->
-        <div class="w-3/4 bg-white" id="conversation-container">
-            <!-- Başlangıç durumu: Mesaj seçilmediğinde gösterilecek -->
-            <div class="h-full flex flex-col items-center justify-center text-gray-500" id="no-conversation-selected">
-                <div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mb-4 border border-gray-200">
-                    <i class="fas fa-comment-dots text-gray-400 text-2xl"></i>
-                </div>
-                <p>Mesajlaşmaya başlamak için bir konuşma seçin</p>
-            </div>
-
-            <!-- Konuşma seçildiğinde gösterilecek -->
-            <div class="h-full hidden" id="conversation-view">
-                <!-- Başlık -->
-                <div class="p-4 border-b flex items-center bg-white">
-                    <div class="w-10 h-10 bg-indigo-100 text-indigo-700 rounded-full mr-3 flex-shrink-0" id="contact-avatar">
-                        <span class="w-full h-full flex items-center justify-center font-bold" id="contact-initial"></span>
-                    </div>
-                    <div class="flex-grow">
-                        <h2 class="font-semibold text-gray-800" id="contact-name"></h2>
-                    </div>
-                    <div class="relative">
-                        <button class="text-gray-500 hover:text-gray-700 hover:bg-gray-100 p-2 rounded-full" id="menu-button">
-                            <i class="fas fa-ellipsis-v"></i>
+<body class="bg-gray-100">
+    <div class="my-6">
+        <div class="chat-container flex sm:flex-row flex-col">
+            <!-- Sol sidebar - Konuşmalar listesi -->
+            <div class="w-full sm:w-1/4 border-r border-gray-200 flex flex-col" id="conversations-list-panel">
+                <div class="p-4 border-b flex items-center">
+                    <a href="index.html" class="text-gray-600 mr-4 hover:text-primary transition-all duration-300 group bg-gray-100 hover:bg-gray-200 p-2 rounded-full flex items-center justify-center w-10 h-10">
+                        <i class="fas fa-arrow-left group-hover:-translate-x-1 transition-transform duration-300"></i>
+                    </a>
+                    <h1 class="text-xl font-semibold text-gray-800">Mesajlar</h1>
+                    <div class="ml-auto flex items-center space-x-2">
+                        <button class="text-gray-600 hover:text-gray-800 p-2 rounded-full">
+                            <i class="fas fa-cog"></i>
                         </button>
-                        <div class="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-10 hidden" id="dropdown-menu">
-                            <button class="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50" id="delete-conversation-btn">
-                                <i class="fas fa-trash mr-2"></i>Konuşmayı Sil
-                            </button>
+                        <button class="text-primary hover:bg-indigo-50 p-2 rounded-full">
+                            <i class="fas fa-edit text-lg"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="p-3 border-b">
+                    <div class="relative">
+                        <input type="text" placeholder="Arama..." class="w-full pl-10 pr-4 py-2 bg-gray-50 rounded-full focus:outline-none border border-gray-200 focus:border-indigo-300 focus:ring-1 focus:ring-indigo-300">
+                        <div class="absolute left-3 top-2.5 text-gray-500">
+                            <i class="fas fa-search"></i>
                         </div>
                     </div>
                 </div>
+                <div class="overflow-y-auto message-list flex-grow">
+                    <div class="py-2 px-4 border-b">
+                        <h2 class="text-gray-500 text-sm font-medium uppercase tracking-wider">TÜM MESAJLAR</h2>
+                    </div>
+                    
+                    <div id="conversations-list" class="mt-2">
+                        <div class="flex justify-center py-6">
+                            <div class="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-primary"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
-                <!-- Mesajlar alanı -->
-                <div class="messages-container bg-gray-50" id="messages-container">
-                    <!-- Mesajlar JavaScript ile doldurulacak -->
+            <!-- Sağ taraf - Konuşma alanı -->
+            <div class="w-full sm:w-3/4 flex flex-col hidden sm:flex flex-1" id="conversation-container">
+                <!-- Başlangıç durumu: Mesaj seçilmediğinde gösterilecek -->
+                <div class="h-full flex flex-col items-center justify-center text-gray-500 hidden" id="no-conversation-selected">
+                    <div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mb-4 border border-gray-200">
+                        <i class="fas fa-comment-dots text-gray-400 text-2xl"></i>
+                    </div>
+                    <p>Mesajlaşmaya başlamak için bir konuşma seçin</p>
                 </div>
 
-                <!-- Mesaj gönderme alanı -->
-                <div class="input-area flex items-center bg-white">
-                    <button class="p-2 text-gray-500 hover:text-primary hover:bg-gray-100 rounded-full">
-                        <i class="fas fa-paperclip"></i>
-                    </button>
-                    <input 
-                        type="text" 
-                        id="message-input"
-                        placeholder="Mesajınızı yazın..." 
-                        class="flex-grow mx-2 p-2 border border-gray-200 rounded-full focus:outline-none focus:ring-2 focus:ring-indigo-300 focus:border-indigo-300 bg-gray-50"
-                    >
-                    <button id="send-button" class="p-2 text-white bg-primary rounded-full hover:bg-indigo-600 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
-                        <i class="fas fa-paper-plane"></i>
-                    </button>
+                <!-- Konuşma seçildiğinde gösterilecek -->
+                <div class="h-full flex flex-col hidden" id="conversation-view">
+                    <!-- Başlık -->
+                    <div class="p-4 border-b flex items-center bg-white sticky top-0 z-10">
+                        <button class="sm:hidden text-gray-600 mr-3 hover:text-primary p-2 rounded-full bg-gray-100 hover:bg-gray-200" id="mobile-back-to-list">
+                            <i class="fas fa-arrow-left"></i>
+                        </button>
+                        <div class="flex-grow sm:ml-3">
+                            <h2 class="font-semibold text-gray-800" id="contact-name"></h2>
+                        </div>
+                        <div class="flex items-center space-x-3">
+                            <button class="text-gray-500 hover:text-gray-700 p-2 rounded-full">
+                                <i class="fas fa-video"></i>
+                            </button>
+                            <button class="text-gray-500 hover:text-gray-700 p-2 rounded-full">
+                                <i class="fas fa-phone-alt"></i>
+                            </button>
+                            <div class="relative">
+                                <button class="text-gray-500 hover:text-gray-700 hover:bg-gray-100 p-2 rounded-full" id="menu-button">
+                                    <i class="fas fa-ellipsis-v"></i>
+                                </button>
+                                <div class="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-10 hidden" id="dropdown-menu">
+                                    <button class="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50" id="delete-conversation-btn">
+                                        <i class="fas fa-trash mr-2"></i>Konuşmayı Sil
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="messages-container flex-1 bg-gray-50 overflow-y-auto p-4" id="messages-container">
+                        <!-- Mesajlar JavaScript ile doldurulacak -->
+                    </div>
+
+                    <div class="audio-message-container bg-gray-50 px-4 py-3 border-t border-gray-200 hidden" id="audio-message-container">
+                        <div class="flex items-center justify-between bg-gray-100 rounded-full p-2">
+                            <button class="text-red-500 hover:text-red-600 p-2" id="cancel-audio-btn">
+                                <i class="fas fa-times"></i>
+                            </button>
+                            <div class="flex-1 flex items-center justify-center">
+                                <div class="h-6 flex items-center">
+                                    <div class="text-xs text-gray-500 mr-2" id="audio-time">1:25</div>
+                                    <div class="audio-wave flex items-center">
+                                        <div class="w-1 h-3 bg-primary mx-0.5 animate-pulse"></div>
+                                        <div class="w-1 h-4 bg-primary mx-0.5 animate-pulse delay-75"></div>
+                                        <div class="w-1 h-5 bg-primary mx-0.5 animate-pulse delay-100"></div>
+                                        <div class="w-1 h-6 bg-primary mx-0.5 animate-pulse delay-150"></div>
+                                        <div class="w-1 h-4 bg-primary mx-0.5 animate-pulse delay-200"></div>
+                                        <div class="w-1 h-3 bg-primary mx-0.5 animate-pulse delay-100"></div>
+                                        <div class="w-1 h-5 bg-primary mx-0.5 animate-pulse delay-75"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <button class="text-primary hover:text-indigo-600 p-2" id="send-audio-btn">
+                                <i class="fas fa-paper-plane"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="input-area flex items-center bg-white p-4 border-t border-gray-200">
+                        <button class="p-2 text-gray-500 hover:text-primary hover:bg-gray-100 rounded-full mr-2">
+                            <i class="fas fa-paperclip"></i>
+                        </button>
+                        <input 
+                            type="text" 
+                            id="message-input"
+                            placeholder="Mesajınızı yazın..." 
+                            class="flex-grow p-3 border border-gray-200 rounded-full focus:outline-none focus:ring-2 focus:ring-indigo-300 focus:border-indigo-300 bg-gray-50"
+                        >
+                        <button id="send-button" class="p-3 text-white bg-primary rounded-full hover:bg-indigo-600 ml-2 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
+                            <i class="fas fa-paper-plane"></i>
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>

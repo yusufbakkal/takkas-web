@@ -1,9 +1,17 @@
 .chat-container {
-    height: calc(100vh - 64px);
+    display: flex;
+    width: 95%;
+    height: 90vh;
+    background-color: #fff;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+    margin-left: auto;
+    margin-right: auto;
 }
 
 .message-list {
-    height: calc(100% - 70px);
+    height: calc(100% - 130px);
     overflow-y: auto;
 }
 
@@ -17,6 +25,8 @@
     flex-grow: 1;
     overflow-y: auto;
     padding: 1rem;
+    display: flex;
+    flex-direction: column;
 }
 
 .input-area {
@@ -29,29 +39,31 @@
     padding: 0.75rem 1rem;
     border-radius: 1rem;
     margin-bottom: 0.5rem;
+    position: relative;
 }
 
 .sent {
-    background-color: #EEF2FF;
-    color: #333;
+    background-color: #7770FF;
+    color: white;
     margin-left: auto;
-    border-top-right-radius: 0;
-    border: 1px solid #E0E7FF;
+    border-top-right-radius: 0.25rem;
 }
 
 .received {
-    background-color: #F9FAFB;
-    border-top-left-radius: 0;
-    border: 1px solid #E5E7EB;
+    background-color: #F3F4F6;
+    color: #333;
+    margin-right: auto;
+    border-top-left-radius: 0.25rem;
 }
 
 .message-time {
     font-size: 0.75rem;
     margin-top: 0.25rem;
+    text-align: right;
 }
 
 .sent .message-time {
-    color: #6B7280;
+    color: rgba(255, 255, 255, 0.8);
 }
 
 .received .message-time {
@@ -61,4 +73,140 @@
 /* Emoji desteği için font-family ayarı */
 .chat-bubble p {
     font-family: 'Segoe UI Emoji', 'Segoe UI Symbol', 'Apple Color Emoji', 'Noto Color Emoji', sans-serif;
+}
+
+/* Ses mesajı için stilller */
+.audio-wave {
+    height: 24px;
+    display: flex;
+    align-items: center;
+}
+
+.audio-wave div {
+    border-radius: 1px;
+}
+
+/* Mesaj tarihi ayırıcı */
+.message-date-divider {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 1rem 0;
+}
+
+.message-date-divider span {
+    background-color: #E5E7EB;
+    color: #6B7280;
+    font-size: 0.75rem;
+    padding: 0.25rem 0.75rem;
+    border-radius: 1rem;
+}
+
+/* Audio mesajı stili */
+.audio-message {
+    display: flex;
+    align-items: center;
+    padding: 0.5rem 1rem;
+    border-radius: 1rem;
+    margin-bottom: 0.5rem;
+}
+
+.audio-message.sent {
+    background-color: #7770FF;
+    color: white;
+}
+
+.audio-message.received {
+    background-color: #F3F4F6;
+    color: #333;
+}
+
+.audio-play-button {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 0.5rem;
+    cursor: pointer;
+}
+
+.sent .audio-play-button {
+    background-color: rgba(255, 255, 255, 0.2);
+    color: white;
+}
+
+.received .audio-play-button {
+    background-color: rgba(79, 70, 229, 0.1);
+    color: #4F46E5;
+}
+
+.audio-waveform {
+    flex-grow: 1;
+    display: flex;
+    align-items: center;
+    height: 24px;
+}
+
+.sent .audio-waveform div {
+    background-color: rgba(255, 255, 255, 0.7);
+}
+
+.received .audio-waveform div {
+    background-color: rgba(79, 70, 229, 0.5);
+}
+
+.audio-time {
+    font-size: 0.75rem;
+    margin-left: 0.5rem;
+}
+
+.sent .audio-time {
+    color: rgba(255, 255, 255, 0.8);
+}
+
+.received .audio-time {
+    color: #6B7280;
+}
+
+/* Mesaj zamanı ve durumu için stilller */
+.message-status {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    font-size: 0.75rem;
+    margin-top: 0.25rem;
+}
+
+.sent .message-status {
+    color: rgba(255, 255, 255, 0.8);
+}
+
+.received .message-status {
+    color: #9ca3af;
+}
+
+.message-status i {
+    font-size: 0.75rem;
+    margin-left: 0.25rem;
+}
+
+/* Yeni mesaj bildirimi için stil */
+.new-message-notification {
+    background-color: #4F46E5;
+    color: white;
+    border-radius: 0.5rem;
+    padding: 0.5rem 1rem;
+    margin: 0.5rem auto;
+    font-size: 0.875rem;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    cursor: pointer;
+    max-width: 80%;
+    text-align: center;
+}
+
+/* Geri butonu hover efekti için stil */
+.back-button-effect:hover {
+    transform: translateX(-4px);
 } 
