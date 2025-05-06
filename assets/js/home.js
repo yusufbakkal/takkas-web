@@ -143,9 +143,6 @@ function createCarCard(car) {
             <header class="car-header">
                 <div class="car-title-row">
                     <h2 class="car-name">${name}</h2>
-                    <button class="car-favorite" aria-label="Favorilere ekle">
-                        <i class="far fa-heart"></i>
-                    </button>
                 </div>
                 <p class="car-type">${brand} ${model}</p>
             </header>

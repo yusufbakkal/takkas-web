@@ -21,22 +21,94 @@
             <button class="notification-btn" aria-label="Bildirimleri göster">
                 <i class="fas fa-bell"></i>
             </button>
-            <a href="settings.html" class="profile-link">
-                <div class="avatar-circle" id="detailUserAvatar">
-                    <span class="avatar-initials">YB</span>
+            <div class="profile-dropdown">
+                <a href="#" class="profile-link">
+                    <div class="avatar-circle" id="detailUserAvatar">
+                        <span class="avatar-initials">YB</span>
+                    </div>
+                </a>
+                <div class="dropdown-menu">
+                    <div id="loggedInMenu">
+                        <div class="dropdown-header">
+                            <div class="user-info">
+                                <div class="avatar-circle small">
+                                    <span class="avatar-initials"></span>
+                                </div>
+                                <div class="user-details">
+                                    <span class="user-name"></span>
+                                    <span class="user-email"></span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="dropdown-items">
+                            <a href="settings.html" class="dropdown-item">
+                                <i class="fas fa-cog"></i>
+                                <span>Ayarlar</span>
+                                <i class="fas fa-chevron-right"></i>
+                            </a>
+                            <a href="/favorites.html" class="dropdown-item">
+                                <i class="fas fa-heart"></i>
+                                <span>Favoriler</span>
+                                <i class="fas fa-chevron-right"></i>
+                            </a>
+                            <a href="/logout.html" class="dropdown-item logout">
+                                <i class="fas fa-sign-out-alt"></i>
+                                <span>Çıkış Yap</span>
+                            </a>
+                        </div>
+                    </div>
+                    <div id="loggedOutMenu">
+                        <a href="pages/signin.html" class="login-button">
+                            Giriş Yap / Hesap Oluştur
+                        </a>
+                    </div>
                 </div>
-            </a>
+            </div>
         </div>
     </div>
 </header>
 
 <script>
-    // Kullanıcı adını al ve baş harfleri göster
     document.addEventListener('DOMContentLoaded', function() {
-        // Örnek kullanıcı adı (gerçek uygulamada API'den veya localStorage'dan alınabilir)
-        const userName = "Yusuf Bakkal"; // Varsayılan kullanıcı adı
+        const authToken = localStorage.getItem('authToken');
+        const userName = localStorage.getItem('userName') || "Yusuf Bakkal";
+        const userEmail = localStorage.getItem('userEmail') || "kullanici@takkas.com";
+        const loggedInMenu = document.getElementById('loggedInMenu');
+        const loggedOutMenu = document.getElementById('loggedOutMenu');
+        const avatarCircle = document.querySelector('#detailUserAvatar');
+        const avatarInitials = document.querySelector('#detailUserAvatar .avatar-initials');
+        const smallAvatarInitials = document.querySelector('.avatar-circle.small .avatar-initials');
+        const userNameElement = document.querySelector('.user-name');
+        const userEmailElement = document.querySelector('.user-email');
+        const profileDropdown = document.querySelector('.profile-dropdown');
+
+        // Logout butonuna özel işleyici ekle
+        const logoutButton = document.querySelector('.logout');
+        if (logoutButton) {
+            logoutButton.addEventListener('click', function(e) {
+                e.preventDefault();
+                localStorage.removeItem('authToken');
+                localStorage.removeItem('userName');
+                localStorage.removeItem('userEmail');
+                localStorage.removeItem('userId');
+                alert('Başarıyla çıkış yapıldı');
+                window.location.href = '/index.html';
+            });
+        }
+
+        if (authToken && userName) {
+            // Kullanıcı giriş yapmış
+            loggedInMenu.style.display = 'block';
+            loggedOutMenu.style.display = 'none';
+            profileDropdown.style.display = 'inline-block';
+        } else {
+            // Kullanıcı giriş yapmamış
+            loggedInMenu.style.display = 'none';
+            loggedOutMenu.style.display = 'block';
+            profileDropdown.style.display = 'inline-block';
+        }
         
-        // Kullanıcı adının baş harflerini al
+        // Avatar ve kullanıcı bilgileri
         const initials = userName.split(' ')
             .map(name => name.charAt(0))
             .join('')
@@ -44,7 +116,18 @@
             .substring(0, 2); // En fazla 2 harf al
         
         // Avatar'a baş harfleri yerleştir
-        document.querySelector('#detailUserAvatar .avatar-initials').textContent = initials;
+        avatarInitials.textContent = initials;
+        if (smallAvatarInitials) {
+            smallAvatarInitials.textContent = initials;
+        }
+        
+        // Kullanıcı bilgilerini ayarla
+        if (userNameElement) {
+            userNameElement.textContent = userName;
+        }
+        if (userEmailElement) {
+            userEmailElement.textContent = userEmail;
+        }
         
         // Rastgele bir arka plan rengi oluştur (kullanıcı adına göre sabit bir renk de olabilir)
         const colors = [
@@ -57,6 +140,194 @@
         const backgroundColor = colors[colorIndex];
         
         // Avatar'ın arka plan rengini ayarla
-        document.querySelector('#detailUserAvatar').style.backgroundColor = backgroundColor;
+        avatarCircle.style.backgroundColor = backgroundColor;
+        const smallAvatar = document.querySelector('.avatar-circle.small');
+        if (smallAvatar) {
+            smallAvatar.style.backgroundColor = backgroundColor;
+        }
     });
-</script> 
+</script>
+
+<style>
+.profile-dropdown {
+    position: relative;
+    display: inline-block;
+    margin-right: 10px;
+    padding-bottom: 20px;
+}
+
+.dropdown-menu {
+    display: none;
+    position: absolute;
+    right: -24px;
+    top: 45px;
+    background-color: white;
+    min-width: 250px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+    border-radius: 12px;
+    z-index: 1000;
+    padding: 0;
+    border: 1px solid #eef0f2;
+}
+
+.profile-dropdown::after {
+    content: '';
+    position: absolute;
+    top: 100%;
+    left: -50px;
+    right: -50px;
+    height: 20px;
+    background: transparent;
+}
+
+.dropdown-menu::before {
+    content: '';
+    position: absolute;
+    top: -20px;
+    left: -50px;
+    right: -50px;
+    height: 20px;
+    background: transparent;
+}
+
+.profile-dropdown .dropdown-menu {
+    display: block;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.2s ease;
+    transform: translateY(-10px);
+}
+
+.profile-dropdown:hover .dropdown-menu {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+.dropdown-header {
+    padding: 20px;
+    border-bottom: 1px solid #eef0f2;
+    background-color: #f8f9fa;
+    border-radius: 12px 12px 0 0;
+}
+
+.user-info {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.avatar-circle.small {
+    width: 36px;
+    height: 36px;
+    font-size: 14px;
+}
+
+.user-details {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.user-name {
+    font-weight: 600;
+    color: #1a1d1f;
+    font-size: 14px;
+}
+
+.user-email {
+    color: #6f767e;
+    font-size: 13px;
+}
+
+.dropdown-items {
+    padding: 8px 0;
+}
+
+.dropdown-item {
+    display: flex;
+    align-items: center;
+    padding: 12px 20px;
+    color: #1a1d1f;
+    text-decoration: none;
+    transition: all 0.2s ease;
+    font-size: 14px;
+    border: none;
+    background: none;
+    width: 100%;
+    text-align: left;
+    cursor: pointer;
+    position: relative;
+    font-weight: 500;
+}
+
+.dropdown-item:hover {
+    background-color: #f8f9fa;
+    color: #FF6B00;
+}
+
+.dropdown-item:hover i {
+    color: #FF6B00;
+}
+
+.dropdown-item i:first-child {
+    margin-right: 12px;
+    width: 20px;
+    text-align: center;
+    color: #6f767e;
+    font-size: 16px;
+    transition: color 0.2s ease;
+}
+
+.dropdown-item .fa-chevron-right {
+    position: absolute;
+    right: 20px;
+    color: #6f767e;
+    font-size: 12px;
+    opacity: 0;
+    transform: translateX(-10px);
+    transition: all 0.2s ease;
+}
+
+.dropdown-item:hover .fa-chevron-right {
+    opacity: 1;
+    transform: translateX(0);
+}
+
+.dropdown-item span {
+    flex: 1;
+}
+
+.login-button {
+    display: block;
+    padding: 14px 24px;
+    background-color: #FF6B00;
+    color: white;
+    text-align: center;
+    text-decoration: none;
+    border-radius: 8px;
+    margin: 16px;
+    font-weight: 600;
+    font-size: 14px;
+    transition: all 0.2s ease;
+}
+
+.login-button:hover {
+    background-color: #E65000;
+    transform: translateY(-1px);
+}
+
+.logout {
+    color: #FF4444;
+    margin-top: 8px;
+}
+
+.logout:hover {
+    background-color: #fff1f1;
+    color: #FF4444;
+}
+
+.logout i {
+    color: #FF4444;
+}
+</style> 

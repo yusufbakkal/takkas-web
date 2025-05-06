@@ -221,7 +221,7 @@
                             <header class="car-header">
                                 <div class="car-title-row">
                                     <h2 class="car-name">${name}</h2>
-                                    <button class="car-favorite" aria-label="Favorilere ekle" onclick="event.stopPropagation(); event.preventDefault();">
+                                    <button class="car-favorite" aria-label="Favorilere ekle" onclick="event.stopPropagation(); event.preventDefault(); toggleFavorite(${car.id}, this);">
                                         <i class="far fa-heart"></i>
                                     </button>
                                 </div>
@@ -328,7 +328,10 @@
             
             if (testData) {
                 console.log('API testi başarılı! Araçlar yükleniyor...');
-                loadMoreCars();
+                loadMoreCars().then(() => {
+                    // Araçlar yüklendikten sonra favori durumunu kontrol et
+                    updateAllFavoriteIcons();
+                });
             } else {
                 console.log('API testi başarısız! Örnek veriler kullanılacak...');
                 // Örnek verilerle devam et
@@ -342,7 +345,10 @@
                     price: 100000 + (index * 50000)
                 }));
                 
-                loadMoreCars();
+                loadMoreCars().then(() => {
+                    // Araçlar yüklendikten sonra favori durumunu kontrol et
+                    updateAllFavoriteIcons();
+                });
             }
         });
         
@@ -358,16 +364,92 @@
             }
         });
 
-        // Favoriye ekleme fonksiyonu
-        document.addEventListener('click', function(e) {
-            if (e.target.closest('.car-favorite')) {
-                const button = e.target.closest('.car-favorite');
-                button.classList.toggle('active');
-                const icon = button.querySelector('i');
-                icon.classList.toggle('far');
-                icon.classList.toggle('fas');
+        async function checkFavoriteStatusForAdvert(advertId) {
+            const authToken = localStorage.getItem('authToken');
+            if (!authToken) return false;
+            try {
+                const response = await fetch(`https://takkas-api.onrender.com/api/favorite-vehicles/check/${advertId}`, {
+                    headers: { 'Authorization': `Bearer ${authToken}` }
+                });
+                if (!response.ok) return false;
+                const data = await response.json();
+                return data === true || data.is_favorite === true;
+            } catch {
+                return false;
             }
-        });
+        }
+
+        async function updateFavoriteIcon(advertId, button) {
+            const isFavorite = await checkFavoriteStatusForAdvert(advertId);
+            const icon = button.querySelector('i');
+            if (isFavorite) {
+                icon.classList.remove('far');
+                icon.classList.add('fas');
+                button.classList.add('active');
+            } else {
+                icon.classList.remove('fas');
+                icon.classList.add('far');
+                button.classList.remove('active');
+            }
+        }
+
+        // Arabalar yüklendikten sonra her kart için favori durumu kontrolü
+        async function updateAllFavoriteIcons() {
+            document.querySelectorAll('.car-favorite').forEach(async button => {
+                const onclickAttr = button.getAttribute('onclick');
+                const match = onclickAttr && onclickAttr.match(/toggleFavorite\((\d+)/);
+                if (match && match[1]) {
+                    await updateFavoriteIcon(match[1], button);
+                }
+            });
+        }
+
+        // loadMoreCars fonksiyonunu güncelleyelim
+        const originalLoadMoreCars = loadMoreCars;
+        loadMoreCars = async function() {
+            await originalLoadMoreCars.call(this);
+            // Yeni içerik yüklendiğinde favori durumunu kontrol et
+            updateAllFavoriteIcons();
+        };
+
+        // toggleFavorite fonksiyonunu güncelle: işlem sonrası ikonu güncelle
+        async function toggleFavorite(advertId, button) {
+            const authToken = localStorage.getItem('authToken');
+            if (!authToken) {
+                alert('Favorilere eklemek için giriş yapmalısınız');
+                window.location.href = 'pages/signin.html';
+                return;
+            }
+
+            const icon = button.querySelector('i');
+            const isFavorite = icon.classList.contains('fas');
+
+            try {
+                if (isFavorite) {
+                    // Favoriden kaldır
+                    const response = await fetch(`https://takkas-api.onrender.com/api/favorite-vehicles/${advertId}`, {
+                        method: 'DELETE',
+                        headers: {
+                            'Authorization': `Bearer ${authToken}`
+                        }
+                    });
+                    if (!response.ok) throw new Error('Favoriden kaldırılırken hata oluştu');
+                } else {
+                    // Favoriye ekle
+                    const response = await fetch(`https://takkas-api.onrender.com/api/favorite-vehicles/${advertId}`, {
+                        method: 'POST',
+                        headers: {
+                            'Authorization': `Bearer ${authToken}`
+                        }
+                    });
+                    if (!response.ok) throw new Error('Favoriye eklenirken hata oluştu');
+                }
+                // İşlem sonrası ikonu güncelle
+                await updateFavoriteIcon(advertId, button);
+            } catch (error) {
+                alert(error.message);
+            }
+        }
     </script>
 </body>
 </html> 
