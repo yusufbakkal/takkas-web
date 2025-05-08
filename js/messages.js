@@ -1,6 +1,7 @@
 let selectedUserId = null;
 let conversationsData = [];
 let currentMessages = [];
+let searchInput = null;
 
 function setInitialLayout() {
     const conversationsListPanel = document.getElementById('conversations-list-panel');
@@ -45,14 +46,30 @@ document.addEventListener('DOMContentLoaded', () => {
     setInitialLayout(); // Başlangıç düzenini ayarla
     window.addEventListener('resize', setInitialLayout); // Ekran boyutu değiştiğinde düzeni güncelle
 
+    // searchInput burada atanıyor
+    searchInput = document.getElementById('conversation-search-input');
+    if (searchInput) {
+        searchInput.addEventListener('input', handleConversationSearch);
+    }
+
     fetchLastMessages(token);
-    window.messagesInterval = setInterval(() => fetchLastMessages(token), 2000);
+    window.messagesInterval = setInterval(() => fetchLastMessages(token), 3000);
 
     const sendButton = document.getElementById('send-button');
     if (sendButton) sendButton.addEventListener('click', handleSendMessage);
 
     const messageInput = document.getElementById('message-input');
-    if (messageInput) messageInput.addEventListener('keypress', (e) => e.key === 'Enter' && handleSendMessage());
+    if (messageInput) {
+        messageInput.addEventListener('keypress', (e) => e.key === 'Enter' && handleSendMessage());
+
+        // Mobil klavye sorununu çözmek için eklendi
+        messageInput.addEventListener('focus', () => {
+            // Klavye animasyonunun tamamlanması için kısa bir gecikme
+            setTimeout(() => {
+                messageInput.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            }, 300);
+        });
+    }
 
     const mobileBackButton = document.getElementById('mobile-back-to-list');
     if (mobileBackButton) {
@@ -208,6 +225,30 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 });
 
+// Konuşma arama tetikleyici fonksiyonu
+function handleConversationSearch() {
+    applyCurrentSearchFilterAndRender();
+}
+
+// Filtreyi uygulayıp render eden merkezi fonksiyon
+function applyCurrentSearchFilterAndRender() {
+    const searchTerm = searchInput ? searchInput.value.toLowerCase().trim() : "";
+
+    if (!conversationsData || conversationsData.length === 0) {
+        renderConversations([]); 
+        return;
+    }
+
+    if (searchTerm === "") {
+        renderConversations(conversationsData); 
+    } else {
+        const filteredConversations = conversationsData.filter(conversation =>
+            conversation.other_user_name.toLowerCase().includes(searchTerm)
+        );
+        renderConversations(filteredConversations);
+    }
+}
+
 async function fetchLastMessages(token) {
     try {
         const response = await fetch('https://takkas-api.onrender.com/api/messages/last-messages', {
@@ -219,29 +260,38 @@ async function fetchLastMessages(token) {
         });
 
         if (!response.ok) {
-            throw new Error('Mesajlar yüklenirken bir hata oluştu');
+            throw new Error('Mesajlar yüklenirken bir hata oluştu. Durum: ' + response.status);
         }
 
-        const messages = await response.json();
+        const newApiMessages = await response.json();
         
-        // Yeni mesaj olup olmadığını kontrol et
-        if (conversationsData.length > 0) {
-            // Son mesajın ID'si öncekinden farklıysa yeni mesaj gelmiş demektir
-            const latestMessage = messages[0];
-            const previousLatestMessage = conversationsData[0];
-            
-            if (latestMessage && previousLatestMessage && 
-                latestMessage.id !== previousLatestMessage.id &&
-                !selectedUserId) {
-                // Seçili bir konuşma yoksa ve yeni mesaj gelmişse bildirim göster
-                showNewMessageNotification(latestMessage);
+        // Yeni mesaj bildirimi için (Bu kısım isteğe bağlı olarak daha da geliştirilebilir)
+        if (conversationsData && conversationsData.length > 0 && newApiMessages.length > 0) {
+            const latestNewMessage = newApiMessages[0];
+            let maxOldTimestamp = 0;
+            if (conversationsData.length > 0) {
+                 // created_at alanının varlığını kontrol et
+                const validConversations = conversationsData.filter(c => c.created_at);
+                if (validConversations.length > 0) {
+                    maxOldTimestamp = Math.max(...validConversations.map(c => new Date(c.created_at).getTime()));
+                }
+            }
+            if (latestNewMessage.created_at) {
+                const latestNewMessageTimestamp = new Date(latestNewMessage.created_at).getTime();
+                if (latestNewMessageTimestamp > maxOldTimestamp &&
+                    (!selectedUserId || selectedUserId !== latestNewMessage.other_user_id) &&
+                    !latestNewMessage.is_sender) {
+                    // showNewMessageNotification(latestNewMessage); // Bildirim isteniyorsa aktif edilebilir
+                }
             }
         }
         
-        conversationsData = messages;
-        renderConversations(messages);
+        conversationsData = newApiMessages; // Global veriyi güncelle
+        applyCurrentSearchFilterAndRender(); // Filtreyi dikkate alarak render et
+
     } catch (err) {
-        showError(err.message);
+        console.error("fetchLastMessages Hata:", err);
+        showErrorInConversationList(err.message);
     }
 }
 
@@ -706,4 +756,17 @@ window.addEventListener('beforeunload', () => {
     if (window.conversationInterval) {
         clearInterval(window.conversationInterval);
     }
-}); 
+});
+
+// Konuşma listesinde hata gösterme fonksiyonu
+function showErrorInConversationList(errorMessage) {
+    const conversationsList = document.getElementById('conversations-list');
+    if (conversationsList) {
+        conversationsList.innerHTML = `
+            <div class="px-4 py-3 text-center text-red-600">
+                <i class="fas fa-exclamation-triangle mr-2"></i>
+                Mesajlar yüklenemedi: ${errorMessage}
+            </div>
+        `;
+    }
+} 
