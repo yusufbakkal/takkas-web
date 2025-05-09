@@ -672,7 +672,7 @@
                 <!-- Gizli alanlar: Model ID, Kategori ID, Kullanıcı ID ve Versiyon ID -->
                 <input type="hidden" id="modelId" name="model_id">
                 <input type="hidden" id="categoryId" name="category_id">
-                <input type="hidden" id="userId" name="user_id" value="2"> <!-- Demo için sabit değer -->
+                <input type="hidden" id="userId" name="user_id">
                 <input type="hidden" id="versionId" name="version_id">
                 <input type="hidden" id="year" name="year">
                 
@@ -788,9 +788,29 @@
 
         // Sayfa yüklendiğinde illeri yükle
         document.addEventListener('DOMContentLoaded', function() {
+            // Kullanıcı girişi kontrolü
+            const authToken = localStorage.getItem('authToken');
+            if (!authToken) {
+                window.location.href = 'login.html';
+                return;
+            }
+
+            // Kullanıcı bilgilerini kontrol et
+            const userId = localStorage.getItem('userId');
+            const userName = localStorage.getItem('userName');
+            const userEmail = localStorage.getItem('userEmail');
+            const userPhone = localStorage.getItem('userPhone');
+
+            if (!userId || !userName || !userEmail || !userPhone) {
+                alert('Kullanıcı bilgileriniz eksik. Lütfen tekrar giriş yapın.');
+                window.location.href = 'login.html';
+                return;
+            }
+
+            // Kullanıcı ID'sini form alanına set et
+            document.getElementById('userId').value = userId;
+
             loadProvinces();
-            
-            // Takas seçeneği ile ilgili işlemler
             setupTradeOptions();
         });
 
@@ -1283,6 +1303,28 @@
             const form = e.target;
             const alertBox = document.getElementById('alertBox');
             
+            // Kullanıcı girişi kontrolü
+            const authToken = localStorage.getItem('authToken');
+            if (!authToken) {
+                alertBox.className = 'alert alert-danger';
+                alertBox.innerHTML = '<i class="fas fa-exclamation-circle"></i> İlan oluşturabilmek için giriş yapmanız gerekmektedir.';
+                alertBox.style.display = 'block';
+                return;
+            }
+
+            // Kullanıcı bilgileri kontrolü
+            const userId = localStorage.getItem('userId');
+            const userName = localStorage.getItem('userName');
+            const userEmail = localStorage.getItem('userEmail');
+            const userPhone = localStorage.getItem('userPhone');
+
+            if (!userId || !userName || !userEmail || !userPhone) {
+                alertBox.className = 'alert alert-danger';
+                alertBox.innerHTML = '<i class="fas fa-exclamation-circle"></i> Kullanıcı bilgileriniz eksik. Lütfen tekrar giriş yapın.';
+                alertBox.style.display = 'block';
+                return;
+            }
+            
             try {
                 // Form verilerini topla
                 const formData = new FormData(form);
@@ -1390,15 +1432,13 @@
                     // Adres bilgisi - API'den dönen ID varsa kullan
                     address_id: addressId,
                     
-                    // Kullanıcı bilgileri
-                    user_id: 2,
-                    user_name: "test_user",
-                    user_email: "test1@example.com",
-                    user_phone: "5551234568",
+                    // Kullanıcı bilgileri - localStorage'dan al
+                    user_id: userId,
+                    user_name: userName,
+                    user_email: userEmail,
+                    user_phone: userPhone,
                     
                     // Sabit değerler
-                    listing_type: 'Sedan',
-                    case_type: 'sedan',
                     currency: 'TRY',
                     advert_status: true,
                     is_open_to_estate_trade: false
