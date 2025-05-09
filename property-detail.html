@@ -12,6 +12,7 @@
     <link rel="stylesheet" href="assets/css/property-detail.css">
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/libphonenumber-js@1.10.25/bundle/libphonenumber-max.js"></script>
     <style>
         /* Adres bölümü için stiller */
         .property-address {
@@ -439,6 +440,20 @@
             // İlan sahibi bilgisini al
             const ownerName = property.user_name || property.from_where || 'Belirtilmemiş';
 
+            // Telefon numarasını libphonenumber-js ile formatla
+            function formatPhoneNumber(phone) {
+                try {
+                    if (!phone) return '';
+                    let raw = phone.trim();
+                    if (raw.startsWith('0')) raw = raw.slice(1);
+                    if (!raw.startsWith('+90')) raw = '+90' + raw;
+                    const parsed = libphonenumber.parsePhoneNumber(raw, 'TR');
+                    return parsed.formatInternational(); // +90 555 123 45 67
+                } catch {
+                    return phone;
+                }
+            }
+
             // Kilit özellikler bölümünü ilan tipine göre oluştur
             const keyDetailsHtml = isLand ? `
                 <div class="property-key-details">
@@ -553,7 +568,7 @@
                                 </div>
                                 <div class="contact-item">
                                     <i class="fas fa-phone"></i>
-                                    <span>+90 (555) 123 45 67</span>
+                                    <span>${formatPhoneNumber(property.user_phone) || '+90 (555) 123 45 67'}</span>
                                 </div>
                             </div>
                             <button class="contact-button">İlan Sahibini Ara</button>
@@ -604,10 +619,10 @@
                         <div class="message-user-info">
                             <div class="message-user-avatar">
                                 <i class="fas fa-user"></i>
-                            </div>
+                        </div>
                             <div class="message-user-details">
                                 <div class="message-user-name">${ownerName}</div>
-                            </div>
+                        </div>
                         </div>
                         <div class="message-quick-buttons">
                             <button type="button" class="quick-message-btn">Hala satılık mı?</button>
@@ -619,7 +634,7 @@
                             <div class="form-group">
                                 <textarea id="messageText" rows="4" placeholder="Mesaj yazın" required></textarea>
                                 <div class="character-count">En az 10 karakter kullanmalısın · 8000 karakter kaldı</div>
-                            </div>
+                        </div>
                             <button type="submit" class="send-message-button">Gönder</button>
                         </form>
                     </div>
@@ -693,7 +708,7 @@
             messageForm.addEventListener('submit', async (e) => {
                 console.log('Emlak Detay - Mesaj Formu Submit Edildi');
                 e.preventDefault();
-
+                
                 const authToken = localStorage.getItem('authToken');
                 // const senderId = localStorage.getItem('userId'); // Backend JWT'den alacak
 
@@ -741,10 +756,10 @@
                         const result = await response.json();
                         console.log('Mesaj gönderildi:', result);
                         showNotification('Mesajınız başarıyla gönderildi!', 'success');
-                        messageForm.reset();
+                messageForm.reset();
                         messageTextarea.dispatchEvent(new Event('input')); 
-                        messagePopup.style.display = 'none';
-                        document.body.style.overflow = 'auto';
+                messagePopup.style.display = 'none';
+                document.body.style.overflow = 'auto';
                     } else {
                         const errorData = await response.json().catch(() => ({ message: 'Mesaj gönderilirken bir hata oluştu. Sunucu yanıtı okunamadı.' }));
                         console.error('Mesaj gönderme hatası:', errorData);

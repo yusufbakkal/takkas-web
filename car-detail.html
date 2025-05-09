@@ -12,6 +12,7 @@
     <link rel="stylesheet" href="assets/css/car-detail.css">
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/libphonenumber-js@1.10.25/bundle/libphonenumber-max.js"></script>
     <style>
         /* Adres bölümü için stiller */
         .property-address {
@@ -286,6 +287,29 @@
                         }
                     } catch (addressError) {
                         console.error('Adres bilgileri alınırken hata oluştu:', addressError);
+                    }
+                }
+                
+                // Kullanıcı adını user_id üzerinden çek
+                if (data.user_id) {
+                    try {
+                        const userApiUrl = `https://takkas-api.onrender.com/api/users/${data.user_id}`;
+                        console.log('Kullanıcı adı için API isteği:', userApiUrl);
+                        const userResponse = await fetch(userApiUrl);
+                        if (userResponse.ok) {
+                            const userData = await userResponse.json();
+                            console.log('Kullanıcı API yanıtı:', userData);
+                            // API'den gelen kullanıcı adını (user_name veya name) ata
+                            if (userData && userData.user_name) {
+                                data.user_name = userData.user_name;
+                            } else if (userData && userData.name) { // Fallback olarak 'name' alanı
+                                data.user_name = userData.name;
+                            }
+                        } else {
+                            console.warn(`Kullanıcı bilgileri alınamadı: ${userResponse.status}`);
+                        }
+                    } catch (userError) {
+                        console.error('Kullanıcı bilgileri alınırken hata:', userError);
                     }
                 }
                 
@@ -565,6 +589,20 @@
 
         // İlan detaylarını sayfaya ekle
         function renderCarDetails(car) {
+            // libphonenumber-js ile telefon numarasını formatla
+            function formatPhoneNumber(phone) {
+                try {
+                    if (!phone) return '';
+                    let raw = phone.trim();
+                    if (raw.startsWith('0')) raw = raw.slice(1);
+                    if (!raw.startsWith('+90')) raw = '+90' + raw;
+                    const parsed = libphonenumber.parsePhoneNumber(raw, 'TR');
+                    return parsed.formatInternational(); // +90 555 123 45 67
+                } catch {
+                    return phone;
+                }
+            }
+
             // "Fotoğraf Bulunamadı" görseli
             const noImagePlaceholder = `https://via.placeholder.com/800x500/e0e0e0/333333?text=${encodeURIComponent('Fotoğraf Bulunamadı')}`;
             
@@ -588,7 +626,7 @@
             const formattedPrice = parseFloat(car.price).toLocaleString('tr-TR');
             
             // İlan sahibi bilgisini al
-            const fromWhere = car.from_where || 'Belirtilmemiş';
+            const fromWhere = car.user_name || car.from_where || 'Belirtilmemiş';
 
             // İlan detay HTML'ini oluştur
             const carDetailHtml = `
@@ -665,7 +703,7 @@
                                 </div>
                                 <div class="contact-item">
                                     <i class="fas fa-phone"></i>
-                                    <span>+90 ${car.user_phone || '(555) 123 45 67'}</span>
+                                    <span>${formatPhoneNumber(car.user_phone) || '+90 (555) 123 45 67'}</span>
                                 </div>
                             </div>
                             <button class="contact-button">İlan Sahibini Ara</button>
@@ -888,7 +926,7 @@
             messageForm.addEventListener('submit', async (e) => {
                 console.log('Araç Detay - Mesaj Formu Submit Edildi');
                 e.preventDefault();
-
+                
                 const authToken = localStorage.getItem('authToken');
                 const senderId = localStorage.getItem('userId'); // Bu, backend JWT'den aldığı için frontend'den göndermeyeceğiz
 
@@ -905,7 +943,7 @@
                 }
                 
                 if (!car || car.user_id === undefined || car.user_id === null) {
-                    showNotification('İlan sahibi bilgileri eksik. Mesaj gönderilemiyor.', 'error');
+                    showNotification('İlan sahibi ID bilgisi eksik. Mesaj gönderilemiyor.', 'error');
                     return; 
                 }
 
@@ -915,8 +953,18 @@
                 sendMessageButton.disabled = true;
                 sendMessageButton.textContent = 'Gönderiliyor...';
 
+                const receiverId = parseInt(car.user_id);
+
+                if (isNaN(receiverId)) {
+                    console.error('Geçersiz ilan sahibi ID:', car.user_id, 'Parse sonucu:', receiverId);
+                    showNotification('İlan sahibinin ID bilgisi geçersiz. Mesaj gönderilemiyor.', 'error');
+                    sendMessageButton.disabled = false; // Butonu tekrar aktif et
+                    sendMessageButton.textContent = originalButtonText;
+                    return;
+                }
+                
                 const messageData = {
-                    receiverId: parseInt(car.user_id),
+                    receiverId: receiverId,
                     content: content
                 };
 
@@ -936,10 +984,10 @@
                         const result = await response.json();
                         console.log('Mesaj gönderildi:', result);
                         showNotification('Mesajınız başarıyla gönderildi!', 'success');
-                        messageForm.reset();
+                messageForm.reset();
                         messageTextarea.dispatchEvent(new Event('input')); 
-                        messagePopup.style.display = 'none';
-                        document.body.style.overflow = 'auto';
+                messagePopup.style.display = 'none';
+                document.body.style.overflow = 'auto';
                     } else {
                         const errorData = await response.json().catch(() => ({ message: 'Mesaj gönderilirken bir hata oluştu. Sunucu yanıtı okunamadı.' }));
                         console.error('Mesaj gönderme hatası:', errorData);
