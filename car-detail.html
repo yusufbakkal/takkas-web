@@ -885,29 +885,73 @@
             });
 
             // Form gönderildiğinde
-            messageForm.addEventListener('submit', (e) => {
+            messageForm.addEventListener('submit', async (e) => {
+                console.log('Araç Detay - Mesaj Formu Submit Edildi');
                 e.preventDefault();
+
+                const authToken = localStorage.getItem('authToken');
+                const senderId = localStorage.getItem('userId'); // Bu, backend JWT'den aldığı için frontend'den göndermeyeceğiz
+
+                if (!authToken) { // Sadece authToken kontrolü yeterli, senderId backend'den gelecek
+                    showNotification('Mesaj gönderebilmek için giriş yapmanız gerekmektedir.', 'error');
+                    return;
+                }
                 
-                // Form verilerini al
-                const message = document.getElementById('messageText').value;
+                const content = messageTextarea.value;
+
+                if (content.length < 10) {
+                    showNotification('Mesajınız en az 10 karakter olmalıdır.', 'error');
+                    return;
+                }
                 
-                // API'ye gönderilecek verileri hazırla
+                if (!car || car.user_id === undefined || car.user_id === null) {
+                    showNotification('İlan sahibi bilgileri eksik. Mesaj gönderilemiyor.', 'error');
+                    return; 
+                }
+
+                const sendMessageButton = messageForm.querySelector('.send-message-button');
+                const originalButtonText = sendMessageButton.textContent;
+                
+                sendMessageButton.disabled = true;
+                sendMessageButton.textContent = 'Gönderiliyor...';
+
                 const messageData = {
-                    message,
-                    car_id: car.id,
-                    user_id: car.user_id
+                    receiverId: parseInt(car.user_id),
+                    content: content
                 };
-                
-                // Burada API entegrasyonu yapılabilir
-                console.log('Mesaj verileri:', messageData);
-                
-                // Başarılı mesaj
-                alert('Mesajınız başarıyla gönderildi!');
-                
-                // Formu temizle ve kapat
-                messageForm.reset();
-                messagePopup.style.display = 'none';
-                document.body.style.overflow = 'auto';
+
+                console.log('Gönderilecek Mesaj Verisi (Araç):', JSON.stringify(messageData, null, 2));
+
+                try {
+                    const response = await fetch('https://takkas-api.onrender.com/api/messages/send', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${authToken}`
+                        },
+                        body: JSON.stringify(messageData)
+                    });
+
+                    if (response.ok) {
+                        const result = await response.json();
+                        console.log('Mesaj gönderildi:', result);
+                        showNotification('Mesajınız başarıyla gönderildi!', 'success');
+                        messageForm.reset();
+                        messageTextarea.dispatchEvent(new Event('input')); 
+                        messagePopup.style.display = 'none';
+                        document.body.style.overflow = 'auto';
+                    } else {
+                        const errorData = await response.json().catch(() => ({ message: 'Mesaj gönderilirken bir hata oluştu. Sunucu yanıtı okunamadı.' }));
+                        console.error('Mesaj gönderme hatası:', errorData);
+                        showNotification(errorData.message || 'Mesaj gönderilirken bir hata oluştu. Lütfen tekrar deneyin.', 'error');
+                    }
+                } catch (error) {
+                    console.error('Mesaj gönderme sırasında bir ağ hatası oluştu:', error);
+                    showNotification('Mesaj gönderilirken bir ağ hatası oluştu. Lütfen internet bağlantınızı kontrol edin.', 'error');
+                } finally {
+                    sendMessageButton.disabled = false;
+                    sendMessageButton.textContent = originalButtonText;
+                }
             });
 
             // Görsel galerisi için değişkenler

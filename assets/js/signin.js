@@ -103,6 +103,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     
                 // Token ve kullanıcı bilgilerini localStorage'a kaydet
                 localStorage.setItem('authToken', userData.token);
+                localStorage.setItem('userId', userData.id);
                 localStorage.setItem('userName', userData.name);
                 localStorage.setItem('userEmail', userData.email);
                 localStorage.setItem('userPhone', userData.phone || '');
@@ -271,6 +272,7 @@ function showNotification(message, type) {
 function logout() {
     // localStorage'dan tüm kullanıcı bilgilerini temizle
     localStorage.removeItem('authToken');
+    localStorage.removeItem('userId');
     localStorage.removeItem('userName');
     localStorage.removeItem('userEmail');
     localStorage.removeItem('userPhone');

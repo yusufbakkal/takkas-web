@@ -198,15 +198,18 @@
     color: white;
     border-radius: 0.5rem;
     padding: 0.5rem 1rem;
-    margin: 0.5rem auto;
-    font-size: 0.875rem;
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-    cursor: pointer;
-    max-width: 80%;
-    text-align: center;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 1000;
+    display: flex;
+    align-items: center;
 }
 
-/* Geri butonu hover efekti için stil */
+.back-button-effect {
+    transition: transform 0.2s ease-in-out;
+}
 .back-button-effect:hover {
-    transform: translateX(-4px);
+    transform: translateX(-2px);
 } 
