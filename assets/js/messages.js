@@ -184,6 +184,13 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     }
+
+    // Merkezi bildirim sistemini yükle
+    if (!window.showNotification) {
+        const script = document.createElement('script');
+        script.src = '../assets/js/notification.js';
+        document.head.appendChild(script);
+    }
 });
 
 function handleConversationSearch() {
@@ -529,6 +536,13 @@ async function deleteConversation(userId) {
 }
 
 function showNotification(message, type = 'success') {
+    // Eğer merkezi sistem yüklendiyse onu kullan
+    if (window.showNotification) {
+        window.showNotification(message, type);
+        return;
+    }
+    
+    // Merkezi sistem yüklenmediyse eski kodu çalıştır (yedek olarak)
     const bgColor = type === 'success' ? 'bg-green-500' : 'bg-indigo-600';
     const notificationElement = document.createElement('div');
     notificationElement.className = `fixed bottom-4 right-4 ${bgColor} text-white px-4 py-2 rounded-lg shadow-lg z-50 transition-opacity duration-500`;

@@ -147,26 +147,6 @@ async function removeFavorite(favoriteId, advertId) {
     }
 }
 
-// Bildirim gösterme fonksiyonu
-function showNotification(message, type = 'info') {
-    const notification = document.createElement('div');
-    notification.className = `notification ${type}`;
-    notification.innerHTML = `
-        <div class="notification-content">
-            <i class="fas ${type === 'success' ? 'fa-check-circle' : type === 'error' ? 'fa-exclamation-circle' : 'fa-info-circle'}"></i>
-            <span>${message}</span>
-        </div>
-    `;
-    
-    document.body.appendChild(notification);
-    
-    // 3 saniye sonra bildirimi kaldır
-    setTimeout(() => {
-        notification.classList.add('fade-out');
-        setTimeout(() => notification.remove(), 300);
-    }, 3000);
-}
-
 // Kullanıcı bilgilerini yükle
 document.addEventListener('DOMContentLoaded', function() {
     // Header yüklendikten sonra kullanıcı bilgilerini ayarla
@@ -202,4 +182,11 @@ document.addEventListener('DOMContentLoaded', function() {
             detailUserAvatar.style.backgroundColor = backgroundColor;
         }
     }, 500); // Biraz gecikmeyle çalıştır, header yüklensin
+
+    // Merkezi bildirim sistemini yükle
+    if (!window.showNotification) {
+        const script = document.createElement('script');
+        script.src = 'assets/js/notification.js';
+        document.head.appendChild(script);
+    }
 }); 
