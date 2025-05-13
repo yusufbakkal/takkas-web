@@ -181,11 +181,7 @@
     border-radius: 12px;
 }
 
-.property-price {
-    font-size: 28px;
-    font-weight: 700;
-    color: #242731;
-}
+
 
 .favorite-button {
     display: flex;
@@ -482,7 +478,7 @@
 }
 
 .property-price {
-    font-size: 15px;
+    font-size: 28px;
     font-weight: 700;
     color: #242731;
     margin: 0;

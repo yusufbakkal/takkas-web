@@ -12,6 +12,8 @@
     <link rel="stylesheet" href="assets/css/create-listing.css">
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <!-- Fiyat Formatlama JS -->
+    <script src="assets/js/price-formatter.js"></script>
     <style>
         :root {
             --primary-color: #4F46E5;
@@ -236,11 +238,11 @@
                     <div class="form-row">
                         <div class="form-group">
                             <label for="price" class="required">Fiyat (TL)</label>
-                            <input type="number" id="price" name="price" class="form-control" required>
+                            <input type="text" id="price" name="price" class="form-control price-input" required>
                         </div>
                         <div class="form-group">
                             <label for="square_meters_price" class="required">Metrekare Birim Fiyatı (TL)</label>
-                            <input type="number" id="square_meters_price" name="square_meters_price" class="form-control" required>
+                            <input type="text" id="square_meters_price" name="square_meters_price" class="form-control price-input" required>
                         </div>
                     </div>
                     
@@ -350,7 +352,7 @@
                         </div>
                         <div class="form-group">
                             <label for="dues">Aidat (TL)</label>
-                            <input type="number" id="dues" name="dues" class="form-control">
+                            <input type="text" id="dues" name="dues" class="form-control price-input">
                         </div>
                     </div>
                     
@@ -535,6 +537,22 @@
                 
                 // İlan başlığını localStorage'a kaydet
                 localStorage.setItem('currentListingTitle', formData.get('title'));
+                
+                // Fiyat değerlerini temizle (nokta işaretlerini kaldır)
+                if (formData.has('price')) {
+                    const cleanedPrice = cleanPriceForSubmit(formData.get('price'));
+                    formData.set('price', cleanedPrice);
+                }
+                
+                if (formData.has('square_meters_price')) {
+                    const cleanedSqmPrice = cleanPriceForSubmit(formData.get('square_meters_price'));
+                    formData.set('square_meters_price', cleanedSqmPrice);
+                }
+                
+                if (formData.has('dues')) {
+                    const cleanedDues = cleanPriceForSubmit(formData.get('dues'));
+                    formData.set('dues', cleanedDues);
+                }
                 
                 // İstenen formata uygun JSON oluştur
                 const data = {

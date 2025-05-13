@@ -12,6 +12,8 @@
     <link rel="stylesheet" href="assets/css/create-listing.css">
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <!-- Fiyat Formatlama JS -->
+    <script src="assets/js/price-formatter.js"></script>
     <style>
         :root {
             --primary-color: #4F46E5;
@@ -392,7 +394,7 @@
                         <div class="form-group">
                             <label for="price" class="required">Fiyat</label>
                             <div class="price-addon">
-                                <input type="number" id="price" name="price" class="form-control price-input" required placeholder="Ör: 500000">
+                                <input type="text" id="price" name="price" class="form-control price-input" required placeholder="Ör: 500000">
                             </div>
                         </div>
                     </div>
@@ -1328,6 +1330,15 @@
             try {
                 // Form verilerini topla
                 const formData = new FormData(form);
+                
+                // Fiyat değerini temizle (nokta işaretlerini kaldır)
+                if (formData.has('price')) {
+                    const cleanedPrice = cleanPriceForSubmit(formData.get('price'));
+                    formData.set('price', cleanedPrice);
+                }
+                
+                // Takas araçlarını ekle
+                formData.append('trade_vehicles', JSON.stringify(tradeVehicles));
                 
                 // Adres bilgilerini al ve kontrol et
                 const provinceSelect = document.getElementById('province');
