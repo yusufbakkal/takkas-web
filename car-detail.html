@@ -121,8 +121,7 @@
                     <i class="fas fa-user"></i>
                 </div>
                 <div class="message-user-details">
-                    <div class="message-user-name">${fromWhere}</div>
-                    <div class="message-user-type">Platinum Üye</div>
+                    <div class="message-user-name">${ownerName}</div>
                 </div>
             </div>
             <div class="message-quick-buttons">
@@ -626,7 +625,7 @@
             const formattedPrice = parseFloat(car.price).toLocaleString('tr-TR');
             
             // İlan sahibi bilgisini al
-            const fromWhere = car.user_name || car.from_where || 'Belirtilmemiş';
+            const ownerName = car.user_name || car.from_where || 'Belirtilmemiş';
 
             // İlan detay HTML'ini oluştur
             const carDetailHtml = `
@@ -699,7 +698,7 @@
                             <div class="contact-info">
                                 <div class="contact-item">
                                     <i class="fas fa-user"></i>
-                                    <span>${fromWhere}</span>
+                                    <span>${ownerName}</span>
                                 </div>
                                 <div class="contact-item">
                                     <i class="fas fa-phone"></i>
@@ -806,7 +805,7 @@
                         </div>
                         <div class="detail-item">
                             <div class="detail-label">Kimden</div>
-                            <div class="detail-value">${fromWhere}</div>
+                            <div class="detail-value">${ownerName}</div>
                         </div>
                         <div class="detail-item">
                             <div class="detail-label">Adres</div>
@@ -845,8 +844,7 @@
                                 <i class="fas fa-user"></i>
                             </div>
                             <div class="message-user-details">
-                                <div class="message-user-name">${fromWhere}</div>
-                                <div class="message-user-type">Platinum Üye</div>
+                                <div class="message-user-name">${ownerName}</div>
                             </div>
                         </div>
                         <div class="message-quick-buttons">
@@ -867,6 +865,11 @@
             `;
 
             // Message popup'ı body'e ekle
+            // Önce mevcut popup'ı kaldır (varsa)
+            const existingPopup = document.getElementById('messagePopup');
+            if (existingPopup) {
+                existingPopup.remove();
+            }
             document.body.insertAdjacentHTML('beforeend', messagePopupHtml);
 
             // Message popup için değişkenler ve fonksiyonlar
