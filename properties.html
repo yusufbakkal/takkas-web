@@ -159,7 +159,7 @@
             const price = property.price || 0;
             
             return `
-                <article class="property-card">
+                <article class="property-card" data-id="${property.id}">
                     <a href="property-detail.html?id=${property.id}" class="property-link">
                     <div class="property-content">
                         <header class="property-header">
@@ -241,6 +241,9 @@
                 // Gösterilen emlak sayısını güncelle
                 displayedPropertiesCount = endIndex;
                 
+                // İlan kartlarının favori durumlarını kontrol et ve güncelle
+                checkAndUpdateFavoriteStatus();
+                
                 // Tüm emlaklar gösterildiyse, allPropertiesLoaded'ı true yap
                 if (displayedPropertiesCount >= allProperties.length) {
                     allPropertiesLoaded = true;
@@ -267,6 +270,18 @@
         // Sayfa yüklendiğinde ilk emlakları yükle
         document.addEventListener('DOMContentLoaded', function() {
             loadMoreProperties();
+            
+            // Kullanıcı oturum durumunu kontrol et
+            const authToken = localStorage.getItem('authToken');
+            if (authToken) {
+                console.log('Kullanıcı oturum açmış, favoriler kontrol edilecek');
+                // Favori durumlarını yükle (sayfa yüklendikten 1 saniye sonra)
+                setTimeout(() => {
+                    checkAndUpdateFavoriteStatus();
+                }, 1000);
+            } else {
+                console.log('Kullanıcı oturum açmamış, favoriler kontrol edilmeyecek');
+            }
         });
         
         // Scroll event listener'ı throttle ile optimize et
@@ -285,30 +300,46 @@
             const authToken = localStorage.getItem('authToken');
             if (!authToken) return false;
             try {
+                console.log(`Emlak favori durumu kontrol ediliyor: ${advertId}`);
                 const response = await fetch(`https://takkas-api.onrender.com/api/favorite-estates/check/${advertId}`, {
-                    headers: { 'Authorization': `Bearer ${authToken}` }
+                    headers: { 
+                        'Authorization': `Bearer ${authToken}`,
+                        'Content-Type': 'application/json'
+                    }
                 });
+                console.log(`Favori kontrol yanıtı (${advertId}):`, response.status);
+                
                 if (!response.ok) return false;
+                
                 const data = await response.json();
+                console.log(`Favori durumu (${advertId}):`, data);
                 return data === true || data.is_favorite === true;
-            } catch {
+            } catch (error) {
+                console.error(`Favori durumu kontrol edilirken hata oluştu (${advertId}):`, error);
                 return false;
             }
         }
 
         async function updateFavoriteIcon(advertId, button) {
-            const isFavorite = await checkFavoriteStatusForAdvert(advertId);
-            const icon = button.querySelector('i');
-            if (isFavorite) {
-                icon.classList.remove('far');
-                icon.classList.add('fas');
-                button.classList.add('active');
-            } else {
-                icon.classList.remove('fas');
-                icon.classList.add('far');
-                button.classList.remove('active');
+            try {
+                const isFavorite = await checkFavoriteStatusForAdvert(advertId);
+                console.log(`İkon güncelleniyor (${advertId}): Favori mi? ${isFavorite}`);
+                
+                const icon = button.querySelector('i');
+                if (isFavorite) {
+                    icon.classList.remove('far');
+                    icon.classList.add('fas');
+                    button.classList.add('active');
+                } else {
+                    icon.classList.remove('fas');
+                    icon.classList.add('far');
+                    button.classList.remove('active');
+                }
+            } catch (error) {
+                console.error(`Favori ikonu güncellenirken hata oluştu (${advertId}):`, error);
             }
-        };
+        }
+
         // toggleFavorite fonksiyonunu güncelle: işlem sonrası ikonu güncelle
         async function toggleFavorite(advertId, button) {
             console.log('toggleFavorite fonksiyonu çağrıldı:', advertId, button);
@@ -323,30 +354,56 @@
             const isFavorite = icon.classList.contains('fas');
 
             try {
+                let response;
+                
                 if (isFavorite) {
                     // Favoriden kaldır
-                    const response = await fetch(`https://takkas-api.onrender.com/api/favorite-estates/${advertId}`, {
+                    response = await fetch(`https://takkas-api.onrender.com/api/favorite-estates/${advertId}`, {
                         method: 'DELETE',
                         headers: {
-                            'Authorization': `Bearer ${authToken}`
+                            'Authorization': `Bearer ${authToken}`,
+                            'Content-Type': 'application/json'
                         }
                     });
+                    
+                    console.log(`Favoriden kaldırma yanıtı (${advertId}):`, response.status);
+                    
                     if (!response.ok) throw new Error('Favoriden kaldırılırken hata oluştu');
+                    
+                    // İkonu güncelle
+                    icon.classList.remove('fas');
+                    icon.classList.add('far');
+                    button.classList.remove('active');
+                    
                     showNotification('Favorilerden çıkarıldı', 'success');
                 } else {
                     // Favoriye ekle
-                    const response = await fetch(`https://takkas-api.onrender.com/api/favorite-estates/${advertId}`, {
+                    response = await fetch(`https://takkas-api.onrender.com/api/favorite-estates/${advertId}`, {
                         method: 'POST',
                         headers: {
-                            'Authorization': `Bearer ${authToken}`
+                            'Authorization': `Bearer ${authToken}`,
+                            'Content-Type': 'application/json'
                         }
                     });
+                    
+                    console.log(`Favoriye ekleme yanıtı (${advertId}):`, response.status);
+                    
                     if (!response.ok) throw new Error('Favoriye eklenirken hata oluştu');
+                    
+                    // İkonu güncelle
+                    icon.classList.remove('far');
+                    icon.classList.add('fas');
+                    button.classList.add('active');
+                    
                     showNotification('Favorilere eklendi', 'success');
                 }
-                // İşlem sonrası ikonu güncelle
-                await updateFavoriteIcon(advertId, button);
+                
+                // Tüm favori durumlarını güncelle
+                setTimeout(() => {
+                    checkAndUpdateFavoriteStatus();
+                }, 500);
             } catch (error) {
+                console.error(`Favori durumu değiştirilirken hata oluştu (${advertId}):`, error);
                 showNotification(error.message, 'error');
             }
         }
@@ -371,6 +428,70 @@
             }, 3000);
         };
 
+        // Tüm ilan kartlarının favori durumunu kontrol edip güncelle
+        async function checkAndUpdateFavoriteStatus() {
+            const authToken = localStorage.getItem('authToken');
+            if (!authToken) return;
+            
+            console.log('Tüm emlakların favori durumu kontrol ediliyor...');
+            
+            try {
+                // Önce kullanıcının tüm favori ilanlarını çek
+                const response = await fetch('https://takkas-api.onrender.com/api/favorite-estates/my-favorites', {
+                    headers: { 
+                        'Authorization': `Bearer ${authToken}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                if (!response.ok) {
+                    console.error('Favori ilanlar çekilirken hata oluştu:', response.status);
+                    return;
+                }
+                
+                const favorites = await response.json();
+                console.log('Kullanıcının favori ilanları:', favorites);
+                
+                // Favori ID'lerini bir set içinde sakla
+                const favoriteIds = new Set();
+                if (Array.isArray(favorites)) {
+                    favorites.forEach(fav => {
+                        if (fav.estate_id || fav.id) {
+                            favoriteIds.add(fav.estate_id || fav.id);
+                        }
+                    });
+                }
+                
+                console.log('Favori ID\'leri:', [...favoriteIds]);
+                
+                // Tüm emlak kartlarını kontrol et
+                const propertyCards = document.querySelectorAll('.property-card');
+                propertyCards.forEach(card => {
+                    const advertId = card.dataset.id;
+                    if (!advertId) return;
+                    
+                    const favoriteButton = card.querySelector('.property-favorite');
+                    if (!favoriteButton) return;
+                    
+                    const icon = favoriteButton.querySelector('i');
+                    
+                    // Favori listesinde varsa ikonu dolu kalp yap
+                    if (favoriteIds.has(Number(advertId)) || favoriteIds.has(advertId)) {
+                        icon.classList.remove('far');
+                        icon.classList.add('fas');
+                        favoriteButton.classList.add('active');
+                    } else {
+                        // Yoksa boş kalp
+                        icon.classList.remove('fas');
+                        icon.classList.add('far');
+                        favoriteButton.classList.remove('active');
+                    }
+                });
+                
+            } catch (error) {
+                console.error('Favori durumları kontrol edilirken hata oluştu:', error);
+            }
+        }
 
     </script>
 </body>

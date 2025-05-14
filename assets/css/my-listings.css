@@ -1,3 +1,4 @@
+/* İlanlarım sayfası için CSS */
 body {
     margin: 0;
     padding: 0;
@@ -28,24 +29,44 @@ body {
     font-size: 1rem;
 }
 
-.avatar-circle {
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
+/* Tab Butonları */
+.listings-tabs {
     display: flex;
-    align-items: center;
     justify-content: center;
-    color: white;
-    font-weight: 600;
+    margin-bottom: 2rem;
+    gap: 1rem;
 }
 
-.favorites-container {
+.tab-btn {
+    padding: 0.75rem 1.5rem;
+    background-color: #fff;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: #4b5563;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.tab-btn:hover {
+    background-color: #f3f4f6;
+}
+
+.tab-btn.active {
+    background-color: #FF6370;
+    color: white;
+    border-color: #FF6370;
+}
+
+/* İlan Kartları */
+.listings-container {
     display: flex;
     flex-direction: column;
     gap: 1.5rem;
 }
 
-.favorite-card {
+.listing-card {
     display: flex;
     background: #fff;
     border-radius: 10px;
@@ -54,30 +75,30 @@ body {
     transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
-.favorite-card:hover {
+.listing-card:hover {
     transform: translateY(-5px);
     box-shadow: 0 5px 20px rgba(0, 0, 0, 0.15);
 }
 
-.favorite-image {
+.listing-image {
     width: 180px;
     height: 150px;
     flex-shrink: 0;
 }
 
-.favorite-image img {
+.listing-image img {
     width: 100%;
     height: 100%;
     object-fit: cover;
 }
 
-.favorite-content {
+.listing-content {
     flex-grow: 1;
     padding: 1.2rem;
     position: relative;
 }
 
-.favorite-content h3 {
+.listing-content h3 {
     font-size: 1.25rem;
     color: #333;
     margin: 0 0 0.5rem 0;
@@ -86,14 +107,14 @@ body {
     text-overflow: ellipsis;
 }
 
-.favorite-price {
+.listing-price {
     font-size: 1.5rem;
     font-weight: bold;
     color: #FF6370;
     margin: 0.25rem 0;
 }
 
-.favorite-location, .favorite-date {
+.listing-location, .listing-date {
     font-size: 0.9rem;
     color: #666;
     margin: 0.25rem 0;
@@ -101,14 +122,14 @@ body {
     align-items: center;
 }
 
-.favorite-location i, .favorite-date i {
+.listing-location i, .listing-date i {
     margin-right: 0.5rem;
     color: #999;
     width: 16px;
     text-align: center;
 }
 
-.favorite-actions {
+.listing-actions {
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -117,7 +138,7 @@ body {
     background-color: #f8f8f8;
 }
 
-.btn-view, .btn-remove {
+.btn-view, .btn-edit, .btn-delete {
     padding: 0.6rem 1rem;
     border-radius: 5px;
     border: none;
@@ -135,7 +156,12 @@ body {
     color: white;
 }
 
-.btn-remove {
+.btn-edit {
+    background-color: #ff9800;
+    color: white;
+}
+
+.btn-delete {
     background-color: transparent;
     color: #f44336;
     border: 1px solid #f44336;
@@ -145,15 +171,68 @@ body {
     background-color: #0d8bf2;
 }
 
-.btn-remove:hover {
+.btn-edit:hover {
+    background-color: #f08c00;
+}
+
+.btn-delete:hover {
     background-color: #ffeeee;
 }
 
-.btn-view i, .btn-remove i {
+.btn-view i, .btn-edit i, .btn-delete i {
     margin-right: 0.5rem;
 }
 
-/* Boş durum */
+/* İlan Durumu */
+.listing-status {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    padding: 0.3rem 0.8rem;
+    border-radius: 30px;
+    font-size: 0.8rem;
+    font-weight: 500;
+    text-transform: uppercase;
+}
+
+.listing-status.approved {
+    background-color: #e8f5e9;
+    color: #2e7d32;
+}
+
+.listing-status.pending {
+    background-color: #fff8e1;
+    color: #f57f17;
+}
+
+.listing-status.rejected {
+    background-color: #ffebee;
+    color: #c62828;
+}
+
+/* İlan Türü */
+.listing-badge {
+    position: absolute;
+    bottom: 1rem;
+    right: 1rem;
+    padding: 0.3rem 0.8rem;
+    border-radius: 30px;
+    font-size: 0.8rem;
+    font-weight: 500;
+    text-transform: uppercase;
+}
+
+.listing-badge.vehicle {
+    background-color: #e3f2fd;
+    color: #1976d2;
+}
+
+.listing-badge.estate {
+    background-color: #e8f5e9;
+    color: #2e7d32;
+}
+
+/* Boş Durum */
 .empty-state {
     display: none;
     flex-direction: column;
@@ -198,33 +277,17 @@ body {
     background-color: #ff4956;
 }
 
-/* Mobil için duyarlı tasarım */
-@media (max-width: 768px) {
-    .favorite-card {
-        flex-direction: column;
-    }
-    
-    .favorite-image {
-        width: 100%;
-        height: 200px;
-    }
-    
-    .favorite-actions {
-        flex-direction: row;
-    }
-    
-    .btn-view, .btn-remove {
-        width: 50%;
-    }
-}
-
-/* Yükleniyor göstergesi */
+/* Yükleniyor Göstergesi */
 .loading-container {
-    display: flex;
+    display: none;
     flex-direction: column;
     align-items: center;
     padding: 2rem;
     text-align: center;
+}
+
+.loading-container.active {
+    display: flex;
 }
 
 .loading-spinner {
@@ -242,119 +305,32 @@ body {
     100% { transform: rotate(360deg); }
 }
 
-/* İlan türü rozetleri */
-.favorite-badge {
-    position: absolute;
-    top: 1rem;
-    right: 1rem;
-    padding: 0.3rem 0.8rem;
-    border-radius: 30px;
-    font-size: 0.8rem;
-    font-weight: 500;
-    text-transform: uppercase;
-}
-
-.favorite-badge.vehicle {
-    background-color: #e3f2fd;
-    color: #1976d2;
-}
-
-.favorite-badge.estate {
-    background-color: #e8f5e9;
-    color: #2e7d32;
-}
-
-/* Tip Rozeti */
-.favorite-type-badge {
-    position: absolute;
-    top: 10px;
-    left: 10px;
-    background-color: rgba(0, 0, 0, 0.7);
-    color: white;
-    border-radius: 50%;
-    width: 30px;
-    height: 30px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 14px;
-    z-index: 2;
-    transition: transform 0.2s ease;
-}
-
-.favorite-card:hover .favorite-type-badge {
-    transform: scale(1.1);
-}
-
-/* Notification Styles */
-.notification {
-    position: fixed;
-    top: 20px;
-    right: 20px;
-    padding: 15px 25px;
-    border-radius: 8px;
-    background: white;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-    z-index: 1000;
-    animation: slideIn 0.3s ease-out;
-}
-
-.notification.success {
-    border-left: 4px solid #4CAF50;
-}
-
-.notification.error {
-    border-left: 4px solid #f44336;
-}
-
-.notification.info {
-    border-left: 4px solid #2196F3;
-}
-
-.notification-content {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-}
-
-.notification i {
-    font-size: 20px;
-}
-
-.notification.success i {
-    color: #4CAF50;
-}
-
-.notification.error i {
-    color: #f44336;
-}
-
-.notification.info i {
-    color: #2196F3;
-}
-
-.notification.fade-out {
-    animation: fadeOut 0.3s ease-out forwards;
-}
-
-@keyframes slideIn {
-    from {
-        transform: translateX(100%);
-        opacity: 0;
+/* Mobil için duyarlı tasarım */
+@media (max-width: 768px) {
+    .listing-card {
+        flex-direction: column;
     }
-    to {
-        transform: translateX(0);
-        opacity: 1;
+    
+    .listing-image {
+        width: 100%;
+        height: 200px;
     }
-}
-
-@keyframes fadeOut {
-    from {
-        transform: translateX(0);
-        opacity: 1;
+    
+    .listing-actions {
+        flex-direction: row;
+        flex-wrap: wrap;
     }
-    to {
-        transform: translateX(100%);
-        opacity: 0;
+    
+    .btn-view, .btn-edit, .btn-delete {
+        flex: 1 1 auto;
+        min-width: 120px;
+    }
+    
+    .listings-tabs {
+        flex-wrap: wrap;
+    }
+    
+    .tab-btn {
+        flex: 1 1 auto;
     }
 } 

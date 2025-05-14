@@ -15,54 +15,191 @@ Promise.all([
     document.getElementById('header-component').innerHTML = header;
     document.getElementById('footer-component').innerHTML = footer;
     
-    // Favorileri API'den yükle
-    loadFavoritesFromAPI();
+    // Tüm favorileri yükle
+    loadAllFavorites();
 });
 
-async function loadFavoritesFromAPI() {
+async function loadAllFavorites() {
     const favoritesContainer = document.getElementById('favoritesContainer');
     const emptyFavorites = document.getElementById('emptyFavorites');
-    const authToken = localStorage.getItem('authToken');
-
-    if (!authToken) {
+    emptyFavorites.style.display = 'none'; // Başlangıçta gizle, hiç favori yoksa sonra göstereceğiz
+    
+    // Yükleniyor göstergesi ekle
+    const loadingDiv = document.createElement('div');
+    loadingDiv.className = 'loading-container';
+    loadingDiv.innerHTML = '<div class="loading-spinner"></div><p>Favoriler yükleniyor...</p>';
+    favoritesContainer.appendChild(loadingDiv);
+    
+    // Hem araç hem de emlak favorilerini yükle
+    const [vehicleFavorites, estateFavorites] = await Promise.all([
+        loadFavorites('vehicles'),
+        loadFavorites('estates')
+    ]);
+    
+    // Yükleniyor göstergesini kaldır
+    loadingDiv.remove();
+    
+    // Tüm favorileri birleştir ve kontrol et
+    const allFavorites = [...vehicleFavorites, ...estateFavorites];
+    
+    if (allFavorites.length === 0) {
         emptyFavorites.style.display = 'flex';
         return;
     }
+    
+    // Her favori için kart oluştur ve ekle
+    allFavorites.forEach(favorite => {
+        favoritesContainer.appendChild(createFavoriteCard(favorite));
+    });
+}
 
+async function loadFavorites(type) {
+    const authToken = localStorage.getItem('authToken');
+    if (!authToken) return [];
+    
     try {
-        const response = await fetch('https://takkas-api.onrender.com/api/favorite-vehicles/my-favorites', {
+        const response = await fetch(`https://takkas-api.onrender.com/api/favorite-${type}/my-favorites`, {
             headers: {
-                'Authorization': `Bearer ${authToken}`
+                'Authorization': `Bearer ${authToken}`,
+                'Content-Type': 'application/json'
             }
         });
-
-        if (!response.ok) throw new Error('Favoriler yüklenemedi');
-
-        const favorites = await response.json();
-
-        if (!favorites || favorites.length === 0) {
-            emptyFavorites.style.display = 'flex';
-            return;
+        
+        if (!response.ok) {
+            console.error(`${type} favorileri yüklenemedi. Durum kodu:`, response.status);
+            return [];
         }
-
-        emptyFavorites.style.display = 'none';
-
-        favorites.forEach(fav => {
-            const card = createFavoriteCard({
-                id: fav.id,
-                advertId: fav.id,
-                title: fav.title,
-                price: fav.price,
-                location: fav.city || 'Belirtilmemiş',
-                date: new Date(fav.favorite_created_at).toLocaleDateString('tr-TR'),
-                image: fav.cover_photo || `https://via.placeholder.com/180x150/e0e0e0/333333?text=Fotoğraf+Bulunamadı`
+        
+        const favorites = await response.json();
+        console.log(`${type} favorileri yüklendi:`, favorites);
+        
+        if (!Array.isArray(favorites) || favorites.length === 0) {
+            return [];
+        }
+        
+        // Favorileri işleyelim ve ilan türünü (araç/emlak) belirtelim
+        return favorites.map(fav => {
+            // API yanıtı yapısı değişiklik gösterebilir
+            // Gerçek veriyi bulmak için farklı property'leri kontrol edelim
+            
+            let itemData;
+            let actualData = fav;
+            
+            // API yapısını kontrol et ve gerçek veriyi bul
+            if (type === 'estates') {
+                // Favori API'si bazen estate objesi içinde veriyi döndürür
+                if (fav.estate) {
+                    itemData = fav.estate;
+                    // Favori ID'sini sakla
+                    actualData.id = fav.id || fav.favorite_id;
+                    actualData.favorite_created_at = fav.created_at || fav.favorite_created_at;
+                } else {
+                    itemData = fav;
+                }
+            } else {
+                // Favori API'si bazen vehicle objesi içinde veriyi döndürür
+                if (fav.vehicle) {
+                    itemData = fav.vehicle;
+                    // Favori ID'sini sakla
+                    actualData.id = fav.id || fav.favorite_id;
+                    actualData.favorite_created_at = fav.created_at || fav.favorite_created_at;
+                } else {
+                    itemData = fav;
+                }
+            }
+            
+            // Veri yapısını konsola yazdır (debug için)
+            console.log(`İşlenen veri (${type}):`, {
+                original: fav,
+                parsed: itemData,
+                actualData: actualData
             });
-            favoritesContainer.appendChild(card);
+            
+            // Ortak bir model oluştur
+            const result = {
+                id: actualData.id || fav.favorite_id || fav.id || '',
+                advertId: type === 'estates' ? 
+                    (fav.estate_id || (itemData && itemData.id) || '') : 
+                    (fav.vehicle_id || (itemData && itemData.id) || ''),
+                title: itemData.title || itemData.name || fav.title || fav.name || (type === 'estates' ? 'Bilinmeyen Emlak' : 'Bilinmeyen Araç'),
+                price: itemData.price || itemData.amount || fav.price || fav.amount || 0,
+                location: itemData.city || itemData.location || itemData.address || fav.city || fav.location || fav.address || 'Belirtilmemiş',
+                type: type === 'vehicles' ? 'vehicle' : 'estate'
+            };
+            
+            // Tarih bilgisini al
+            const dateValue = actualData.favorite_created_at || actualData.created_at || 
+                            fav.favorite_created_at || fav.created_at || 
+                            itemData.created_at || new Date().toISOString();
+            
+            // Tarih alanını formatlama
+            try {
+                result.date = new Date(dateValue).toLocaleDateString('tr-TR');
+            } catch (e) {
+                console.error('Tarih formatlanırken hata:', e);
+                result.date = 'Belirtilmemiş';
+            }
+            
+            // Görsel URL'sini bul
+            if (type === 'estates') {
+                // Emlak için görsel öncelik sırası
+                if (itemData.primary_photo && itemData.primary_photo.url) {
+                    result.image = itemData.primary_photo.url;
+                } else if (fav.primary_photo && fav.primary_photo.url) {
+                    result.image = fav.primary_photo.url;
+                } else if (fav.estate && fav.estate.primary_photo && fav.estate.primary_photo.url) {
+                    result.image = fav.estate.primary_photo.url;
+                } else if (itemData.cover_photo) {
+                    result.image = itemData.cover_photo;
+                } else if (fav.cover_photo) {
+                    result.image = fav.cover_photo;
+                } else if (itemData.image_url) {
+                    result.image = itemData.image_url;
+                } else if (itemData.image) {
+                    result.image = itemData.image;
+                } else if (fav.image_url) {
+                    result.image = fav.image_url;
+                } else if (fav.image) {
+                    result.image = fav.image;
+                } else {
+                    result.image = null;
+                }
+            } else {
+                // Araç için görsel öncelik sırası
+                if (itemData.cover_photo) {
+                    result.image = itemData.cover_photo;
+                } else if (fav.cover_photo) {
+                    result.image = fav.cover_photo;
+                } else if (itemData.primary_photo && itemData.primary_photo.url) {
+                    result.image = itemData.primary_photo.url;
+                } else if (fav.primary_photo && fav.primary_photo.url) {
+                    result.image = fav.primary_photo.url;
+                } else if (itemData.image_url) {
+                    result.image = itemData.image_url;
+                } else if (itemData.image) {
+                    result.image = itemData.image;
+                } else if (fav.image_url) {
+                    result.image = fav.image_url;
+                } else if (fav.image) {
+                    result.image = fav.image;
+                } else {
+                    result.image = null;
+                }
+            }
+            
+            console.log(`İşlenmiş sonuç (${type}):`, result);
+            
+            return result;
         });
     } catch (error) {
-        alert(error.message);
-        emptyFavorites.style.display = 'flex';
+        console.error(`${type} favorileri yüklenirken hata:`, error);
+        return [];
     }
+}
+
+async function loadFavoritesFromAPI() {
+    // Bu fonksiyonu loadAllFavorites ile değiştirdik, geriye uyumluluk için bırakıyoruz
+    loadAllFavorites();
 }
 
 function createFavoriteCard(favorite) {
@@ -73,6 +210,7 @@ function createFavoriteCard(favorite) {
     card.className = 'favorite-card';
     card.dataset.id = favorite.id;
     card.dataset.advertId = favorite.advertId;
+    card.dataset.type = favorite.type; // İlan türünü data attribute olarak ekle
     
     card.innerHTML = `
         <div class="favorite-image">
@@ -83,12 +221,13 @@ function createFavoriteCard(favorite) {
             <p class="favorite-price">${typeof favorite.price === 'number' ? favorite.price.toLocaleString() : favorite.price} TL</p>
             <p class="favorite-location"><i class="fas fa-map-marker-alt"></i> ${favorite.location}</p>
             <p class="favorite-date"><i class="far fa-clock"></i> ${favorite.date}</p>
+            <span class="favorite-badge ${favorite.type}">${favorite.type === 'vehicle' ? 'Araç' : 'Emlak'}</span>
         </div>
         <div class="favorite-actions">
-            <button class="btn-view" onclick="viewListing('${favorite.advertId}')">
+            <button class="btn-view" onclick="viewListing('${favorite.advertId}', '${favorite.type}')">
                 <i class="fas fa-eye"></i> Görüntüle
             </button>
-            <button class="btn-remove" onclick="removeFavorite('${favorite.id}', '${favorite.advertId}')">
+            <button class="btn-remove" onclick="removeFavorite('${favorite.id}', '${favorite.advertId}', '${favorite.type}')">
                 <i class="fas fa-trash"></i> Kaldır
             </button>
         </div>
@@ -97,12 +236,16 @@ function createFavoriteCard(favorite) {
     return card;
 }
 
-function viewListing(advertId) {
-    // İlan detay sayfasına yönlendir
-    window.location.href = `car-detail.html?id=${advertId}`;
+function viewListing(advertId, type) {
+    // İlan türüne göre doğru sayfaya yönlendir
+    if (type === 'vehicle') {
+        window.location.href = `car-detail.html?id=${advertId}`;
+    } else {
+        window.location.href = `property-detail.html?id=${advertId}`;
+    }
 }
 
-async function removeFavorite(favoriteId, advertId) {
+async function removeFavorite(favoriteId, advertId, type) {
     const authToken = localStorage.getItem('authToken');
     
     if (!authToken) {
@@ -118,10 +261,16 @@ async function removeFavorite(favoriteId, advertId) {
     card.remove();
     
     try {
-        const response = await fetch(`https://takkas-api.onrender.com/api/favorite-vehicles/${advertId}`, {
+        // İlan türüne göre doğru endpoint'i kullan
+        const endpoint = type === 'vehicle' ? 
+            `https://takkas-api.onrender.com/api/favorite-vehicles/${advertId}` : 
+            `https://takkas-api.onrender.com/api/favorite-estates/${advertId}`;
+        
+        const response = await fetch(endpoint, {
             method: 'DELETE',
             headers: {
-                'Authorization': `Bearer ${authToken}`
+                'Authorization': `Bearer ${authToken}`,
+                'Content-Type': 'application/json'
             }
         });
         
