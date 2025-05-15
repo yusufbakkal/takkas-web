@@ -1,28 +1,86 @@
 // Authentication check
 const authToken = localStorage.getItem('authToken');
 const userId = localStorage.getItem('userId') || '36'; // Varsayılan olarak 36 ID'li kullanıcı
+const API_BASE_URL = 'https://takkas-api.onrender.com/api';
 
-if (!authToken) {
-    showNotification('Giriş yapmanız gerekiyor. Giriş sayfasına yönlendiriliyorsunuz...', 'info');
-    setTimeout(() => {
-        window.location.href = 'pages/signin.html';
-    }, 1000);
+// DOM elemanları ve durum değişkenleri
+let domReady = false;
+let componentsLoaded = false;
+let allListings = [];
+
+// DOM yüklendiğinde
+document.addEventListener('DOMContentLoaded', () => {
+    domReady = true;
+    
+    // Header ve footer elementlerinin varlığını kontrol et
+    const headerElement = document.getElementById('header-component');
+    const footerElement = document.getElementById('footer-component');
+    
+    if (headerElement && footerElement) {
+        // Bileşenleri yükle
+        loadComponents()
+            .then(() => startApp())
+            .catch(() => startApp());
+    } else {
+        startApp();
+    }
+});
+
+// Sayfa hazır olduğunda çalışacak ana fonksiyon
+function startApp() {
+    if (!authToken) {
+        showNotification('Giriş yapmanız gerekiyor. Giriş sayfasına yönlendiriliyorsunuz...', 'info');
+        setTimeout(() => {
+            window.location.href = 'pages/signin.html';
+        }, 1000);
+        return;
+    }
+    
+    initPage();
 }
 
-// Bileşenleri yükle
-Promise.all([
-    fetch('components/property-detail-header.html').then(response => response.text()),
-    fetch('components/footer.html').then(response => response.text())
-]).then(([header, footer]) => {
-    document.getElementById('header-component').innerHTML = header;
-    document.getElementById('footer-component').innerHTML = footer;
-    
-    // Sayfayı yükle
-    initPage();
-});
+// Bileşenleri yükleme fonksiyonu
+async function loadComponents() {
+    try {
+        const headerElement = document.getElementById('header-component');
+        const footerElement = document.getElementById('footer-component');
+        
+        // Header ve footer HTML içeriğini getir
+        const [headerResponse, footerResponse] = await Promise.all([
+            fetch('components/property-detail-header.html'),
+            fetch('components/footer.html')
+        ]);
+        
+        if (!headerResponse.ok || !footerResponse.ok) {
+            throw new Error("Bileşen dosyaları yüklenemedi");
+        }
+        
+        const headerHtml = await headerResponse.text();
+        const footerHtml = await footerResponse.text();
+        
+        // DOM'a ekle
+        if (headerElement) headerElement.innerHTML = headerHtml;
+        if (footerElement) footerElement.innerHTML = footerHtml;
+        
+        componentsLoaded = true;
+        return true;
+    } catch (error) {
+        return false;
+    }
+}
 
 // Sayfa başlangıç
 async function initPage() {
+    const loadingContainer = document.getElementById('loadingContainer');
+    const emptyListings = document.getElementById('emptyListings');
+    
+    // Sayfa yüklenirken önce boş durum ve yükleme göstergelerini ayarla
+    if (emptyListings) emptyListings.style.display = 'none';
+    if (loadingContainer) {
+        loadingContainer.style.display = 'flex';
+        loadingContainer.classList.add('active');
+    }
+    
     // Tab butonlarına tıklama olaylarını ekle
     document.querySelectorAll('.tab-btn').forEach(btn => {
         btn.addEventListener('click', () => {
@@ -35,8 +93,20 @@ async function initPage() {
         });
     });
     
-    // İlanları yükle
-    await loadAllListings();
+    try {
+        await loadAllListings();
+    } catch (error) {
+        showNotification("İlanlar yüklenirken bir sorun oluştu", "error");
+        
+        // Hata durumunda yükleme göstergesini gizle
+        if (loadingContainer) {
+            loadingContainer.classList.remove('active');
+            loadingContainer.style.display = 'none';
+        }
+        
+        // Boş durum mesajını göster
+        if (emptyListings) emptyListings.style.display = 'flex';
+    }
 }
 
 // Tüm ilanları yükle
@@ -45,40 +115,52 @@ async function loadAllListings() {
     const emptyListings = document.getElementById('emptyListings');
     const loadingContainer = document.getElementById('loadingContainer');
     
+    if (!listingsContainer || !emptyListings || !loadingContainer) {
+        showNotification("Sayfa yapısında bir sorun var, lütfen sayfayı yenileyin", "error");
+        return;
+    }
+    
     // Yükleniyor göstergesini göster
+    loadingContainer.style.display = 'flex';
     loadingContainer.classList.add('active');
+    
+    // Önce diğer içeriği gizle
     emptyListings.style.display = 'none';
+    listingsContainer.innerHTML = '';
     
     try {
-        // Hem araç hem de emlak ilanlarını paralel olarak çek
-        const [vehicleListings, estateListings] = await Promise.all([
-            loadListings('vehicle'),
-            loadListings('estate')
-        ]);
+        // Hem araç hem de emlak ilanlarını sırayla çek
+        const vehicleListings = await loadListings('vehicle') || [];
+        const estateListings = await loadListings('estate') || [];
         
-        console.log("Yüklenen araç ilanları:", vehicleListings);
-        console.log("Yüklenen emlak ilanları:", estateListings);
+        // İlanları birleştir
+        allListings = [...vehicleListings, ...estateListings];
         
-        // Tüm ilanları birleştir
-        window.allListings = [...vehicleListings, ...estateListings];
-        console.log("Birleştirilmiş tüm ilanlar:", window.allListings);
+        // İlanları tarih sırasına göre sırala (en yeni en üstte)
+        if (allListings.length > 0) {
+            allListings.sort((a, b) => {
+                const dateA = new Date(a.created_at || 0);
+                const dateB = new Date(b.created_at || 0);
+                return dateB - dateA;
+            });
+        }
         
         // Yükleniyor göstergesini gizle
         loadingContainer.classList.remove('active');
+        loadingContainer.style.display = 'none';
         
         // İlan var mı kontrol et
-        if (!window.allListings || window.allListings.length === 0) {
-            console.log("Hiç ilan bulunamadı.");
+        if (allListings.length === 0) {
             emptyListings.style.display = 'flex';
             return;
         }
         
         // İlanları ekrana ekle
-        displayListings(window.allListings);
+        displayListings(allListings);
         
     } catch (error) {
-        console.error('İlanlar yüklenirken hata:', error);
         loadingContainer.classList.remove('active');
+        loadingContainer.style.display = 'none';
         emptyListings.style.display = 'flex';
         showNotification('İlanlar yüklenirken bir hata oluştu', 'error');
     }
@@ -86,145 +168,170 @@ async function loadAllListings() {
 
 // Belirli türdeki ilanları yükle (vehicle/estate)
 async function loadListings(type) {
-    const apiEndpoint = type === 'vehicle' 
-        ? `https://takkas-api.onrender.com/api/users/${userId}/vehicle-listings`
-        : `https://takkas-api.onrender.com/api/users/${userId}/estate-listings`;
-    
-    console.log(`${type} ilanları için API isteği gönderiliyor:`, apiEndpoint);
+    const apiEndpoint = `${API_BASE_URL}/users/${userId}/${type}-listings`;
     
     try {
+        // Fetch API isteği oluştur
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 15000); // 15 saniye timeout
+        
         const response = await fetch(apiEndpoint, {
+            method: 'GET',
             headers: {
                 'Authorization': `Bearer ${authToken}`,
-                'Content-Type': 'application/json'
-            }
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
+            },
+            signal: controller.signal
         });
         
-        console.log(`${type} API yanıt durumu:`, response.status);
+        clearTimeout(timeoutId); // timeout'u temizle
         
         if (!response.ok) {
-            console.error(`${type} ilanları yüklenemedi. Durum kodu:`, response.status);
+            throw new Error(`${type} ilanları yüklenemedi`);
+        }
+        
+        // API yanıtını JSON olarak çözümle
+        const text = await response.text();
+        
+        // Boş yanıt kontrolü
+        if (!text || text.trim() === '') {
             return [];
         }
         
-        const data = await response.json();
-        console.log(`${type} API yanıtı:`, data);
+        // JSON parse et
+        const data = JSON.parse(text);
         
         // API yanıtının yapısını kontrol et
         let listings = [];
         
-        if (Array.isArray(data)) {
-            // Doğrudan dizi döndüyse
-            listings = data;
-        } else {
-            // Obje döndüyse (yaygın API yapıları)
-            if (data.data) listings = data.data;
-            else if (data.listings) listings = data.listings;
-            else if (data.results) listings = data.results;
-            else if (type === 'estate' && Array.isArray(data.estates)) listings = data.estates;
-            else if (type === 'vehicle' && Array.isArray(data.vehicles)) listings = data.vehicles;
-            else listings = []; // Uygun yapı bulunamadı
+        // Veri yapısını kontrol et ve uygun dizi yapısını bul
+        if (!data) {
+            return [];
         }
         
-        console.log(`İşlenecek ${type} ilanları:`, listings);
+        if (Array.isArray(data)) {
+            listings = data;
+        } else if (typeof data === 'object') {
+            // Yaygın API yanıt yapıları kontrolü
+            if (data.data && Array.isArray(data.data)) {
+                listings = data.data;
+            } else if (data.listings && Array.isArray(data.listings)) {
+                listings = data.listings;
+            } else if (data.results && Array.isArray(data.results)) {
+                listings = data.results;
+            } else if (type === 'estate' && data.estates && Array.isArray(data.estates)) {
+                listings = data.estates;
+            } else if (type === 'vehicle' && data.vehicles && Array.isArray(data.vehicles)) {
+                listings = data.vehicles;
+            } else if (data[type + 's'] && Array.isArray(data[type + 's'])) {
+                listings = data[type + 's'];
+            } else {
+                // Otomatik olarak bir dizi özelliği bulmaya çalış
+                for (const key in data) {
+                    if (Array.isArray(data[key])) {
+                        listings = data[key];
+                        break;
+                    }
+                }
+                
+                // Hala bulunamadıysa ve yine de nesne ise, nesneyi dizi olarak kullan
+                if (listings.length === 0 && data) {
+                    listings = [data];
+                }
+            }
+        } else {
+            return [];
+        }
         
         if (!Array.isArray(listings) || listings.length === 0) {
-            console.log(`Hiç ${type} ilanı bulunamadı.`);
             return [];
         }
         
         // İlanları standart formata dönüştür
-        const processedListings = listings.map(listing => {
-            console.log(`İşlenen ${type} ilanı:`, listing);
+        return listings.map((listing, index) => {
+            if (!listing) return null;
             
-            // Ortak özellikler
-            const result = {
-                id: listing.id,
-                title: listing.title || listing.name || `Bilinmeyen ${type === 'vehicle' ? 'Araç' : 'Emlak'}`,
-                price: listing.price || listing.amount || 0,
-                location: listing.city || listing.location || listing.address || 'Belirtilmemiş',
-                type: type,
-                status: listing.approval_status || 'pending',
-                created_at: listing.created_at || new Date().toISOString()
-            };
-            
-            // Görsel URL'ini belirle
-            if (type === 'estate') {
-                if (listing.primary_photo && listing.primary_photo.url) {
-                    result.image = listing.primary_photo.url;
-                } else if (listing.cover_photo) {
-                    result.image = listing.cover_photo;
-                } else if (listing.image_url) {
-                    result.image = listing.image_url;
-                } else if (listing.image) {
-                    result.image = listing.image;
-                } else {
+            try {
+                // Ortak özellikler
+                const result = {
+                    id: listing.id || listing._id || `${type}-${index}`,
+                    title: listing.title || listing.name || `Bilinmeyen ${type === 'vehicle' ? 'Araç' : 'Emlak'}`,
+                    price: listing.price || listing.amount || 0,
+                    location: listing.city || listing.location || listing.address || 'Belirtilmemiş',
+                    type: type,
+                    status: listing.approval_status || listing.status || 'pending',
+                    created_at: listing.created_at || listing.createdAt || new Date().toISOString()
+                };
+                
+                // Görsel URL'ini belirle
+                const imageFields = ['primary_photo', 'cover_photo', 'image_url', 'image', 'photos'];
+                
+                for (const field of imageFields) {
+                    if (listing[field]) {
+                        if (field === 'primary_photo' && listing[field].url) {
+                            result.image = listing[field].url;
+                            break;
+                        } else if (field === 'photos' && Array.isArray(listing[field]) && listing[field].length > 0) {
+                            if (typeof listing[field][0] === 'object' && listing[field][0].url) {
+                                result.image = listing[field][0].url;
+                            } else {
+                                result.image = listing[field][0];
+                            }
+                            break;
+                        } else if (typeof listing[field] === 'string') {
+                            result.image = listing[field];
+                            break;
+                        }
+                    }
+                }
+                
+                if (!result.image) {
                     result.image = null;
                 }
                 
-                // Emlak tipini ekle
-                result.estateType = listing.estate_type || 'Belirtilmemiş';
-            } else {
-                if (listing.cover_photo) {
-                    result.image = listing.cover_photo;
-                } else if (listing.primary_photo && listing.primary_photo.url) {
-                    result.image = listing.primary_photo.url;
-                } else if (listing.image_url) {
-                    result.image = listing.image_url;
-                } else if (listing.image) {
-                    result.image = listing.image;
+                // Türe özgü özellikler
+                if (type === 'estate') {
+                    result.estateType = listing.estate_type || listing.estateType || 'Belirtilmemiş';
                 } else {
-                    result.image = null;
+                    result.brand = listing.brand || listing.marka || 'Belirtilmemiş';
+                    result.model = listing.model || 'Belirtilmemiş';
+                    result.year = listing.year || listing.yil || 'Belirtilmemiş';
                 }
                 
-                // Araç bilgilerini ekle
-                result.brand = listing.brand || 'Belirtilmemiş';
-                result.model = listing.model || 'Belirtilmemiş';
-                result.year = listing.year || 'Belirtilmemiş';
-            }
-            
-            // Tarih formatla
-            if (result.created_at) {
-                try {
-                    result.formattedDate = new Date(result.created_at).toLocaleDateString('tr-TR');
-                } catch (e) {
-                    console.error('Tarih formatlanırken hata:', e);
-                    result.formattedDate = 'Belirtilmemiş';
+                // Tarih formatla
+                if (result.created_at) {
+                    try {
+                        result.formattedDate = new Date(result.created_at).toLocaleDateString('tr-TR');
+                    } catch (e) {
+                        result.formattedDate = 'Belirtilmemiş';
+                    }
                 }
+                
+                return result;
+            } catch (error) {
+                return null;
             }
-            
-            console.log(`İşlenmiş ${type} ilanı:`, result);
-            return result;
-        });
-        
-        console.log(`Dönüştürülmüş ${type} ilanları:`, processedListings);
-        return processedListings;
+        }).filter(item => item !== null); // Null değerleri filtrele
     } catch (error) {
-        console.error(`${type} ilanları yüklenirken hata:`, error);
         return [];
     }
 }
 
 // İlanları filtrele ve göster
 function filterListings(filterType) {
-    if (!window.allListings) {
-        console.log("Filtrelenecek ilan bulunamadı, window.allListings boş.");
-        return;
-    }
-    
-    console.log(`İlanlar "${filterType}" filtresine göre filtreleniyor.`);
+    if (!allListings) return;
     
     let filteredListings;
     
     if (filterType === 'all') {
-        filteredListings = window.allListings;
+        filteredListings = allListings;
     } else if (filterType === 'vehicles') {
-        filteredListings = window.allListings.filter(listing => listing.type === 'vehicle');
+        filteredListings = allListings.filter(listing => listing.type === 'vehicle');
     } else if (filterType === 'estates') {
-        filteredListings = window.allListings.filter(listing => listing.type === 'estate');
+        filteredListings = allListings.filter(listing => listing.type === 'estate');
     }
     
-    console.log("Filtrelenmiş ilanlar:", filteredListings);
     displayListings(filteredListings);
 }
 
@@ -233,30 +340,26 @@ function displayListings(listings) {
     const listingsContainer = document.getElementById('listingsContainer');
     const emptyListings = document.getElementById('emptyListings');
     
-    console.log("Ekranda gösterilecek ilanlar:", listings);
+    if (!listingsContainer) return;
     
     // İçeriği temizle
     listingsContainer.innerHTML = '';
     
     // İlan var mı kontrol et
     if (!listings || listings.length === 0) {
-        console.log("Gösterilecek ilan bulunamadı, boş durum mesajı gösteriliyor.");
-        emptyListings.style.display = 'flex';
+        if (emptyListings) emptyListings.style.display = 'flex';
         return;
     }
     
-    console.log(`${listings.length} adet ilan gösteriliyor.`);
-    emptyListings.style.display = 'none';
+    if (emptyListings) emptyListings.style.display = 'none';
     
     // İlanları ekle
-    listings.forEach((listing, index) => {
-        console.log(`${index + 1}. ilan kartı oluşturuluyor:`, listing);
+    listings.forEach(listing => {
         try {
             const listingCard = createListingCard(listing);
             listingsContainer.appendChild(listingCard);
-            console.log(`${index + 1}. ilan kartı başarıyla eklendi.`);
         } catch (error) {
-            console.error(`${index + 1}. ilan kartı oluşturulurken hata:`, error);
+            console.error(`İlan kartı oluşturulurken hata:`, error);
         }
     });
 }
@@ -264,21 +367,13 @@ function displayListings(listings) {
 // İlan kartı oluştur
 function createListingCard(listing) {
     if (!listing || !listing.id) {
-        console.error("Geçersiz ilan verisi:", listing);
         throw new Error("Geçersiz ilan verisi");
     }
-    
-    console.log("İlan kartı oluşturuluyor:", listing);
     
     const noImagePlaceholder = `https://via.placeholder.com/400x250/e0e0e0/333333?text=${encodeURIComponent('Fotoğraf Bulunamadı')}`;
     const image = listing.image || noImagePlaceholder;
     
-    const card = document.createElement('div');
-    card.className = 'listing-card';
-    card.dataset.id = listing.id;
-    card.dataset.type = listing.type;
-    
-    // Durum metni
+    // Durum bilgisi
     let statusText = 'Beklemede';
     let statusClass = 'pending';
     
@@ -295,69 +390,139 @@ function createListingCard(listing) {
         listing.price.toLocaleString() : 
         listing.price;
     
-    // Kart içeriği
-    card.innerHTML = `
-        <div class="listing-image">
-            <img src="${image}" alt="${listing.title}" onerror="this.onerror=null; this.src='${noImagePlaceholder}';">
-        </div>
-        <div class="listing-content">
-            <h3>${listing.title}</h3>
-            <span class="listing-status ${statusClass}">${statusText}</span>
-            <p class="listing-price">${price} TL</p>
-            <p class="listing-location"><i class="fas fa-map-marker-alt"></i> ${listing.location}</p>
-            <p class="listing-date"><i class="far fa-calendar-alt"></i> ${listing.formattedDate || 'Belirtilmemiş'}</p>
-            <span class="listing-badge ${listing.type}">${listing.type === 'vehicle' ? 'Araç' : 'Emlak'}</span>
-        </div>
-        <div class="listing-actions">
-            <button class="btn-view" onclick="viewListing('${listing.id}', '${listing.type}')">
-                <i class="fas fa-eye"></i> Görüntüle
-            </button>
-            <button class="btn-edit" onclick="editListing('${listing.id}', '${listing.type}')">
-                <i class="fas fa-edit"></i> Düzenle
-            </button>
-            <button class="btn-delete" onclick="deleteListing('${listing.id}', '${listing.type}')">
-                <i class="fas fa-trash"></i> Sil
-            </button>
-        </div>
-    `;
+    // DOM elementleri oluştur
+    const card = document.createElement('div');
+    card.className = 'listing-card';
+    card.dataset.id = listing.id;
+    card.dataset.type = listing.type;
+    
+    // 1. Resim bölümü
+    const imageSection = document.createElement('div');
+    imageSection.className = 'listing-image';
+    
+    const imgElement = document.createElement('img');
+    imgElement.src = image;
+    imgElement.alt = listing.title;
+    imgElement.onerror = function() { this.onerror = null; this.src = noImagePlaceholder; };
+    imageSection.appendChild(imgElement);
+    
+    // Mobil görünüm için durum etiketi
+    const mobileStatus = document.createElement('span');
+    mobileStatus.className = `listing-status mobile-status ${statusClass}`;
+    mobileStatus.textContent = statusText;
+    imageSection.appendChild(mobileStatus);
+    
+    card.appendChild(imageSection);
+    
+    // 2. İçerik bölümü
+    const contentSection = document.createElement('div');
+    contentSection.className = 'listing-content';
+    
+    // İçerik elementlerini oluştur ve ekle
+    const title = document.createElement('h3');
+    title.textContent = listing.title;
+    contentSection.appendChild(title);
+    
+    // Masaüstü görünüm için durum etiketi
+    const desktopStatus = document.createElement('span');
+    desktopStatus.className = `listing-status desktop-status ${statusClass}`;
+    desktopStatus.textContent = statusText;
+    contentSection.appendChild(desktopStatus);
+    
+    const priceElement = document.createElement('p');
+    priceElement.className = 'listing-price';
+    priceElement.textContent = `${price} TL`;
+    contentSection.appendChild(priceElement);
+    
+    // Konum bilgisi
+    const locationEl = document.createElement('p');
+    locationEl.className = 'listing-location';
+    const locationIcon = document.createElement('i');
+    locationIcon.className = 'fas fa-map-marker-alt';
+    locationEl.appendChild(locationIcon);
+    locationEl.appendChild(document.createTextNode(` ${listing.location}`));
+    contentSection.appendChild(locationEl);
+    
+    // Tarih bilgisi
+    const dateEl = document.createElement('p');
+    dateEl.className = 'listing-date';
+    const dateIcon = document.createElement('i');
+    dateIcon.className = 'far fa-calendar-alt';
+    dateEl.appendChild(dateIcon);
+    dateEl.appendChild(document.createTextNode(` ${listing.formattedDate || 'Belirtilmemiş'}`));
+    contentSection.appendChild(dateEl);
+    
+    // İlan türü etiketi
+    const badgeElement = document.createElement('span');
+    badgeElement.className = `listing-badge ${listing.type}`;
+    badgeElement.textContent = listing.type === 'vehicle' ? 'ARAÇ' : 'EMLAK';
+    contentSection.appendChild(badgeElement);
+    
+    card.appendChild(contentSection);
+    
+    // 3. Butonlar bölümü
+    const actionsSection = document.createElement('div');
+    actionsSection.className = 'listing-actions';
+    
+    // Görüntüle butonu
+    const viewButton = document.createElement('button');
+    viewButton.className = 'btn-view';
+    const viewIcon = document.createElement('i');
+    viewIcon.className = 'fas fa-eye';
+    viewButton.appendChild(viewIcon);
+    viewButton.appendChild(document.createTextNode(' Görüntüle'));
+    viewButton.addEventListener('click', () => viewListing(listing.id, listing.type));
+    actionsSection.appendChild(viewButton);
+    
+    // Düzenle butonu
+    const editButton = document.createElement('button');
+    editButton.className = 'btn-edit';
+    const editIcon = document.createElement('i');
+    editIcon.className = 'fas fa-edit';
+    editButton.appendChild(editIcon);
+    editButton.appendChild(document.createTextNode(' Düzenle'));
+    editButton.addEventListener('click', () => editListing(listing.id, listing.type));
+    actionsSection.appendChild(editButton);
+    
+    // Sil butonu
+    const deleteButton = document.createElement('button');
+    deleteButton.className = 'btn-delete';
+    const deleteIcon = document.createElement('i');
+    deleteIcon.className = 'fas fa-trash';
+    deleteButton.appendChild(deleteIcon);
+    deleteButton.appendChild(document.createTextNode(' Sil'));
+    deleteButton.addEventListener('click', () => deleteListing(listing.id, listing.type));
+    actionsSection.appendChild(deleteButton);
+    
+    card.appendChild(actionsSection);
     
     return card;
 }
 
 // İlanı görüntüle
 function viewListing(id, type) {
-    console.log(`İlan görüntüleniyor: ID=${id}, Tür=${type}`);
-    if (type === 'vehicle') {
-        window.location.href = `car-detail.html?id=${id}`;
-    } else {
-        window.location.href = `property-detail.html?id=${id}`;
-    }
+    window.location.href = type === 'vehicle' 
+        ? `car-detail.html?id=${id}` 
+        : `property-detail.html?id=${id}`;
 }
 
 // İlanı düzenle
 function editListing(id, type) {
-    console.log(`İlan düzenleniyor: ID=${id}, Tür=${type}`);
-    // Düzenleme sayfasına yönlendir
-    if (type === 'vehicle') {
-        window.location.href = `edit-vehicle.html?id=${id}`;
-    } else {
-        window.location.href = `edit-property.html?id=${id}`;
-    }
+    window.location.href = type === 'vehicle' 
+        ? `edit-vehicle.html?id=${id}` 
+        : `edit-property.html?id=${id}`;
 }
 
 // İlanı sil
 async function deleteListing(id, type) {
-    console.log(`İlan silme isteği: ID=${id}, Tür=${type}`);
     // Kullanıcıya silme işlemini onayla
     if (!confirm('Bu ilanı silmek istediğinizden emin misiniz?')) {
         return;
     }
     
     const endpoint = type === 'vehicle' 
-        ? `https://takkas-api.onrender.com/api/vehicles/${id}`
-        : `https://takkas-api.onrender.com/api/estates/${id}`;
-    
-    console.log(`Silme API isteği: ${endpoint}`);
+        ? `${API_BASE_URL}/vehicles/${id}`
+        : `${API_BASE_URL}/estates/${id}`;
     
     try {
         const response = await fetch(endpoint, {
@@ -367,8 +532,6 @@ async function deleteListing(id, type) {
                 'Content-Type': 'application/json'
             }
         });
-        
-        console.log(`Silme API yanıtı: ${response.status}`);
         
         if (!response.ok) {
             throw new Error('İlan silinemedi');
@@ -381,9 +544,7 @@ async function deleteListing(id, type) {
         }
         
         // Tüm ilanlarda sil
-        if (window.allListings) {
-            window.allListings = window.allListings.filter(listing => !(listing.id == id && listing.type === type));
-        }
+        allListings = allListings.filter(listing => !(listing.id == id && listing.type === type));
         
         // Boş durum kontrolü
         const listingsContainer = document.getElementById('listingsContainer');
@@ -395,30 +556,84 @@ async function deleteListing(id, type) {
         
         showNotification('İlan başarıyla silindi', 'success');
     } catch (error) {
-        console.error('İlan silinirken hata:', error);
         showNotification('İlan silinirken bir hata oluştu', 'error');
     }
 }
 
 // Bildirim göster
 function showNotification(message, type = 'info') {
-    // Check if notification.js is loaded and provides the showNotification function
+    // Check if notification.js is loaded
     if (window.showNotification) {
         window.showNotification(message, type);
         return;
     }
 
-    // Fallback bildirim fonksiyonu
-    console.log('showNotification fonksiyonu çağrıldı:', message, type);
+    // Önceki bildirimleri temizle
+    const existingNotifications = document.querySelectorAll('.notification');
+    existingNotifications.forEach(notification => {
+        notification.remove();
+    });
+    
+    // Bildirim elementini oluştur
     const notification = document.createElement('div');
     notification.className = `notification ${type}`;
+    
+    // Icon seç
+    let iconClass = 'fa-info-circle';
+    if (type === 'success') iconClass = 'fa-check-circle';
+    else if (type === 'error') iconClass = 'fa-exclamation-circle';
+    else if (type === 'warning') iconClass = 'fa-exclamation-triangle';
+    else if (type === 'info') iconClass = 'fa-info-circle';
+    
     notification.innerHTML = `
         <div class="notification-content">
-            <i class="fas ${type === 'success' ? 'fa-check-circle' : type === 'error' ? 'fa-exclamation-circle' : 'fa-info-circle'}"></i>
+            <i class="fas ${iconClass}"></i>
             <span>${message}</span>
         </div>
     `;
     
+    // CSS ekle
+    if (!document.getElementById('notification-style')) {
+        const style = document.createElement('style');
+        style.id = 'notification-style';
+        style.textContent = `
+            .notification {
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background-color: white;
+                box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+                border-radius: 8px;
+                padding: 15px 20px;
+                z-index: 1000;
+                transition: transform 0.3s ease, opacity 0.3s ease;
+                max-width: 350px;
+            }
+            
+            .notification-content {
+                display: flex;
+                align-items: center;
+                gap: 10px;
+            }
+            
+            .notification i {
+                font-size: 1.2rem;
+            }
+            
+            .notification.success i { color: #4CAF50; }
+            .notification.error i { color: #F44336; }
+            .notification.warning i { color: #FF9800; }
+            .notification.info i { color: #2196F3; }
+            
+            .notification.fade-out {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+        `;
+        document.head.appendChild(style);
+    }
+    
+    // Bildirimi body'e ekle
     document.body.appendChild(notification);
     
     // 3 saniye sonra bildirimi kaldır
@@ -426,4 +641,5 @@ function showNotification(message, type = 'info') {
         notification.classList.add('fade-out');
         setTimeout(() => notification.remove(), 300);
     }, 3000);
-} 
+}
+ 
