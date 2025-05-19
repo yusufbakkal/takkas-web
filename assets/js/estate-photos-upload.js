@@ -658,8 +658,15 @@ function finishUpload(listingId, listingType) {
         const listingTitle = localStorage.getItem('currentListingTitle') || '';
         
         // İlan türüne göre kategori belirle
-        const category = 'estate'; // Emlak ve arsa için hep estate
-        const type = listingType === 'estate' ? 'apartment' : 'land';
+        let category, type;
+        
+        if (listingType === 'vehicle') {
+            category = 'vehicle'; // Araç ilanları için vehicle
+            type = 'vehicle';
+        } else {
+            category = 'estate'; // Emlak ve arsa için estate
+            type = listingType === 'estate' ? 'apartment' : 'land';
+        }
         
         window.location.href = `listing-success.html?id=${listingId}&title=${encodeURIComponent(listingTitle)}&type=${type}&category=${category}`;
     }, 2000);

@@ -1473,21 +1473,21 @@
 
                 // Donanım özelliklerini ekle
                 data.common_properties = {
-                    airbag: !!formData.get('airbag'),
-                    abs: !!formData.get('abs'),
-                    esp: !!formData.get('esp'),
-                    klima: !!formData.get('klima'),
-                    merkezi_kilit: !!formData.get('merkezi_kilit'),
-                    elektrikli_ayna: !!formData.get('elektrikli_ayna')
+                    airbag: formData.has('airbag'),
+                    abs: formData.has('abs'),
+                    esp: formData.has('esp'),
+                    klima: formData.has('klima'),
+                    merkezi_kilit: formData.has('merkezi_kilit'),
+                    elektrikli_ayna: formData.has('elektrikli_ayna')
                 };
                 
                 data.specific_properties = {
-                    sunroof: !!formData.get('sunroof'),
-                    leather_seats: !!formData.get('leather_seats'),
-                    park_sensoru: !!formData.get('park_sensoru'),
-                    geri_gorus_kamera: !!formData.get('geri_gorus_kamera'),
-                    navigasyon: !!formData.get('navigasyon'),
-                    bluetooth: !!formData.get('bluetooth')
+                    sunroof: formData.has('sunroof'),
+                    leather_seats: formData.has('leather_seats'),
+                    park_sensoru: formData.has('park_sensoru'),
+                    geri_gorus_kamera: formData.has('geri_gorus_kamera'),
+                    navigasyon: formData.has('navigasyon'),
+                    bluetooth: formData.has('bluetooth')
                 };
 
                 // Takas ile ilgili bilgileri ekle
