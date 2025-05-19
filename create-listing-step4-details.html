@@ -415,7 +415,7 @@
                                 <option value="">Seçiniz</option>
                                 <option value="benzin">Benzin</option>
                                 <option value="dizel">Dizel</option>
-                                <option value="lpg">LPG</option>
+                                <option value="lpg">Benzin/LPG</option>
                                 <option value="hibrit">Hibrit</option>
                                 <option value="elektrik">Elektrik</option>
                             </select>
@@ -429,6 +429,23 @@
                                 <option value="yarı otomatik">Yarı Otomatik</option>
                             </select>
                         </div>
+                        <div class="form-group">
+                            <label for="caseType" class="required">Kasa Tipi</label>
+                            <select id="caseType" name="case_type" class="form-control" required>
+                                <option value="">Seçiniz</option>
+                                <option value="Cabrio">Cabrio</option>
+                                <option value="Coupe">Coupe</option>
+                                <option value="Coupe 4 Kapı">Coupe 4 Kapı</option>
+                                <option value="Hatchback 3 Kapı">Hatchback 3 Kapı</option>
+                                <option value="Hatchback 5 Kapı">Hatchback 5 Kapı</option>
+                                <option value="Sedan">Sedan</option>
+                                <option value="Station Wagon">Station Wagon</option>
+                                <option value="Minivan/Panelvan">Minivan/Panelvan</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
                         <div class="form-group">
                             <label for="color" class="required">Renk</label>
                             <select id="color" name="color" class="form-control" required>
@@ -449,9 +466,6 @@
                                 <option value="bej">Bej</option>
                             </select>
                         </div>
-                    </div>
-                    
-                    <div class="form-row">
                         <div class="form-group">
                             <label for="motorPower" class="required">Motor Gücü (hp)</label>
                             <input type="number" id="motorPower" name="motor_power" class="form-control" required placeholder="Ör: 150">
@@ -460,13 +474,13 @@
                             <label for="motorVolume" class="required">Motor Hacmi (L)</label>
                             <input type="text" id="motorVolume" name="motor_volume" class="form-control" required placeholder="Ör: 1.6">
                         </div>
+                    </div>
+                    
+                    <div class="form-row">
                         <div class="form-group">
                             <label for="kilometer" class="required">Kilometre</label>
                             <input type="number" id="kilometer" name="kilometer" class="form-control" required placeholder="Ör: 50000">
                         </div>
-                    </div>
-                    
-                    <div class="form-row">
                         <div class="form-group">
                             <label for="driveType">Çekiş Tipi</label>
                             <select id="driveType" name="drive_type" class="form-control">
@@ -484,6 +498,9 @@
                                 <option value="sahibinden">Sahibinden</option>
                             </select>
                         </div>
+                    </div>
+                    
+                    <div class="form-row">
                         <div class="form-group">
                             <label for="paintChange">Boya Değişimi</label>
                             <select id="paintChange" name="paint_change" class="form-control">
