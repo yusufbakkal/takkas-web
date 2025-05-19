@@ -1,13 +1,12 @@
 .matches-container {
     display: flex;
-    height: 100vh;
-    margin-left: 280px;
-    margin-top: -50px; /* Yukarı kaydırmak için negatif margin ekledik */
+    height: calc(100vh - 60px); /* Navbar yüksekliğine göre ayarladık */
+    margin-left: 0; /* Navbar ile hizalamak için 0 yaptık */
+    margin-top: 0; /* Navbar altından başlasın */
     background: #f5f7fa;
     justify-content: center;
     align-items: center;
-    padding: 0 40px;
-    gap: 40px;
+    padding: 0 20px;
 }
 
 /* Matches Sidebar - Sağda */
@@ -122,9 +121,10 @@
     background: #a1a3a9;
 }
 
-/* Ana Swipe Alanı */
+/* Ana Swipe Alanı - Ortada */
 .swipe-container {
     width: 500px;
+    max-width: 100%;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -264,7 +264,7 @@
 }
 
 .action-button.like {
-    color: #FF6370;
+    color: #4CAF50;
 }
 
 /* Kart animasyonları */
@@ -283,27 +283,14 @@
 }
 
 /* Responsive düzenlemeler */
-@media (max-width: 1400px) {
-    .matches-container {
-        gap: 16px;
-    }
-    .matches-sidebar {
-        width: 400px;
-    }
-    .swipe-container {
-        width: 450px;
-    }
-}
-
 @media (max-width: 1200px) {
     .matches-container {
+        margin-left: 0;
         padding: 0 20px;
     }
-    .matches-sidebar {
-        width: 350px;
-    }
+    
     .swipe-container {
-        width: 400px;
+        width: 450px;
     }
 }
 
@@ -311,52 +298,46 @@
     .matches-container {
         margin-left: 0;
         padding: 0 15px;
-        flex-direction: column; /* Mobilde alt alta göster */
     }
     
     .swipe-container {
         width: 100%;
-        max-width: 400px;
-        height: 500px;
-    }
-    
-    .matches-sidebar {
-        width: 100%;
-        max-width: 400px;
-        height: auto;
-        margin: 20px 0;
-    }
-
-    .matches-list {
-        max-height: 300px;
+        max-width: 450px;
+        height: 80vh;
     }
 }
 
 @media (max-width: 576px) {
     .matches-container {
         padding: 0 10px;
+        height: calc(100vh - 60px);
+        margin-top: 0;
     }
     
     .swipe-container {
-        height: 450px;
-    }
-    
-    .matches-sidebar {
-        max-width: 100%;
-    }
-    
-    .match-card {
-        padding: 12px;
-    }
-    
-    .match-image {
-        width: 70px;
-        height: 70px;
+        height: 80vh;
     }
     
     .action-button {
-        width: 48px;
-        height: 48px;
+        width: 50px;
+        height: 50px;
+        font-size: 20px;
+    }
+    
+    .card-info h2 {
+        font-size: 24px;
+    }
+    
+    .car-type {
+        font-size: 16px;
+    }
+    
+    .car-specs {
+        font-size: 14px;
+        flex-wrap: wrap;
+    }
+    
+    .car-price {
         font-size: 20px;
     }
 }
@@ -466,10 +447,6 @@
 /* Touch cihazlar için iyileştirmeler */
 @media (hover: none) {
     .action-button:hover {
-        transform: none;
-    }
-    
-    .match-card:hover {
         transform: none;
     }
 }

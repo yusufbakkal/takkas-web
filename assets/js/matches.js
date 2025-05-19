@@ -33,6 +33,113 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
     
+    // Favori durumu kontrol fonksiyonu
+    async function checkFavoriteStatus(vehicleId) {
+        const token = localStorage.getItem('authToken');
+        if (!token) return false;
+        
+        try {
+            console.log('Favori durumu kontrol ediliyor. Araç ID:', vehicleId);
+            const response = await fetch(`https://takkas-api.onrender.com/api/favorite-vehicles/check/${vehicleId}`, {
+                headers: { 
+                    'Authorization': `Bearer ${token}` 
+                }
+            });
+            
+            if (!response.ok) return false;
+            
+            const data = await response.json();
+            console.log('Favori durumu yanıtı:', data);
+            
+            return data === true || data.is_favorite === true;
+        } catch (error) {
+            console.error('Favori durumu kontrol edilirken hata:', error);
+            return false;
+        }
+    }
+    
+    // Favoriye ekleme fonksiyonu
+    async function addToFavorites(vehicleId) {
+        try {
+            // LocalStorage'dan token al (oturum açılmışsa)
+            const token = localStorage.getItem('authToken');
+            
+            if (!token) {
+                console.error('Kullanıcı girişi yapılmamış veya token bulunamadı');
+                showToast('Favorilere eklemek için giriş yapmalısınız', 'error');
+                return false;
+            }
+            
+            // Önce ilan zaten favorilerde mi kontrol et
+            const isFavorite = await checkFavoriteStatus(vehicleId);
+            if (isFavorite) {
+                console.log('İlan zaten favorilerde:', vehicleId);
+                showToast('Bu ilan zaten favorilerinizde', 'info');
+                return true; // Zaten favorilerde olduğu için işlem başarılı sayılır
+            }
+            
+            console.log('Favoriye ekleme isteği gönderiliyor. Araç ID:', vehicleId);
+            
+            const response = await fetch(`https://takkas-api.onrender.com/api/favorite-vehicles/${vehicleId}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+            
+            console.log('Favori API yanıt durumu:', response.status, response.statusText);
+            
+            const data = await response.json();
+            console.log('Favori API yanıtı:', data);
+            
+            if (response.ok) {
+                showToast('İlan favorilere eklendi', 'success');
+                return true;
+            } else {
+                console.error('Favorilere ekleme hatası:', data);
+                showToast(data.message || 'Favorilere eklenirken bir hata oluştu', 'error');
+                return false;
+            }
+        } catch (error) {
+            console.error('Favorilere eklenirken hata:', error);
+            showToast('Bağlantı hatası. Lütfen tekrar deneyin.', 'error');
+            return false;
+        }
+    }
+    
+    // Basit toast bildirim fonksiyonu
+    function showToast(message, type = 'info') {
+        // Eğer toast container yoksa oluştur
+        let toastContainer = document.querySelector('.toast-container');
+        if (!toastContainer) {
+            toastContainer = document.createElement('div');
+            toastContainer.className = 'toast-container';
+            document.body.appendChild(toastContainer);
+        }
+        
+        // Yeni toast oluştur
+        const toast = document.createElement('div');
+        toast.className = `toast ${type}`;
+        toast.textContent = message;
+        
+        // Toast'u ekle
+        toastContainer.appendChild(toast);
+        
+        // Animasyon için zaman tanı
+        setTimeout(() => {
+            toast.classList.add('show');
+        }, 10);
+        
+        // 3 saniye sonra kaldır
+        setTimeout(() => {
+            toast.classList.remove('show');
+            setTimeout(() => {
+                toast.remove();
+            }, 300);
+        }, 3000);
+    }
+    
     // API'den araçları çek
     async function fetchVehicles() {
         try {
@@ -73,48 +180,10 @@ document.addEventListener('DOMContentLoaded', function() {
             if (allCards.length > 0) {
                 renderCard(allCards[currentCardIndex]);
             }
-            
-            // Ayrıca eşleşmeler listesini de güncelle
-            updateMatchesList(allCards);
         } catch (error) {
             console.error('Araçlar yüklenirken hata:', error);
             // Hata durumunda örnek verilerle devam et
             loadSampleData();
-        }
-    }
-
-    // Eşleşmeler listesini güncelleme
-    function updateMatchesList(vehicles) {
-        const matchesList = document.querySelector('.matches-list');
-        if (!matchesList) return;
-        
-        // Listeyi temizle
-        matchesList.innerHTML = '';
-        
-        // Tüm araçlar içinden rastgele 5 tanesini eşleşme olarak göster
-        const matchCount = Math.min(vehicles.length, 5);
-        const shuffled = [...vehicles].sort(() => 0.5 - Math.random());
-        
-        for (let i = 0; i < matchCount; i++) {
-            const vehicle = shuffled[i];
-            const matchCard = document.createElement('div');
-            matchCard.className = 'match-card';
-            
-            // Görseli yoksa boş bir görsel alanı göster
-            const imageHTML = vehicle.hasImages 
-                ? `<img src="${vehicle.images[0]}" alt="${vehicle.title}">`
-                : `<div class="no-image">Görsel Yok</div>`;
-                
-            matchCard.innerHTML = `
-                <div class="match-image">
-                    ${imageHTML}
-                </div>
-                <div class="match-info">
-                    <h3>${vehicle.title}</h3>
-                    <p>${vehicle.type}</p>
-                </div>
-            `;
-            matchesList.appendChild(matchCard);
         }
     }
 
@@ -138,7 +207,6 @@ document.addEventListener('DOMContentLoaded', function() {
             // Diğer örnek kartlar buraya eklenebilir
         ];
     renderCard(allCards[currentCardIndex]);
-    updateMatchesList(allCards);
     }
 
     // Sayfa yüklendiğinde API'den verileri çek
@@ -267,8 +335,13 @@ document.addEventListener('DOMContentLoaded', function() {
     function initializeButtons(card) {
         const likeBtn = card.querySelector('.action-button.like');
         const rejectBtn = card.querySelector('.action-button.reject');
+        const currentVehicle = allCards[currentCardIndex];
 
-        likeBtn.addEventListener('click', () => {
+        likeBtn.addEventListener('click', async () => {
+            // Favoriye ekleme işlemi
+            const success = await addToFavorites(currentVehicle.id);
+            
+            // Animasyonu başlat
             card.classList.add('swipe-right');
             setTimeout(showNextCard, 300);
         });
@@ -283,6 +356,7 @@ document.addEventListener('DOMContentLoaded', function() {
         let isDragging = false;
         let startX = 0;
         let currentX = 0;
+        const currentVehicle = allCards[currentCardIndex];
 
         card.addEventListener('mousedown', startDragging);
         document.addEventListener('mousemove', drag);
@@ -311,6 +385,12 @@ document.addEventListener('DOMContentLoaded', function() {
             if (Math.abs(currentX) > 100) {
                 const direction = currentX > 0 ? 'right' : 'left';
                 card.classList.add(`swipe-${direction}`);
+                
+                // Eğer sağa kaydırıldıysa (beğenildiyse) favorilere ekle
+                if (direction === 'right') {
+                    addToFavorites(currentVehicle.id);
+                }
+                
                 setTimeout(showNextCard, 300);
             } else {
                 card.style.transform = '';
@@ -324,14 +404,54 @@ document.addEventListener('DOMContentLoaded', function() {
                 overlay.style.opacity = '1';
                 if (offset > 0) {
                     overlay.className = 'swipe-overlay like';
-                    overlay.textContent = 'LIKE';
+                    overlay.textContent = 'FAVORİ';
                 } else {
                     overlay.className = 'swipe-overlay nope';
-                    overlay.textContent = 'NOPE';
+                    overlay.textContent = 'GEÇŞ';
                 }
             } else {
                 overlay.style.opacity = '0';
             }
         }
     }
+    
+    // Toast bildirimleri için CSS ekleme
+    const style = document.createElement('style');
+    style.textContent = `
+        .toast-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 9999;
+        }
+        
+        .toast {
+            min-width: 250px;
+            margin-bottom: 10px;
+            padding: 15px 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            color: white;
+            font-weight: 500;
+            transform: translateX(120%);
+            transition: transform 0.3s ease;
+        }
+        
+        .toast.show {
+            transform: translateX(0);
+        }
+        
+        .toast.success {
+            background-color: #4CAF50;
+        }
+        
+        .toast.error {
+            background-color: #F44336;
+        }
+        
+        .toast.info {
+            background-color: #2196F3;
+        }
+    `;
+    document.head.appendChild(style);
 }); 
