@@ -676,8 +676,8 @@
                                 <div class="key-detail-value">${car.model}</div>
                             </div>
                             <div class="key-detail-item">
-                                <div class="key-detail-label">Seri</div>
-                                <div class="key-detail-value">${car.series || 'Belirtilmemiş'}</div>
+                                <div class="key-detail-label">Paket</div>
+                                <div class="key-detail-value">${car.version || 'Belirtilmemiş'}</div>
                             </div>
                             <div class="key-detail-item">
                                 <div class="key-detail-label">Yıl</div>
@@ -732,10 +732,6 @@
                     <h3>Tüm Özellikler</h3>
                     <div class="details-grid">
                         <div class="detail-item">
-                            <div class="detail-label">İlan Tipi</div>
-                            <div class="detail-value">${car.listing_type}</div>
-                        </div>
-                        <div class="detail-item">
                             <div class="detail-label">Marka</div>
                             <div class="detail-value">${car.brand}</div>
                         </div>
@@ -744,12 +740,8 @@
                             <div class="detail-value">${car.model}</div>
                         </div>
                         <div class="detail-item">
-                            <div class="detail-label">Seri</div>
-                            <div class="detail-value">${car.series || 'Belirtilmemiş'}</div>
-                        </div>
-                        <div class="detail-item">
                             <div class="detail-label">Paket</div>
-                            <div class="detail-value">${car.series_package || 'Belirtilmemiş'}</div>
+                            <div class="detail-value">${car.version || 'Belirtilmemiş'}</div>
                         </div>
                         <div class="detail-item">
                             <div class="detail-label">Yıl</div>
@@ -769,7 +761,7 @@
                         </div>
                         <div class="detail-item">
                             <div class="detail-label">Kasa Tipi</div>
-                            <div class="detail-value">${car.case_type}</div>
+                            <div class="detail-value">${car.case_type || 'Belirtilmemiş'}</div>
                         </div>
                         <div class="detail-item">
                             <div class="detail-label">Renk</div>
@@ -792,10 +784,6 @@
                             <div class="detail-value">${car.fuel_consumption} lt/100km</div>
                         </div>
                         <div class="detail-item">
-                            <div class="detail-label">Yakıt Deposu</div>
-                            <div class="detail-value">${car.fuel_tank_capacity} lt</div>
-                        </div>
-                        <div class="detail-item">
                             <div class="detail-label">Boya Değişimi</div>
                             <div class="detail-value">${car.paint_change ? 'Var' : 'Yok'}</div>
                         </div>
@@ -806,10 +794,6 @@
                         <div class="detail-item">
                             <div class="detail-label">Kimden</div>
                             <div class="detail-value">${ownerName}</div>
-                        </div>
-                        <div class="detail-item">
-                            <div class="detail-label">Adres</div>
-                            <div class="detail-value">${car.province_name || 'İl'} / ${car.district_name || 'İlçe'} / ${car.neighborhood_name || 'Mahalle'}</div>
                         </div>
                     </div>
                 </div>

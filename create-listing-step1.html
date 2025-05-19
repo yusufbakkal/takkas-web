@@ -303,54 +303,42 @@
                     // Kategori için uygun ikon ve renk belirle
                     let icon = 'fa-home';
                     let color = '#FFA500';
-                    let nextStep = '';
                     
                     // Kategori adına göre ikon ve renk ayarla
                     switch(category.name.toLowerCase()) {
                         case 'otomobil':
                             icon = 'fa-car';
                             color = '#FF6370';
-                            nextStep = '#';
                             break;
                         case 'elektrikli otomobil':
                             icon = 'fa-bolt';  // Elektrikli araç için yıldırım ikonu
                             color = '#FF6370';
-                            nextStep = 'create-listing-step2-year.html';
                             break;
                         case 'emlak':
                             icon = 'fa-house';  // Emlak için ev ikonu
                             color = '#FFA500';
-                            nextStep = 'create-listing-step2-property.html';  // Emlak için direkt yönlendirme
                             break;
                         case 'karavan':
                             icon = 'fa-caravan';  // Karavan için karavan ikonu
                             color = '#FF6370';
-                            nextStep = '#';  // Alt kategorileri göstermek için
                             break;
                         case 'motorsiklet':
                             icon = 'fa-motorcycle';  // Motorsiklet için motorsiklet ikonu
                             color = '#FF6370';
-                            nextStep = 'create-listing-step2-year.html';
                             break;
                         case 'off-road suv pickup':
                             icon = 'fa-truck-pickup';  // SUV/Pickup için özel ikon
                             color = '#FF6370';
-                            nextStep = '#';  // Alt kategorileri göstermek için
                             break;
                         default:
                             icon = 'fa-tag';
                             color = '#4CAF50';
-                            nextStep = 'create-listing-step2-vehicle.html';
                     }
                     
+                    // Tüm kategoriler için altına gitme işlemini uygula
                     htmlContent += `
                         <div class="category-card" data-category-id="${category.id}">
-                            <a href="${nextStep}?categoryId=${category.id}" class="category-link" ${
-                                (category.name.toLowerCase() === 'otomobil' || 
-                                 category.name.toLowerCase() === 'karavan' || 
-                                 category.name.toLowerCase() === 'off-road suv pickup') ? 
-                                 'onclick="loadSubcategories(' + category.id + '); return false;"' : ''
-                            }>
+                            <a href="#" class="category-link" onclick="loadSubcategories(${category.id}); return false;">
                                 <div class="category-icon" style="background-color: ${color};">
                                     <i class="fas ${icon}"></i>
                                 </div>
@@ -398,75 +386,50 @@
                     return;
                 }
                 
-                // Tüm kategoriler için yerel veri havuzu tanımla
-                const localCategoryData = {
-                    // Otomobil alt kategorileri (ID: 1)
-                    "1": [
-                        { id: 34, name: "Hatchback", parent_id: 1 },
-                        { id: 35, name: "Sedan", parent_id: 1 },
-                        { id: 36, name: "Station Wagon", parent_id: 1 },
-                        { id: 37, name: "Coupe", parent_id: 1 },
-                        { id: 41, name: "Elektrikli Otomobil", parent_id: 1 }
-                    ],
-                    // Emlak alt kategorileri (ID: 20)
-                    "20": [
-                        { id: 24, name: "Arsa", parent_id: 20 },
-                        { id: 25, name: "Konut", parent_id: 20 }
-                    ],
-                    // Karavan alt kategorileri (ID: 15)
-                    "15": [
-                        { id: 26, name: "Çekme Karavan", parent_id: 15 },
-                        { id: 27, name: "Motokaravan", parent_id: 15 }
-                    ],
-                    // Off-Road Suv Pickup alt kategorileri (ID: 17)
-                    "17": [
-                        { id: 38, name: "Off-Road", parent_id: 17 },
-                        { id: 39, name: "SUV", parent_id: 17 },
-                        { id: 40, name: "Pickup", parent_id: 17 }
-                    ]
-                };
+                // Motorsiklet kategorisi için direkt yönlendirme (ID: 16)
+                if (categoryId == 16) {
+                    const motorsikletUrl = 'create-listing-step2-year.html?categoryId=' + categoryId;
+                    console.log('Motorsiklet kategorisi için direkt yönlendirme: ' + motorsikletUrl);
+                    window.location.href = motorsikletUrl;
+                    return;
+                }
+                
+                // Elektrikli otomobil kategorisi için direkt yönlendirme (ID: 41)
+                if (categoryId == 41) {
+                    const elektrikliUrl = 'create-listing-step2-year.html?categoryId=' + categoryId;
+                    console.log('Elektrikli otomobil kategorisi için direkt yönlendirme: ' + elektrikliUrl);
+                    window.location.href = elektrikliUrl;
+                    return;
+                }
                 
                 let subcategories = [];
                 
-                // Önce lokal verilere bak
-                if (localCategoryData[categoryId]) {
-                    console.log("Yerel alt kategori verileri kullanılıyor:", categoryId);
-                    subcategories = localCategoryData[categoryId];
-                } else {
-                    // Yerel veri yoksa API'den alınmaya çalışılıyor
-                    console.log("Bu kategori için yerel veri yok, API'den almaya çalışılacak:", categoryId);
+                // API'den alt kategorileri çek
+                try {
+                    console.log(`API'den alt kategoriler çekiliyor: https://takkas-api.onrender.com/api/categories/parent/${categoryId}`);
                     
-                    try {
-                        // İki farklı endpoint formatını dene
-                        let response = await fetch(`https://takkas-api.onrender.com/api/categories/parent/${categoryId}`);
-                        
-                        // İlk endpoint çalışmazsa alternatif endpoint'i dene
-                        if (!response.ok) {
-                            console.warn(`İlk API endpointi başarısız oldu, alternatif endpoint deneniyor...`);
-                            response = await fetch(`https://takkas-api.onrender.com/api/v1/categories/subcategories/${categoryId}`);
-                        }
-                        
-                        if (response.ok) {
-                            subcategories = await response.json();
-                            console.log('API\'den alınan alt kategoriler:', subcategories);
-                        } else {
-                            console.error(`API yanıt kodu: ${response.status}`);
-                            console.error(`API yanıt metni: ${await response.text()}`);
-                            throw new Error(`API isteği başarısız oldu: ${response.status}`);
-                        }
-                    } catch (error) {
-                        console.error(`Kategori ${categoryId} için API çağrısında hata:`, error);
-                        throw error;
+                    const response = await fetch(`https://takkas-api.onrender.com/api/categories/parent/${categoryId}`);
+                    
+                    if (response.ok) {
+                        subcategories = await response.json();
+                        console.log('API\'den alınan alt kategoriler:', subcategories);
+                    } else {
+                        console.error(`API yanıt kodu: ${response.status}`);
+                        console.error(`API yanıt metni: ${await response.text()}`);
+                        throw new Error(`API isteği başarısız oldu: ${response.status}`);
                     }
+                } catch (error) {
+                    console.error(`Kategori ${categoryId} için API çağrısında hata:`, error);
+                    throw error;
                 }
                 
                 console.log('İşlenecek alt kategoriler:', subcategories);
                 
-                // Alt kategori yoksa bildirim göster
-                if (subcategories.length === 0) {
-                    errorMessage.innerHTML = '<p>Bu kategori için henüz alt kategori bulunmamaktadır.</p>';
-                    errorMessage.style.display = 'block';
-                    loadingSpinner.style.display = 'none';
+                // Alt kategori yoksa veya boş bir array dönerse
+                if (!subcategories || subcategories.length === 0) {
+                    // Alt kategori yok, direkt olarak bir sonraki ekrana yönlendir
+                    console.log(`Kategori ${categoryId} için alt kategori bulunamadı. vehicle sayfasına yönlendiriliyor...`);
+                    window.location.href = `create-listing-step2-vehicle.html?categoryId=${categoryId}`;
                     return;
                 }
                 
