@@ -39,6 +39,58 @@ function startApp() {
     initPage();
 }
 
+function setupUserAvatar() {
+    const userName = localStorage.getItem('userName') || "Yusuf Bakkal";
+    const detailUserAvatar = document.querySelector('#detailUserAvatar');
+    
+    if (detailUserAvatar) {
+        const initials = userName.split(' ')
+            .map(name => name.charAt(0))
+            .join('')
+            .toUpperCase()
+            .substring(0, 2);
+        
+        const avatarInitialsEl = detailUserAvatar.querySelector('.avatar-initials');
+        if (avatarInitialsEl) {
+            avatarInitialsEl.textContent = initials;
+        }
+        
+        const colors = [
+            '#FF6370', '#4CAF50', '#2196F3', '#9C27B0', '#FF9800', 
+            '#795548', '#607D8B', '#3F51B5', '#009688', '#FFC107'
+        ];
+        
+        const colorIndex = userName.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0) % colors.length;
+        const backgroundColor = colors[colorIndex];
+        
+        detailUserAvatar.style.backgroundColor = backgroundColor;
+    }
+}
+
+function injectAvatarStyles() {
+    if (document.getElementById('avatar-style')) return; // Stil zaten eklenmişse tekrar ekleme
+
+    const style = document.createElement('style');
+    style.id = 'avatar-style';
+    style.textContent = `
+        #detailUserAvatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%; /* Dairesel avatar */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white; /* Baş harflerin rengi */
+            font-weight: bold;
+            font-size: 16px; /* Font boyutu, isteğe bağlı ayarlanabilir */
+            /* Arka plan rengi JavaScript ile dinamik olarak ayarlanır */
+        }
+
+        /* .avatar-initials için ek stil gerekirse buraya eklenebilir */
+    `;
+    document.head.appendChild(style);
+}
+
 // Bileşenleri yükleme fonksiyonu
 async function loadComponents() {
     try {
@@ -59,7 +111,11 @@ async function loadComponents() {
         const footerHtml = await footerResponse.text();
         
         // DOM'a ekle
-        if (headerElement) headerElement.innerHTML = headerHtml;
+        if (headerElement) {
+            headerElement.innerHTML = headerHtml;
+            injectAvatarStyles(); // Avatar stillerini ekle
+            setupUserAvatar(); // Kullanıcı avatarını başlık yüklendikten sonra ayarla
+        }
         if (footerElement) footerElement.innerHTML = footerHtml;
         
         componentsLoaded = true;
