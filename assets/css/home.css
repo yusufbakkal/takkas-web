@@ -284,12 +284,22 @@
     margin: 2px 0;
 }
 
+.car-slider .car-image-container {
+    position: relative;
+    width: 100%;
+    overflow: hidden;
+    border-radius: 8px;
+    margin: 0 0 10px 0;
+    line-height: 0; /* Alt boşluk sorununu giderir */
+}
+
 .car-slider .car-link {
     display: block;
     width: 100%;
     transition: transform 0.3s;
     overflow: hidden;
     border-radius: 8px;
+    line-height: 0; /* Alt boşluk sorununu giderir */
 }
 
 .car-slider .car-link:hover {
@@ -300,15 +310,17 @@
     width: 100%;
     height: 200px;
     object-fit: cover;
-    border-radius: 8px 8px 0 0;
+    border-radius: 8px;
     margin: 0;
     padding: 0;
+    display: block;
+    vertical-align: bottom; /* Alt boşluk sorununu giderir */
 }
 
 .car-slider .car-details {
     margin-top: auto;
     padding-top: 8px;
-    border-top: 1px solid #E6E8EC;
+    /* border-top: 1px solid #E6E8EC; */ /* Çizgiyi kaldırdık */
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -343,6 +355,27 @@
 .car-slider .price-amount {
     font-weight: 700;
     color: #242731;
+}
+
+/* Araç kartı lokasyon stili */
+.car-slider .location-item {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    color: #5f6165;
+    font-size: 14px;
+    position: relative;
+    padding-left: 18px; /* İkon için yer bırakıyoruz */
+}
+
+.car-slider .location-item::before {
+    content: "\f3c5"; /* map-marker-alt ikonunun unicode değeri */
+    font-family: "Font Awesome 5 Free";
+    font-weight: 900;
+    position: absolute;
+    left: 0;
+    color: #000000;
+    font-size: 14px;
 }
 
 /* Kaydırma Butonları */
@@ -419,4 +452,341 @@
     .slider-nav {
         display: none; /* Mobilde ok butonlarını gizle */
     }
+}
+
+/* Emlak Slider Stili */
+.estate-slider {
+    position: relative;
+    width: 100%;
+    padding: 0 40px;
+    margin: 2rem 0;
+    overflow: hidden;
+    touch-action: pan-y pinch-zoom; /* Dokunmatik kaydırmayı etkinleştir */
+}
+
+.estate-slider-container {
+    display: flex;
+    gap: 24px;
+    transition: transform 0.5s ease;
+    padding: 1rem 0;
+    cursor: grab; /* Kaydırılabilir olduğunu belirt */
+    user-select: none; /* Metin seçimini engelle */
+}
+
+.estate-slider-container:active {
+    cursor: grabbing; /* Kaydırma sırasında cursor'ı değiştir */
+}
+
+.estate-slider .estate-card {
+    flex: 0 0 auto;
+    width: calc(25% - 18px); /* 4 kart yan yana */
+    min-width: 280px;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    overflow: hidden;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.estate-slider .estate-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+}
+
+.estate-slider .estate-content {
+    padding: 12px;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    min-width: 0;
+}
+
+.estate-slider .estate-header {
+    margin-bottom: 8px;
+    min-width: 0;
+}
+
+.estate-slider .estate-title-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    position: relative;
+    min-width: 0;
+}
+
+.estate-slider .estate-name {
+    font-size: 18px;
+    font-weight: 700;
+    color: #242731;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: calc(100% - 40px);
+    flex: 1;
+    min-width: 0;
+    margin: 0;
+}
+
+.estate-slider .estate-favorite {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: #f5f6f8;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+    flex-shrink: 0;
+}
+
+.estate-slider .estate-favorite i {
+    color: #b1b4c1;
+    font-size: 16px;
+    transition: all 0.2s;
+}
+
+.estate-slider .estate-favorite:hover i {
+    color: #ff5252;
+    transform: scale(1.1);
+}
+
+.estate-slider .estate-favorite.active i {
+    color: #ff5252;
+}
+
+.estate-slider .estate-type {
+    font-size: 14px;
+    color: #6f767e;
+    margin: 0;
+}
+
+.estate-slider .estate-image-container {
+    position: relative;
+    width: 100%;
+    overflow: hidden;
+    border-radius: 8px;
+    margin: 0 0 10px 0;
+    line-height: 0; /* Alt boşluk sorununu giderir */
+}
+
+.estate-slider .estate-link {
+    display: block;
+    width: 100%;
+    transition: transform 0.3s;
+    overflow: hidden;
+    border-radius: 8px;
+    line-height: 0; /* Alt boşluk sorununu giderir */
+}
+
+.estate-slider .estate-link:hover {
+    transform: scale(1.02);
+}
+
+.estate-slider .estate-image {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+    border-radius: 8px;
+    margin: 0;
+    padding: 0;
+    display: block;
+    vertical-align: bottom; /* Alt boşluk sorununu giderir */
+}
+
+.estate-slider .estate-details {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-top: auto;
+}
+
+.estate-slider .estate-specs {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.estate-slider .spec-item {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 14px;
+    color: #6f767e;
+    margin-right: 8px;
+}
+
+.estate-slider .spec-icon {
+    color: #000000;
+    font-size: 14px;
+}
+
+.estate-slider .estate-price {
+    font-size: 16px;
+    font-weight: 700;
+    color: #242731;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.estate-slider .price-amount {
+    color: #000000;
+}
+
+/* Emlak Slider için Responsive Stiller */
+@media (max-width: 1200px) {
+    .estate-slider .estate-card {
+        width: calc(33.333% - 16px); /* 3 kart yan yana */
+    }
+}
+
+/* Emlak görseli üzerindeki alan (m²) rozeti */
+.estate-slider .estate-area-badge {
+    position: absolute;
+    bottom: 10px;
+    left: 10px;
+    background-color: rgba(0, 0, 0, 0.7);
+    color: white;
+    padding: 6px 10px;
+    border-radius: 4px;
+    font-size: 13px;
+    font-weight: 500;
+    z-index: 10;
+    backdrop-filter: blur(2px);
+    -webkit-backdrop-filter: blur(2px);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+    transition: transform 0.2s ease;
+    line-height: 1.2;
+}
+
+.estate-slider .estate-image-container:hover .estate-area-badge {
+    transform: translateY(-2px);
+    background-color: rgba(46, 103, 247, 0.85);
+}
+
+@media (max-width: 992px) {
+    .estate-slider .estate-card {
+        width: calc(50% - 12px); /* 2 kart yan yana */
+    }
+}
+
+@media (max-width: 576px) {
+    .estate-slider .estate-card {
+        width: 100%; /* 1 kart tam genişlik */
+    }
+    
+    .estate-slider {
+        padding: 0 20px;
+        margin: 1.5rem 0;
+    }
+}
+
+@media (max-width: 768px) {
+    .estate-slider {
+        padding: 0 16px;
+    }
+    
+    .estate-slider .estate-card {
+        min-width: 240px;
+    }
+    
+    .slider-nav {
+        width: 36px;
+        height: 36px;
+    }
+}
+
+/* Bölüm Başlıkları */
+.section-title {
+    text-align: center;
+    padding: 1rem 0;
+    margin: 1rem 0;
+}
+
+.section-title h2 {
+    font-size: 2rem;
+    color: #2c3e50;
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+}
+
+.section-title p {
+    font-size: 1.1rem;
+    color: #6f767e;
+    margin: 0;
+}
+
+@media (max-width: 768px) {
+    .section-title h2 {
+        font-size: 1.5rem;
+    }
+    
+    .section-title p {
+        font-size: 0.9rem;
+    }
+}
+
+/* Araç görseli üzerindeki KM rozeti */
+.car-slider .car-km-badge {
+    position: absolute;
+    bottom: 10px;
+    left: 10px;
+    background-color: rgba(0, 0, 0, 0.7);
+    color: white;
+    padding: 6px 10px;
+    border-radius: 4px;
+    font-size: 13px;
+    font-weight: 500;
+    z-index: 10;
+    backdrop-filter: blur(2px);
+    -webkit-backdrop-filter: blur(2px);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+    transition: transform 0.2s ease;
+    line-height: 1.2;
+}
+
+.car-slider .car-image-container:hover .car-km-badge {
+    transform: translateY(-2px);
+    background-color: rgba(46, 103, 247, 0.85);
+}
+
+/* Araç görseli üzerindeki Şanzıman rozeti */
+.car-slider .car-transmission-badge {
+    position: absolute;
+    bottom: 10px;
+    right: 10px;
+    background-color: rgba(0, 0, 0, 0.7);
+    color: white;
+    padding: 6px 10px;
+    border-radius: 4px;
+    font-size: 13px;
+    font-weight: 500;
+    z-index: 10;
+    backdrop-filter: blur(2px);
+    -webkit-backdrop-filter: blur(2px);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+    transition: transform 0.2s ease;
+    line-height: 1.2;
+}
+
+.car-slider .car-transmission-badge i {
+    margin-right: 4px;
+    font-size: 12px;
+}
+
+.car-slider .car-image-container:hover .car-transmission-badge {
+    transform: translateY(-2px);
+    background-color: rgba(46, 103, 247, 0.85);
+}
+
+/* Car ve Estate ikonlarını aynı yap */
+.car-slider .spec-icon, 
+.estate-slider .spec-icon {
+    color: #000000;
+    font-size: 14px;
 } 
