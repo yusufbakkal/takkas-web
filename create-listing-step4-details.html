@@ -628,14 +628,6 @@
                             </select>
                         </div>
                         
-                        <div class="form-group">
-                            <label for="tradeSubCategory">Alt Kategori Seçimi</label>
-                            <select id="tradeSubCategory" name="trade_subcategory" class="form-control" disabled>
-                                <option value="">Alt Kategori Seçiniz</option>
-                                <!-- Alt kategoriler JavaScript ile doldurulacak -->
-                            </select>
-                        </div>
-                        
                         <div class="form-row">
                             <div class="form-group">
                                 <label for="tradeYearStart">Başlangıç Yılı</label>
@@ -886,8 +878,6 @@
                                 
                                 if (autoCategory) {
                                     tradeCategory.value = autoCategory.value;
-                                    // Alt kategorileri yükle
-                                    loadTradeSubCategories(autoCategory.value);
                                 }
                             }, 300);
                         });
@@ -905,10 +895,9 @@
             document.getElementById('tradeCategory').addEventListener('change', function() {
                 const categoryId = this.value;
                 if (categoryId) {
-                    loadTradeSubCategories(categoryId);
+                    // Alt kategori kaldırıldığı için buradaki işlem kaldırıldı
                 } else {
-                    document.getElementById('tradeSubCategory').innerHTML = '<option value="">Alt Kategori Seçiniz</option>';
-                    document.getElementById('tradeSubCategory').disabled = true;
+                    // Alt kategori kaldırıldığı için bu kısım gereksiz
                 }
             });
             
@@ -963,29 +952,6 @@
                 });
             } catch (error) {
                 console.error('Kategoriler yüklenirken hata:', error);
-            }
-        }
-        
-        // Takas alt kategorilerini yükle
-        async function loadTradeSubCategories(categoryId) {
-            try {
-                // Tüm kategorileri yükle
-                const response = await fetch('car_categories.json');
-                const categories = await response.json();
-                
-                const tradeSubCategorySelect = document.getElementById('tradeSubCategory');
-                tradeSubCategorySelect.innerHTML = '<option value="">Alt Kategori Seçiniz</option>';
-                tradeSubCategorySelect.disabled = false;
-                
-                // Seçilen kategoriye ait alt kategorileri filtrele
-                categories.filter(category => category.parent_id === parseInt(categoryId)).forEach(subCategory => {
-                    const option = document.createElement('option');
-                    option.value = subCategory.id;
-                    option.textContent = subCategory.name;
-                    tradeSubCategorySelect.appendChild(option);
-                });
-            } catch (error) {
-                console.error('Alt kategoriler yüklenirken hata:', error);
             }
         }
         
@@ -1188,7 +1154,6 @@
         // Takas aracı ekle
         function addTradeVehicle() {
             const tradeCategory = document.getElementById('tradeCategory');
-            const tradeSubCategory = document.getElementById('tradeSubCategory');
             const tradeYearStart = document.getElementById('tradeYearStart');
             const tradeYearEnd = document.getElementById('tradeYearEnd');
             const tradeBrand = document.getElementById('tradeBrand');
@@ -1220,15 +1185,10 @@
                 year_range_end: parseInt(tradeYearEnd.value)
             };
             
-            // Kategori ve alt kategori bilgilerini de ekle
+            // Kategori bilgilerini de ekle
             if (tradeCategory.value) {
                 tradeVehicle.category_id = parseInt(tradeCategory.value);
                 tradeVehicle.category_name = tradeCategory.options[tradeCategory.selectedIndex].text;
-            }
-            
-            if (tradeSubCategory.value) {
-                tradeVehicle.subcategory_id = parseInt(tradeSubCategory.value);
-                tradeVehicle.subcategory_name = tradeSubCategory.options[tradeSubCategory.selectedIndex].text;
             }
             
             // Takas araçları dizisine ekle
@@ -1241,8 +1201,6 @@
             tradeBrand.value = '';
             tradeModel.innerHTML = '<option value="">Model Seçiniz</option>';
             tradeModel.disabled = true;
-            tradeVersion.innerHTML = '<option value="">Versiyon Seçiniz</option>';
-            tradeVersion.disabled = true;
             tradeYearStart.value = '';
             tradeYearEnd.value = '';
         }
@@ -1268,9 +1226,7 @@
                 
                 let categoryText = '';
                 if (vehicle.category_name) {
-                    categoryText = vehicle.subcategory_name 
-                        ? `${vehicle.category_name} - ${vehicle.subcategory_name}` 
-                        : vehicle.category_name;
+                    categoryText = vehicle.category_name;
                 }
                 
                 vehicleCard.innerHTML = `
