@@ -7,7 +7,17 @@ if (!authToken) {
     }, 1000); // 2 saniye sonra yönlendir
 }
 
-// Not: Bileşenlerin yüklenmesi artık favorites.html içinde yapılıyor
+// Bileşenleri yükle
+Promise.all([
+    fetch('components/property-detail-header.html').then(response => response.text()),
+    fetch('components/footer.html').then(response => response.text())
+]).then(([header, footer]) => {
+    document.getElementById('header-component').innerHTML = header;
+    document.getElementById('footer-component').innerHTML = footer;
+    
+    // Tüm favorileri yükle
+    loadAllFavorites();
+});
 
 async function loadAllFavorites() {
     const favoritesContainer = document.getElementById('favoritesContainer');

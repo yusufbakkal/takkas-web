@@ -17,9 +17,9 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     
     <!-- JavaScript -->
-    <script src="assets/js/main.js"></script>
     <script src="assets/js/slider.js" defer></script>
     <script src="assets/js/home.js" defer></script>
+    <script src="assets/js/main.js" defer></script>
 </head>
 <body>
     <!-- Header Bileşeni -->
@@ -98,17 +98,18 @@
 
     <!-- JavaScript -->
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // Bileşenleri yükle
-            loadComponents({
-                header: true,
-                navbar: true,
-                footer: true,
-                callback: function() {
-                    // Slider'ı başlat
-                    initSlider();
-                }
-            });
+        // Bileşenleri yükle
+        Promise.all([
+            fetch('components/header.html').then(response => response.text()),
+            fetch('components/navbar.html').then(response => response.text()),
+            fetch('components/footer.html').then(response => response.text())
+        ]).then(([header, navbar, footer]) => {
+            document.getElementById('header-component').innerHTML = header;
+            document.getElementById('navbar-component').innerHTML = navbar;
+            document.getElementById('footer-component').innerHTML = footer;
+            
+            // Slider'ı başlat
+            initSlider();
         });
     </script>
 </body>

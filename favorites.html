@@ -12,8 +12,6 @@
     <link rel="stylesheet" href="assets/css/favorites.css">
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <!-- JavaScript -->
-    <script src="assets/js/main.js"></script>
 </head>
 <body>
     <!-- Özel Header Bileşeni -->
@@ -42,21 +40,5 @@
 
     <!-- JavaScript -->
     <script src="assets/js/favorites.js"></script>
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // Bileşenleri yükle
-            loadComponents({
-                header: true,
-                headerType: 'property-detail-header',
-                footer: true,
-                callback: function() {
-                    // Favorileri yükle
-                    if (typeof loadAllFavorites === 'function') {
-                        loadAllFavorites();
-                    }
-                }
-            });
-        });
-    </script>
 </body>
 </html> 
