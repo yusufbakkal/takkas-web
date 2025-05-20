@@ -308,28 +308,79 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function initializeSlider(card) {
+        const slider = card.querySelector('.image-slider');
         const sliderImages = card.querySelector('.slider-images');
-        const indicators = card.querySelectorAll('.indicator');
         const prevBtn = card.querySelector('.slider-nav.prev');
         const nextBtn = card.querySelector('.slider-nav.next');
-        let currentImageIndex = 0;
-
+        const indicators = card.querySelectorAll('.indicator');
+        
+        if (!sliderImages || sliderImages.children.length <= 1) return;
+        
+        let currentIndex = 0;
+        let imageCount = sliderImages.children.length;
+        let startX, moveX, currentTranslate = 0;
+        let isDragging = false;
+        
         function showImage(index) {
-            sliderImages.style.transform = `translateX(-${index * 100}%)`;
-            indicators.forEach((ind, i) => ind.classList.toggle('active', i === index));
+            if (index < 0) index = imageCount - 1;
+            if (index >= imageCount) index = 0;
+            
+            currentIndex = index;
+            currentTranslate = -index * 100;
+            sliderImages.style.transform = `translateX(${currentTranslate}%)`;
+            
+            // Göstergeleri güncelle
+            indicators.forEach((dot, i) => {
+                dot.classList.toggle('active', i === currentIndex);
+            });
         }
-
-        prevBtn.addEventListener('click', (e) => {
-            e.stopPropagation();
-            currentImageIndex = (currentImageIndex - 1 + indicators.length) % indicators.length;
-            showImage(currentImageIndex);
-        });
-
-        nextBtn.addEventListener('click', (e) => {
-            e.stopPropagation();
-            currentImageIndex = (currentImageIndex + 1) % indicators.length;
-            showImage(currentImageIndex);
-        });
+        
+        // Dokunmatik hareketler için olay dinleyicileri
+        sliderImages.addEventListener('touchstart', touchStart, {passive: true});
+        sliderImages.addEventListener('touchmove', touchMove, {passive: true});
+        sliderImages.addEventListener('touchend', touchEnd, {passive: true});
+        
+        function touchStart(e) {
+            startX = e.touches[0].clientX;
+            isDragging = true;
+        }
+        
+        function touchMove(e) {
+            if (!isDragging) return;
+            moveX = e.touches[0].clientX;
+            const diff = moveX - startX;
+            const movePercent = (diff / window.innerWidth) * 100;
+            
+            // Sınırlama ekle (tam kart genişliğinden fazla kaydırmayı engelle)
+            const totalTranslate = currentTranslate + movePercent;
+            if (totalTranslate > 10 || totalTranslate < -(imageCount - 0.9) * 100) return;
+            
+            sliderImages.style.transform = `translateX(${totalTranslate}%)`;
+        }
+        
+        function touchEnd(e) {
+            if (!isDragging) return;
+            isDragging = false;
+            
+            const diff = moveX - startX;
+            if (Math.abs(diff) > 50) { // 50px'den fazla kaydırma yapıldıysa görsel değiştir
+                if (diff > 0) {
+                    showImage(currentIndex - 1);
+                } else {
+                    showImage(currentIndex + 1);
+                }
+            } else {
+                // Yetersiz kaydırma, mevcut görsele geri dön
+                sliderImages.style.transform = `translateX(${currentTranslate}%)`;
+            }
+        }
+        
+        // Düğme ve yön tuşlarıyla gezinme
+        if (prevBtn) prevBtn.addEventListener('click', () => showImage(currentIndex - 1));
+        if (nextBtn) nextBtn.addEventListener('click', () => showImage(currentIndex + 1));
+        
+        // İlk görseli göster
+        showImage(0);
     }
 
     function initializeButtons(card) {
