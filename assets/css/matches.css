@@ -321,20 +321,39 @@ html, body {
     .matches-container {
         padding: 0;
         height: calc(100vh - 60px);
-        align-items: flex-start; /* Üstten başlaması için */
+        align-items: center; /* Kartı dikey olarak ortala */
         justify-content: center;
+        overflow-y: auto; /* İçerik taşarsa kaydırma çubuğu ekle */
     }
 
     .swipe-container {
         width: 100%;
-        height: 100%;
-        padding-top: 0; /* Üst kısmı sıfır olması için */
-        border-radius: 0; /* Köşeleri kaldırdık */
+        max-width: 100%;
+        height: auto; /* İçeriğe göre otomatik yükseklik */
+        min-height: 70vh; /* En az bu kadar yükseklik */
+        max-height: 90vh; /* En fazla bu kadar yükseklik */
+        padding: 10px; /* Biraz boşluk ekle */
     }
 
     .card {
-        border-radius: 0; /* Mobilde köşeleri kaldırdık */
+        border-radius: 12px; /* Yuvarlaklığı geri getirdik */
         height: 100%;
+        min-height: 65vh; /* En az bu kadar yükseklik */
+        max-height: 85vh; /* En fazla bu kadar yükseklik */
+    }
+    
+    .card-image {
+        height: 70%; /* Kartın %70'i resim olsun */
+    }
+    
+    .card-content {
+        padding: 15px;
+        padding-bottom: 90px; /* Butonlar için boşluk */
+    }
+    
+    .action-buttons {
+        bottom: 25px; /* Biraz yukarı çekelim */
+        gap: 20px;
     }
     
     .action-button {
@@ -358,11 +377,6 @@ html, body {
     
     .car-price {
         font-size: 18px;
-    }
-    
-    .card-content {
-        padding: 15px;
-        padding-bottom: 100px;
     }
 }
 
