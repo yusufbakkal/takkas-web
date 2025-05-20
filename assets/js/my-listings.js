@@ -176,15 +176,15 @@ async function loadAllListings() {
         return;
     }
     
-    // Yükleniyor göstergesini göster
-    loadingContainer.style.display = 'flex';
-    loadingContainer.classList.add('active');
-    
-    // Önce diğer içeriği gizle
-    emptyListings.style.display = 'none';
-    listingsContainer.innerHTML = '';
-    
     try {
+        // Yükleniyor göstergesini göster
+        loadingContainer.style.display = 'flex';
+        loadingContainer.classList.add('active');
+        
+        // Önce diğer içeriği gizle
+        emptyListings.style.display = 'none';
+        listingsContainer.innerHTML = '';
+        
         // Hem araç hem de emlak ilanlarını sırayla çek
         const vehicleListings = await loadListings('vehicle') || [];
         const estateListings = await loadListings('estate') || [];
@@ -201,10 +201,6 @@ async function loadAllListings() {
             });
         }
         
-        // Yükleniyor göstergesini gizle
-        loadingContainer.classList.remove('active');
-        loadingContainer.style.display = 'none';
-        
         // İlan var mı kontrol et
         if (allListings.length === 0) {
             emptyListings.style.display = 'flex';
@@ -215,10 +211,13 @@ async function loadAllListings() {
         displayListings(allListings);
         
     } catch (error) {
+        console.error('İlanlar yüklenirken hata:', error);
+        showNotification('İlanlar yüklenirken bir hata oluştu', 'error');
+        emptyListings.style.display = 'flex';
+    } finally {
+        // Her durumda yükleniyor göstergesini gizle
         loadingContainer.classList.remove('active');
         loadingContainer.style.display = 'none';
-        emptyListings.style.display = 'flex';
-        showNotification('İlanlar yüklenirken bir hata oluştu', 'error');
     }
 }
 
@@ -303,6 +302,13 @@ async function loadListings(type) {
         if (!Array.isArray(listings) || listings.length === 0) {
             return [];
         }
+
+        // Sadece onaylanmış ilanları filtrele
+        listings = listings.filter(listing => 
+            listing.approval_status === 'approved' || 
+            listing.status === 'approved' ||
+            listing.is_approved === true
+        );
         
         // İlanları standart formata dönüştür
         return listings.map((listing, index) => {
@@ -316,7 +322,7 @@ async function loadListings(type) {
                     price: listing.price || listing.amount || 0,
                     location: listing.city || listing.location || listing.address || 'Belirtilmemiş',
                     type: type,
-                    status: listing.approval_status || listing.status || 'pending',
+                    status: listing.approval_status || listing.status || 'approved',
                     created_at: listing.created_at || listing.createdAt || new Date().toISOString()
                 };
                 
@@ -571,13 +577,20 @@ function editListing(id, type) {
 
 // İlanı sil
 async function deleteListing(id, type) {
+    // Token kontrolü
+    const authToken = localStorage.getItem('authToken');
+    if (!authToken) {
+        showNotification('Bu işlem için giriş yapmanız gerekiyor', 'error');
+        return;
+    }
+
     // Kullanıcıya silme işlemini onayla
     if (!confirm('Bu ilanı silmek istediğinizden emin misiniz?')) {
         return;
     }
     
     const endpoint = type === 'vehicle' 
-        ? `${API_BASE_URL}/vehicles/${id}`
+        ? `${API_BASE_URL}/vehicle-listings/${id}`
         : `${API_BASE_URL}/estates/${id}`;
     
     try {
@@ -592,24 +605,24 @@ async function deleteListing(id, type) {
         if (!response.ok) {
             throw new Error('İlan silinemedi');
         }
-        
-        // İlan başarıyla silindi, UI'dan kaldır
+
+        // İlan başarıyla silindi, DOM'u güncelle
         const card = document.querySelector(`.listing-card[data-id="${id}"]`);
         if (card) {
             card.remove();
         }
-        
+
         // Tüm ilanlarda sil
-        allListings = allListings.filter(listing => !(listing.id == id && listing.type === type));
-        
+        allListings = allListings.filter(listing => listing.id != id);
+
         // Boş durum kontrolü
         const listingsContainer = document.getElementById('listingsContainer');
         const emptyListings = document.getElementById('emptyListings');
         
-        if (listingsContainer.querySelectorAll('.listing-card').length === 0) {
+        if (listingsContainer && emptyListings && listingsContainer.querySelectorAll('.listing-card').length === 0) {
             emptyListings.style.display = 'flex';
         }
-        
+
         showNotification('İlan başarıyla silindi', 'success');
     } catch (error) {
         showNotification('İlan silinirken bir hata oluştu', 'error');
