@@ -56,11 +56,8 @@
         const currentPath = window.location.pathname;
         
         // Eğer zaten ana sayfadaysak
-        if (currentPath.endsWith('/index.html') || currentPath.endsWith('/')) {
-            window.location.href = 'pages/signin.html';
-        } else {
-            // Alt sayfadaysak
-            window.location.href = '../pages/signin.html';
+        // GitHub Pages'te repo içinde çalıştığında sorun yaşamamak için düzeltildi
+        window.location.href = 'pages/signin.html';
         }
     }
 
