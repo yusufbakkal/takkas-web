@@ -30,47 +30,26 @@
 
     <!-- Ana İçerik -->
     <main>
-        <!-- Hero Slider Section -->
-        <section class="hero-slider">
-            <div class="slider-container">
-                <div class="slides">
-                    <div class="slide active">
-                        <img src="https://images.unsplash.com/photo-1617814076367-b759c7d7e738?auto=format&fit=crop&w=1920&h=1080" alt="Lüks Araba 1">
-                    </div>
-                    <div class="slide">
-                        <img src="https://images.unsplash.com/photo-1618843479313-40f8afb4b4d8?auto=format&fit=crop&w=1920&h=1080" alt="Lüks Araba 2">
-                    </div>
-                    <div class="slide">
-                        <img src="https://images.unsplash.com/photo-1614200179396-2bdb77ebf81b?auto=format&fit=crop&w=1920&h=1080" alt="Lüks Araba 3">
-                    </div>
-                    <div class="slide">
-                        <img src="https://images.unsplash.com/photo-1606220838315-056192d5e927?auto=format&fit=crop&w=1920&h=1080" alt="Lüks Araba 4">
-                    </div>
-                    <div class="slide">
-                        <img src="https://images.unsplash.com/photo-1603584173870-7f23fdae1b7a?auto=format&fit=crop&w=1920&h=1080" alt="Lüks Araba 5">
-                    </div>
-                </div>
-                
-                <div class="slider-dots">
-                    <span class="dot active" data-index="0"></span>
-                    <span class="dot" data-index="1"></span>
-                    <span class="dot" data-index="2"></span>
-                    <span class="dot" data-index="3"></span>
-                    <span class="dot" data-index="4"></span>
-                </div>
+        <!-- Logo Section -->
+        <section class="logo-section">
+            <div class="logo-container">
+                <img src="assets/images/takasla-logo.png" alt="Takasla Logo" class="main-logo">
+                <h1>Araç - Emlak Takas Platformuna Hoş Geldiniz</h1>
+                <p>Güvenilir ve hızlı araç takası için doğru adres</p>
             </div>
         </section>
-
-        <div class="welcome-section">
-            <h1>Araba Takas Platformuna Hoş Geldiniz</h1>
-            <p>Güvenilir ve hızlı araç takası için doğru adres</p>
-            
-        </div>
 
         <!-- Kaydırılabilir Araç Kartları -->
         <div class="car-slider">
             <div class="car-slider-container">
                 <!-- Araç kartları JavaScript ile dinamik olarak eklenecek -->
+            </div>
+        </div>
+
+        <!-- Kaydırılabilir Emlak Kartları -->
+        <div class="estate-slider">
+            <div class="estate-slider-container">
+                <!-- Emlak kartları JavaScript ile dinamik olarak eklenecek -->
             </div>
         </div>
 
@@ -112,5 +91,82 @@
             initSlider();
         });
     </script>
+
+    <style>
+    .logo-section {
+        padding: 30px 0;
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        text-align: center;
+        border-radius: 0 0 30px 30px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
+    }
+
+    .logo-container {
+        max-width: 320px;
+        margin: 0 auto;
+        padding: 0 20px;
+    }
+
+    .main-logo {
+        width: 200px;
+        height: auto;
+        margin-bottom: 10px;
+        padding-top: 20px;
+        animation: fadeInUp 0.8s ease;
+        filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.05));
+    }
+
+    .logo-section h1 {
+        font-size: 1.5rem;
+        color: #1a1d1f;
+        margin-bottom: 8px;
+        font-weight: 600;
+        animation: fadeInUp 0.8s ease 0.1s;
+        animation-fill-mode: both;
+        letter-spacing: -0.3px;
+    }
+
+    .logo-section p {
+        font-size: 0.95rem;
+        color: #6f767e;
+        margin-bottom: 0;
+        animation: fadeInUp 0.8s ease 0.2s;
+        animation-fill-mode: both;
+        line-height: 1.5;
+    }
+
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(10px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    @media (max-width: 768px) {
+        .logo-section {
+            padding: 24px 0;
+            border-radius: 0 0 24px 24px;
+        }
+
+        .main-logo {
+            width: 110px;
+            margin-bottom: 6px;
+            padding-top: 12px;
+        }
+
+        .logo-section h1 {
+            font-size: 1.3rem;
+            margin-bottom: 6px;
+        }
+
+        .logo-section p {
+            font-size: 0.9rem;
+        }
+    }
+    </style>
 </body>
 </html> 
