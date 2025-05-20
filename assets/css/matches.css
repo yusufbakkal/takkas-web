@@ -321,62 +321,65 @@ html, body {
     .matches-container {
         padding: 0;
         height: calc(100vh - 60px);
-        align-items: center; /* Kartı dikey olarak ortala */
+        align-items: center;
         justify-content: center;
-        overflow-y: auto; /* İçerik taşarsa kaydırma çubuğu ekle */
+        overflow-y: auto;
     }
 
     .swipe-container {
         width: 100%;
         max-width: 100%;
-        height: auto; /* İçeriğe göre otomatik yükseklik */
-        min-height: 70vh; /* En az bu kadar yükseklik */
-        max-height: 90vh; /* En fazla bu kadar yükseklik */
-        padding: 10px; /* Biraz boşluk ekle */
+        height: auto;
+        min-height: 60vh;
+        max-height: 80vh;
+        padding: 10px;
     }
 
     .card {
-        border-radius: 12px; /* Yuvarlaklığı geri getirdik */
+        border-radius: 12px;
         height: 100%;
-        min-height: 65vh; /* En az bu kadar yükseklik */
-        max-height: 85vh; /* En fazla bu kadar yükseklik */
+        min-height: 55vh;
+        max-height: 75vh;
     }
     
     .card-image {
-        height: 70%; /* Kartın %70'i resim olsun */
+        height: 65%;
     }
     
     .card-content {
-        padding: 15px;
-        padding-bottom: 90px; /* Butonlar için boşluk */
+        padding: 12px;
+        padding-bottom: 70px;
     }
     
     .action-buttons {
-        bottom: 25px; /* Biraz yukarı çekelim */
-        gap: 20px;
+        bottom: 15px;
+        gap: 18px;
     }
     
     .action-button {
-        width: 50px;
-        height: 50px;
-        font-size: 20px;
+        width: 45px;
+        height: 45px;
+        font-size: 18px;
     }
     
     .card-info h2 {
-        font-size: 20px;
+        font-size: 18px;
+        margin-bottom: 4px;
     }
     
     .car-type {
-        font-size: 14px;
+        font-size: 13px;
+        margin-bottom: 8px;
     }
     
     .car-specs {
-        font-size: 12px;
-        gap: 10px;
+        font-size: 11px;
+        gap: 8px;
+        margin-bottom: 8px;
     }
     
     .car-price {
-        font-size: 18px;
+        font-size: 16px;
     }
 }
 
