@@ -7,20 +7,7 @@ if (!authToken) {
     }, 1000); // 2 saniye sonra yönlendir
 }
 
-// GitHub Pages'te doğru yolları belirle
-const repoBase = location.pathname.includes('/takkas-web/') ? '/takkas-web' : '';
-
-// Bileşenleri yükle
-Promise.all([
-    fetch(`${repoBase}/components/property-detail-header.html`).then(response => response.text()),
-    fetch(`${repoBase}/components/footer.html`).then(response => response.text())
-]).then(([header, footer]) => {
-    document.getElementById('header-component').innerHTML = header;
-    document.getElementById('footer-component').innerHTML = footer;
-    
-    // Tüm favorileri yükle
-    loadAllFavorites();
-});
+// Not: Bileşenlerin yüklenmesi artık favorites.html içinde yapılıyor
 
 async function loadAllFavorites() {
     const favoritesContainer = document.getElementById('favoritesContainer');

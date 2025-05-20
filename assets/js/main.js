@@ -168,4 +168,144 @@ function isProtectedPage(path) {
     ];
     
     return protectedPages.some(page => path.endsWith(page));
+}
+
+// GitHub Pages'te doğru yolları belirle
+const repoBase = location.pathname.includes('/takkas-web/') ? '/takkas-web' : '';
+
+/**
+ * Bileşenleri yükleyen yardımcı fonksiyon
+ * @param {Object} options - Bileşen yükleme seçenekleri
+ * @param {boolean} options.header - Header bileşenini yüklemek istiyorsanız true
+ * @param {boolean} options.navbar - Navbar bileşenini yüklemek istiyorsanız true
+ * @param {boolean} options.footer - Footer bileşenini yüklemek istiyorsanız true
+ * @param {string} options.headerType - Özel header tipini belirtir (örn. 'property-detail-header')
+ * @param {Function} options.callback - Bileşenler yüklendikten sonra çalışacak callback fonksiyonu
+ */
+function loadComponents(options = {}) {
+    const defaultOptions = {
+        header: true,
+        navbar: false,
+        footer: true,
+        headerType: 'header',
+        callback: null
+    };
+
+    const opts = { ...defaultOptions, ...options };
+    const promises = [];
+
+    if (opts.header) {
+        promises.push(
+            fetch(`${repoBase}/components/${opts.headerType}.html`)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`Header bileşeni yüklenemedi: ${response.status}`);
+                    }
+                    return response.text();
+                })
+        );
+    }
+
+    if (opts.navbar) {
+        promises.push(
+            fetch(`${repoBase}/components/navbar.html`)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`Navbar bileşeni yüklenemedi: ${response.status}`);
+                    }
+                    return response.text();
+                })
+        );
+    }
+
+    if (opts.footer) {
+        promises.push(
+            fetch(`${repoBase}/components/footer.html`)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`Footer bileşeni yüklenemedi: ${response.status}`);
+                    }
+                    return response.text();
+                })
+        );
+    }
+
+    Promise.all(promises)
+        .then(results => {
+            let index = 0;
+            
+            if (opts.header) {
+                const headerElement = document.getElementById('header-component');
+                if (headerElement) headerElement.innerHTML = results[index++];
+            }
+            
+            if (opts.navbar) {
+                const navbarElement = document.getElementById('navbar-component');
+                if (navbarElement) navbarElement.innerHTML = results[index++];
+            }
+            
+            if (opts.footer) {
+                const footerElement = document.getElementById('footer-component');
+                if (footerElement) footerElement.innerHTML = results[index++];
+            }
+            
+            if (typeof opts.callback === 'function') {
+                opts.callback();
+            }
+        })
+        .catch(error => {
+            console.error('Bileşenler yüklenirken hata oluştu:', error);
+        });
+}
+
+// Bildirim gösterme fonksiyonu (favoriteler.js için)
+function showNotification(message, type = 'info') {
+    // Mevcut bildirimler
+    const existingNotifications = document.querySelectorAll('.notification');
+    
+    // Bildirim oluştur
+    const notification = document.createElement('div');
+    notification.className = `notification notification-${type}`;
+    notification.innerHTML = `
+        <div class="notification-content">
+            <span class="notification-message">${message}</span>
+            <button class="notification-close"><i class="fas fa-times"></i></button>
+        </div>
+    `;
+    
+    // Bildirim pozisyonunu ayarla
+    notification.style.top = `${10 + (existingNotifications.length * 60)}px`;
+    
+    // Bildirim kapatma butonu
+    const closeButton = notification.querySelector('.notification-close');
+    closeButton.addEventListener('click', () => {
+        document.body.removeChild(notification);
+        
+        // Diğer bildirimlerin pozisyonunu güncelle
+        updateNotificationPositions();
+    });
+    
+    // Bildirim süre sonunda kapansın
+    const notificationTimeout = setTimeout(() => {
+        if (document.body.contains(notification)) {
+            document.body.removeChild(notification);
+            updateNotificationPositions();
+        }
+    }, 5000); // 5 saniye sonra kaldır
+    
+    // Bildirim DOM'a ekle
+    document.body.appendChild(notification);
+    
+    // Bildirim gösterildi efekti
+    setTimeout(() => {
+        notification.classList.add('show');
+    }, 10);
+    
+    // Bildirim pozisyonu güncelleme fonksiyonu
+    function updateNotificationPositions() {
+        const notifications = document.querySelectorAll('.notification');
+        notifications.forEach((n, index) => {
+            n.style.top = `${10 + (index * 60)}px`;
+        });
+    }
 } 
