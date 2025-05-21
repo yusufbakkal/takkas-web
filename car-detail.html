@@ -56,9 +56,64 @@
             color: #444;
         }
 
+        /* Takas seçenekleri için stiller */
+        .detail-item.full-width {
+            grid-column: 1 / -1;
+            border-top: 1px solid #e9ecef;
+            margin-top: 1rem;
+            padding-top: 1rem;
+        }
+
+        .trade-options-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-top: 5px;
+        }
+
+        .trade-option-item {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            padding: 10px;
+            background-color: #f8f9fa;
+            border-radius: 6px;
+            border-left: 3px solid #4F46E5;
+        }
+
+        .trade-brand {
+            font-weight: 600;
+            color: #333;
+        }
+
+        .trade-model {
+            color: #444;
+        }
+
+        .trade-version {
+            color: #666;
+            font-style: italic;
+            margin-left: 5px;
+        }
+
+        .trade-year {
+            color: #4F46E5;
+            font-weight: 500;
+            margin-left: auto;
+        }
+
         @media (max-width: 768px) {
             .property-address {
                 padding: 1rem;
+            }
+            
+            .trade-option-item {
+                flex-direction: column;
+                gap: 5px;
+            }
+            
+            .trade-year {
+                margin-left: 0;
             }
         }
     </style>
@@ -185,8 +240,12 @@
                 // Görsel verilerini çek
                 let carImages = await fetchCarImages(carId);
                 
-                // Görsel verilerini ilan detaylarına ekle
+                // Takas seçeneklerini çek
+                let tradeOptions = await fetchTradeOptions(carId);
+                
+                // Verileri ilan detaylarına ekle
                 carDetails.images = carImages;
+                carDetails.tradeOptions = tradeOptions;
                 
                 // İlan detaylarını sayfaya ekle
                 renderCarDetails(carDetails);
@@ -237,6 +296,35 @@
                 }).map(img => img.url);
             } catch (error) {
                 console.error(`${carId} ID'li araç için görseller çekilirken hata:`, error);
+                return null;
+            }
+        }
+        
+        // API'den takas seçeneklerini çek
+        async function fetchTradeOptions(carId) {
+            try {
+                const tradeUrl = `https://takkas-api.onrender.com/api/trade-models/vehicle-listing/${carId}`;
+                console.log('Takas API isteği gönderiliyor:', tradeUrl);
+                
+                const response = await fetch(tradeUrl);
+                console.log('Takas API yanıt durumu:', response.status, response.statusText);
+                
+                if (!response.ok) {
+                    console.warn(`${carId} ID'li araç için takas seçenekleri bulunamadı. HTTP Durumu: ${response.status}`);
+                    return null;
+                }
+                
+                const tradeData = await response.json();
+                console.log('Takas API yanıtı:', tradeData);
+                
+                if (!tradeData || !tradeData.success || !tradeData.data || tradeData.data.length === 0) {
+                    console.warn(`${carId} ID'li araç için takas seçenekleri bulunamadı veya boş dizi döndü.`);
+                    return null;
+                }
+                
+                return tradeData.data;
+            } catch (error) {
+                console.error(`${carId} ID'li araç için takas seçenekleri çekilirken hata:`, error);
                 return null;
             }
         }
@@ -588,6 +676,52 @@
 
         // İlan detaylarını sayfaya ekle
         function renderCarDetails(car) {
+            // Takas seçeneklerini render et
+            function renderTradeOptions(tradeOptions) {
+                if (!tradeOptions || tradeOptions.length === 0) {
+                    return `
+                        <div class="detail-item full-width">
+                            <div class="detail-label">Takas Seçenekleri</div>
+                            <div class="detail-value">Takas seçeneği bulunmamaktadır</div>
+                        </div>
+                    `;
+                }
+                
+                let tradeOptionsHtml = `
+                    <div class="detail-item full-width">
+                        <div class="detail-label">Takas Seçenekleri</div>
+                        <div class="detail-value">
+                            <div class="trade-options-list">
+                `;
+                
+                tradeOptions.forEach(trade => {
+                    if (trade.trade_models && trade.trade_models.length > 0) {
+                        trade.trade_models.forEach(model => {
+                            const startYear = model.year_range_start || (model.year_range && model.year_range[0] ? model.year_range[0].start_year : '');
+                            const endYear = model.year_range_end || (model.year_range && model.year_range[0] ? model.year_range[0].end_year : '');
+                            const yearRange = startYear && endYear ? `${startYear} - ${endYear}` : 'Belirtilmemiş';
+                            
+                            tradeOptionsHtml += `
+                                <div class="trade-option-item">
+                                    <span class="trade-brand">${model.brand}</span>
+                                    <span class="trade-model">${model.model}</span>
+                                    <span class="trade-version">${model.version || ''}</span>
+                                    <span class="trade-year">${yearRange}</span>
+                                </div>
+                            `;
+                        });
+                    }
+                });
+                
+                tradeOptionsHtml += `
+                            </div>
+                        </div>
+                    </div>
+                `;
+                
+                return tradeOptionsHtml;
+            }
+            
             // libphonenumber-js ile telefon numarasını formatla
             function formatPhoneNumber(phone) {
                 try {
@@ -795,6 +929,7 @@
                             <div class="detail-label">Kimden</div>
                             <div class="detail-value">${ownerName}</div>
                         </div>
+                        ${renderTradeOptions(car.tradeOptions)}
                     </div>
                 </div>
             `;
