@@ -664,7 +664,27 @@
     line-height: 1.2;
 }
 
-.estate-slider .estate-image-container:hover .estate-area-badge {
+/* Emlak görseli üzerindeki oda sayısı rozeti */
+.estate-slider .estate-room-badge {
+    position: absolute;
+    bottom: 10px;
+    right: 10px;
+    background-color: rgba(0, 0, 0, 0.7);
+    color: white;
+    padding: 6px 10px;
+    border-radius: 4px;
+    font-size: 13px;
+    font-weight: 500;
+    z-index: 10;
+    backdrop-filter: blur(2px);
+    -webkit-backdrop-filter: blur(2px);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+    transition: transform 0.2s ease;
+    line-height: 1.2;
+}
+
+.estate-slider .estate-image-container:hover .estate-area-badge,
+.estate-slider .estate-image-container:hover .estate-room-badge {
     transform: translateY(-2px);
     background-color: rgba(46, 103, 247, 0.85);
 }

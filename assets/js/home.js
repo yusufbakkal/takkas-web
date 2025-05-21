@@ -525,13 +525,14 @@ function createEstateCard(estate) {
                 <div class="estate-title-row">
                     <h2 class="estate-name">${name}</h2>
                 </div>
-                <p class="estate-type">${type} ${room ? `(${room})` : ''}</p>
+                <p class="estate-type">${type}</p>
             </header>
             <div class="estate-image-container">
                 <a href="property-detail.html?id=${estate.id}" class="estate-link">
                     <img src="${image}" alt="${name}" class="estate-image" onerror="this.onerror=null; this.src='${noImagePlaceholder}';">
                 </a>
                 <span class="estate-area-badge">${area}</span>
+                ${room ? `<span class="estate-room-badge">${room}</span>` : ''}
             </div>
             <footer class="estate-details">
                 <div class="estate-specs">
