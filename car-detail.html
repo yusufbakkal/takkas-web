@@ -271,11 +271,33 @@
                 const imageUrl = `https://takkas-api.onrender.com/api/listing-photos/${carId}`;
                 console.log('Görsel API isteği gönderiliyor:', imageUrl);
                 
-                const response = await fetch(imageUrl);
+                // Auth token'ı localStorage'dan al (giriş yapmış kullanıcılar için)
+                const authToken = localStorage.getItem('authToken');
+                const headers = authToken ? { 'Authorization': `Bearer ${authToken}` } : {};
+                
+                const response = await fetch(imageUrl, { headers });
                 console.log('Görsel API yanıt durumu:', response.status, response.statusText);
                 
                 if (!response.ok) {
                     console.warn(`${carId} ID'li araç için görseller bulunamadı. HTTP Durumu: ${response.status}`);
+                    
+                    // Token olmadan tekrar dene (bazı API'ler public erişime izin verebilir)
+                    try {
+                        const publicResponse = await fetch(imageUrl);
+                        if (publicResponse.ok) {
+                            const publicData = await publicResponse.json();
+                            if (publicData && publicData.length > 0) {
+                                console.log('Görseller public erişimle alındı:', publicData);
+                                return publicData.sort((a, b) => {
+                                    if (a.is_primary && !b.is_primary) return -1;
+                                    if (!a.is_primary && b.is_primary) return 1;
+                                    return (a.order_index || 0) - (b.order_index || 0);
+                                }).map(img => img.url);
+                            }
+                        }
+                    } catch (e) {
+                        console.error('Public erişimde de hata:', e);
+                    }
                     return null;
                 }
                 
@@ -306,11 +328,28 @@
                 const tradeUrl = `https://takkas-api.onrender.com/api/trade-models/vehicle-listing/${carId}`;
                 console.log('Takas API isteği gönderiliyor:', tradeUrl);
                 
-                const response = await fetch(tradeUrl);
+                // Auth token'ı localStorage'dan al (giriş yapmış kullanıcılar için)
+                const authToken = localStorage.getItem('authToken');
+                const headers = authToken ? { 'Authorization': `Bearer ${authToken}` } : {};
+                
+                const response = await fetch(tradeUrl, { headers });
                 console.log('Takas API yanıt durumu:', response.status, response.statusText);
                 
                 if (!response.ok) {
                     console.warn(`${carId} ID'li araç için takas seçenekleri bulunamadı. HTTP Durumu: ${response.status}`);
+                    // İsteği token olmadan tekrar dene (bazı API'ler public erişime izin verebilir)
+                    try {
+                        const publicResponse = await fetch(tradeUrl);
+                        if (publicResponse.ok) {
+                            const publicData = await publicResponse.json();
+                            if (publicData && publicData.success && publicData.data && publicData.data.length > 0) {
+                                console.log('Takas seçenekleri public erişimle alındı:', publicData);
+                                return publicData.data;
+                            }
+                        }
+                    } catch (e) {
+                        console.error('Public erişimde de hata:', e);
+                    }
                     return null;
                 }
                 
@@ -322,6 +361,8 @@
                     return null;
                 }
                 
+                // API yanıt formatı: tradeData.data
+                console.log('İşlenmiş takas seçenekleri:', tradeData.data);
                 return tradeData.data;
             } catch (error) {
                 console.error(`${carId} ID'li araç için takas seçenekleri çekilirken hata:`, error);
@@ -335,10 +376,30 @@
                 const apiUrl = `https://takkas-api.onrender.com/api/vehicle-listings/${carId}`;
                 console.log('API isteği gönderiliyor:', apiUrl);
                 
-                const response = await fetch(apiUrl);
+                // Auth token'ı localStorage'dan al (giriş yapmış kullanıcılar için)
+                const authToken = localStorage.getItem('authToken');
+                const headers = authToken ? { 'Authorization': `Bearer ${authToken}` } : {};
+                
+                const response = await fetch(apiUrl, { headers });
                 console.log('API yanıt durumu:', response.status, response.statusText);
                 
                 if (!response.ok) {
+                    console.warn(`İlan detayları alınamadı. HTTP Durumu: ${response.status}`);
+                    
+                    // Token olmadan tekrar dene (bazı API'ler public erişime izin verebilir)
+                    try {
+                        const publicResponse = await fetch(apiUrl);
+                        if (publicResponse.ok) {
+                            const publicData = await publicResponse.json();
+                            if (publicData && Object.keys(publicData).length > 0) {
+                                console.log('İlan detayları public erişimle alındı:', publicData);
+                                return publicData;
+                            }
+                        }
+                    } catch (e) {
+                        console.error('Public erişimde de hata:', e);
+                    }
+                    
                     throw new Error(`API isteği başarısız oldu: ${response.status} ${response.statusText}`);
                 }
                 
@@ -678,6 +739,7 @@
         function renderCarDetails(car) {
             // Takas seçeneklerini render et
             function renderTradeOptions(tradeOptions) {
+                console.log("Render edilen takas seçenekleri:", tradeOptions);
                 if (!tradeOptions || tradeOptions.length === 0) {
                     return `
                         <div class="detail-item full-width">
@@ -694,17 +756,29 @@
                             <div class="trade-options-list">
                 `;
                 
-                tradeOptions.forEach(trade => {
-                    if (trade.trade_models && trade.trade_models.length > 0) {
-                        trade.trade_models.forEach(model => {
-                            const startYear = model.year_range_start || (model.year_range && model.year_range[0] ? model.year_range[0].start_year : '');
-                            const endYear = model.year_range_end || (model.year_range && model.year_range[0] ? model.year_range[0].end_year : '');
-                            const yearRange = startYear && endYear ? `${startYear} - ${endYear}` : 'Belirtilmemiş';
+                // API yanıt yapısını doğru şekilde işle
+                tradeOptions.forEach(tradeItem => {
+                    // API yanıtının yapısını kontrol et ve uygun şekilde işle
+                    if (tradeItem.trade_models && Array.isArray(tradeItem.trade_models)) {
+                        tradeItem.trade_models.forEach(model => {
+                            // Model yıl aralığını kontrol et ve çıkar
+                            let startYear = '';
+                            let endYear = '';
+                            
+                            if (model.year_range_start && model.year_range_end) {
+                                startYear = model.year_range_start;
+                                endYear = model.year_range_end;
+                            } else if (model.year_range && Array.isArray(model.year_range) && model.year_range.length > 0) {
+                                startYear = model.year_range[0].start_year;
+                                endYear = model.year_range[0].end_year;
+                            }
+                            
+                            const yearRange = (startYear && endYear) ? `${startYear} - ${endYear}` : 'Belirtilmemiş';
                             
                             tradeOptionsHtml += `
                                 <div class="trade-option-item">
-                                    <span class="trade-brand">${model.brand}</span>
-                                    <span class="trade-model">${model.model}</span>
+                                    <span class="trade-brand">${model.brand || ''}</span>
+                                    <span class="trade-model">${model.model || ''}</span>
                                     <span class="trade-version">${model.version || ''}</span>
                                     <span class="trade-year">${yearRange}</span>
                                 </div>
